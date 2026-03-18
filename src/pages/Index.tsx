@@ -1,20 +1,84 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
+import CRLCalculator from "@/pages/CRLCalculator";
+import BPDCalculator from "@/pages/BPDCalculator";
+import BiometryCalculator from "@/pages/BiometryCalculator";
+import EFWCalculator from "@/pages/EFWCalculator";
 
-type ActiveModule = null | "fertility" | "gestational";
+type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw";
+
+const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
+  { value: "fertility", label: "Ciclo Menstrual", icon: <Heart className="w-3.5 h-3.5" />, short: "Ciclo" },
+  { value: "gestational", label: "Idade Gestacional", icon: <Baby className="w-3.5 h-3.5" />, short: "IG" },
+  { value: "crl", label: "CRL", icon: <Ruler className="w-3.5 h-3.5" />, short: "CRL" },
+  { value: "bpd", label: "DBP", icon: <Ruler className="w-3.5 h-3.5" />, short: "DBP" },
+  { value: "biometry", label: "Biometria", icon: <Activity className="w-3.5 h-3.5" />, short: "Bio" },
+  { value: "efw", label: "PFE", icon: <Scale className="w-3.5 h-3.5" />, short: "PFE" },
+];
+
+const CARDS: { value: ActiveModule; title: string; description: string; icon: React.ReactNode; mesh: string; iconBg: string; iconColor: string; linkColor: string }[] = [
+  {
+    value: "fertility", title: "Ciclo Menstrual e Período Fértil",
+    description: "Estimativa da janela fértil, data de ovulação, previsão da próxima menstruação e identificação de fase do ciclo.",
+    icon: <Heart className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
+    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
+  },
+  {
+    value: "gestational", title: "Idade Gestacional e DPP",
+    description: "Cálculo por DUM, ultrassonografia ou transferência embrionária, com referências de desenvolvimento fetal.",
+    icon: <Baby className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
+    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
+  },
+  {
+    value: "crl", title: "CRL — Comprimento Crânio-Caudal",
+    description: "Datação gestacional no 1º trimestre pela medida do CCN (Robinson & Fleming).",
+    icon: <Ruler className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
+    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
+  },
+  {
+    value: "bpd", title: "DBP — Diâmetro Biparietal",
+    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal (Hadlock).",
+    icon: <Ruler className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
+    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
+  },
+  {
+    value: "biometry", title: "Biometria Fetal Composta",
+    description: "IG por múltiplas medidas (DBP, CC, CA, CF) — maior acurácia no 2º/3º trimestre.",
+    icon: <Activity className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
+    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
+  },
+  {
+    value: "efw", title: "Peso Fetal Estimado (PFE)",
+    description: "Cálculo do peso fetal pela fórmula de Hadlock (CC, CA, CF), com classificação por percentil.",
+    icon: <Scale className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
+    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
+  },
+];
 
 const Index = () => {
   const [activeModule, setActiveModule] = useState<ActiveModule>(null);
+
+  const renderModule = () => {
+    switch (activeModule) {
+      case "fertility": return <FertilityCalculator />;
+      case "gestational": return <GestationalCalculator />;
+      case "crl": return <CRLCalculator />;
+      case "bpd": return <BPDCalculator />;
+      case "biometry": return <BiometryCalculator />;
+      case "efw": return <EFWCalculator />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/80">
-        <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => setActiveModule(null)} className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
               <Heart className="w-4 h-4 text-primary" />
@@ -23,25 +87,20 @@ const Index = () => {
           </button>
 
           {activeModule && (
-            <div className="flex gap-2">
-              <Button
-                variant={activeModule === "fertility" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setActiveModule("fertility")}
-                className={activeModule === "fertility" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}
-              >
-                <Heart className="w-3.5 h-3.5 mr-1" />
-                Ciclo Menstrual
-              </Button>
-              <Button
-                variant={activeModule === "gestational" ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setActiveModule("gestational")}
-                className={activeModule === "gestational" ? "bg-accent text-accent-foreground" : "text-muted-foreground"}
-              >
-                <Baby className="w-3.5 h-3.5 mr-1" />
-                Idade Gestacional
-              </Button>
+            <div className="flex gap-1 overflow-x-auto">
+              {NAV_ITEMS.map((item) => (
+                <Button
+                  key={item.value}
+                  variant={activeModule === item.value ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveModule(item.value)}
+                  className={`text-xs px-2 ${activeModule === item.value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+                >
+                  {item.icon}
+                  <span className="ml-1 hidden sm:inline">{item.label}</span>
+                  <span className="ml-1 sm:hidden">{item.short}</span>
+                </Button>
+              ))}
             </div>
           )}
         </div>
@@ -56,7 +115,7 @@ const Index = () => {
             className="space-y-12"
           >
             {/* Hero */}
-            <div className="text-center space-y-4 py-12">
+            <div className="text-center space-y-4 py-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -65,85 +124,95 @@ const Index = () => {
                 <h1 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
                   Calculadoras para
                   <br />
-                  <span className="text-primary">Saúde Reprodutiva</span>
+                  <span className="text-primary">Medicina Fetal</span>
                 </h1>
                 <p className="text-muted-foreground mt-4 max-w-xl mx-auto leading-relaxed">
-                  Ferramentas de cálculo para estimativa de período fértil e idade gestacional,
-                  com referências baseadas em diretrizes clínicas vigentes.
+                  Ferramentas de biometria e datação gestacional para uso clínico diário,
+                  com referências baseadas em diretrizes internacionais.
                 </p>
               </motion.div>
             </div>
 
-            {/* Module Selection Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => setActiveModule("fertility")}
-                className="glass-card p-8 text-left space-y-4 mesh-cyan group cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-primary/15 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-primary" />
+            {/* Category Labels */}
+            <div className="space-y-8">
+              {/* Datação */}
+              <div className="space-y-4">
+                <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium px-1">Datação Gestacional</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {CARDS.filter(c => ["fertility", "gestational", "crl", "bpd", "biometry"].includes(c.value as string)).map((card, i) => (
+                    <motion.button
+                      key={card.value}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => setActiveModule(card.value)}
+                      className={`glass-card p-6 text-left space-y-3 ${card.mesh} group cursor-pointer`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                        {card.icon}
+                      </div>
+                      <div>
+                        <h2 className="font-display text-base text-foreground">{card.title}</h2>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{card.description}</p>
+                      </div>
+                      <div className={`flex items-center gap-1 ${card.linkColor} text-xs font-medium`}>
+                        Acessar
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.button>
+                  ))}
                 </div>
-                <div>
-                  <h2 className="font-display text-xl text-foreground">Ciclo Menstrual e Período Fértil</h2>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    Estimativa da janela fértil, data provável de ovulação, previsão da próxima menstruação e identificação de fase do ciclo com base em parâmetros clínicos.
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-primary text-sm font-medium">
-                  Acessar calculadora
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </motion.button>
+              </div>
 
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => setActiveModule("gestational")}
-                className="glass-card p-8 text-left space-y-4 mesh-teal group cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center">
-                  <Baby className="w-6 h-6 text-accent" />
+              {/* Crescimento */}
+              <div className="space-y-4">
+                <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium px-1">Crescimento Fetal</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {CARDS.filter(c => c.value === "efw").map((card, i) => (
+                    <motion.button
+                      key={card.value}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => setActiveModule(card.value)}
+                      className={`glass-card p-6 text-left space-y-3 ${card.mesh} group cursor-pointer`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                        {card.icon}
+                      </div>
+                      <div>
+                        <h2 className="font-display text-base text-foreground">{card.title}</h2>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{card.description}</p>
+                      </div>
+                      <div className={`flex items-center gap-1 ${card.linkColor} text-xs font-medium`}>
+                        Acessar
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.button>
+                  ))}
                 </div>
-                <div>
-                  <h2 className="font-display text-xl text-foreground">Idade Gestacional e DPP</h2>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    Cálculo de idade gestacional por DUM, ultrassonografia ou transferência embrionária,
-                    com data provável do parto e referências de desenvolvimento fetal por semana.
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-accent text-sm font-medium">
-                  Acessar calculadora
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </motion.button>
+              </div>
             </div>
 
             {/* Trust Bar */}
-            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground py-4">
+            <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground py-4 flex-wrap">
               <div className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
                 <span>Processamento local</span>
               </div>
               <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-              <span>Referências clínicas</span>
+              <span>Hadlock · Robinson · Shepard</span>
               <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-              <span>Uso educativo</span>
+              <span>Uso clínico</span>
             </div>
 
-            {/* Disclaimer */}
             <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-lg mx-auto">
-              <strong>Nota:</strong> O IDALIA-CALC é uma ferramenta informativa e educativa. Os resultados apresentados são estimativas calculadas
+              <strong>Nota:</strong> O IDALIA-CALC é uma ferramenta de apoio clínico. Os resultados são estimativas calculadas
               e não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
             </p>
           </motion.div>
-        ) : activeModule === "fertility" ? (
-          <FertilityCalculator />
         ) : (
-          <GestationalCalculator />
+          renderModule()
         )}
       </main>
     </div>
