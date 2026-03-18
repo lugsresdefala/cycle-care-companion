@@ -351,9 +351,9 @@ const GestationalCalculator = () => {
             {/* Disclaimer */}
             <div className="glass-card-static p-4 border-accent/20">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong>IMPORTANTE:</strong> Esta ferramenta fornece estimativas baseadas em cálculos padrão.
-                As recomendações seguem diretrizes do Ministério da Saúde, Febrasgo e ACOG.
-                Consulte sempre um profissional de saúde para orientação individualizada.
+                <strong>Nota técnica:</strong> Os valores apresentados são estimativas baseadas em métodos de cálculo padronizados.
+                As referências seguem diretrizes do Ministério da Saúde, FEBRASGO e ACOG.
+                Estes resultados não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
               </p>
             </div>
           </motion.div>
