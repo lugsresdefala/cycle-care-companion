@@ -139,11 +139,39 @@ const CRLCalculator = () => {
         )}
       </AnimatePresence>
 
-      <div className="glass-card-static p-4 border-accent/20">
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          <strong>Nota:</strong> A medida do CCN é mais acurada entre 7 e 10 semanas. Acima de 14 semanas, recomenda-se utilizar biometria composta (DBP, CC, CA, CF).
-        </p>
-      </div>
+      <ScientificFooter
+        references={[
+          {
+            authors: "Robinson HP, Fleming JEE",
+            title: "A critical evaluation of sonar crown-rump length measurements",
+            journal: "Br J Obstet Gynaecol",
+            year: 1975,
+            doi: "10.1111/j.1471-0528.1975.tb00710.x",
+            pubmedId: "1191154",
+          },
+          {
+            authors: "Hadlock FP, Shah YP, Kanon DJ, Lindsey JV",
+            title: "Fetal crown-rump length: reevaluation of relation to menstrual age (5–18 weeks) with high-resolution real-time US",
+            journal: "Radiology",
+            year: 1992,
+            doi: "10.1148/radiology.182.2.1732960",
+            pubmedId: "1732960",
+          },
+          {
+            authors: "ISUOG",
+            title: "Practice guidelines: performance of first-trimester fetal ultrasound scan",
+            journal: "Ultrasound Obstet Gynecol",
+            year: 2013,
+            doi: "10.1002/uog.12342",
+            pubmedId: "23371446",
+          },
+        ]}
+        units={[
+          { param: "CCN", unit: "mm", description: "Comprimento crânio-caudal medido no plano sagital médio" },
+          { param: "Idade gestacional", unit: "sem + dias", description: "Semanas completas + dias (ex: 12+3)" },
+        ]}
+        extraDisclaimer="A medida do CCN é mais acurada entre 7 e 10 semanas (±3–5 dias). Acima de 14 semanas, recomenda-se biometria composta."
+      />
     </div>
   );
 };

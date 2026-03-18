@@ -147,11 +147,35 @@ const BiometryCalculator = () => {
         )}
       </AnimatePresence>
 
-      <div className="glass-card-static p-4 border-accent/20">
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          <strong>Nota:</strong> A biometria composta é mais acurada que medidas isoladas. A discordância &gt;2 semanas entre parâmetros pode indicar CIUR assimétrico ou anomalias.
-        </p>
-      </div>
+      <ScientificFooter
+        references={[
+          {
+            authors: "Hadlock FP, Deter RL, Harrist RB, Park SK",
+            title: "Estimating fetal age: computer-assisted analysis of multiple fetal growth parameters",
+            journal: "Radiology",
+            year: 1984,
+            doi: "10.1148/radiology.152.2.6739822",
+            pubmedId: "6739822",
+          },
+          {
+            authors: "Hadlock FP, Harrist RB, Martinez-Poyer J",
+            title: "In utero analysis of fetal growth: a sonographic weight standard",
+            journal: "Radiology",
+            year: 1991,
+            doi: "10.1148/radiology.181.1.1887021",
+            pubmedId: "1887021",
+          },
+          {
+            authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al. (INTERGROWTH-21st)",
+            title: "International standards for fetal growth based on serial ultrasound measurements",
+            journal: "Lancet",
+            year: 2014,
+            doi: "10.1016/S0140-6736(14)61490-2",
+            pubmedId: "25209488",
+          },
+        ]}
+        extraDisclaimer="A biometria composta é mais acurada que medidas isoladas. Discordância >2 semanas entre parâmetros pode indicar CIUR assimétrico ou anomalias."
+      />
     </div>
   );
 };
