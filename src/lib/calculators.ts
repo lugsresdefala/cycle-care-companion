@@ -92,29 +92,29 @@ export interface CyclePhaseDetail {
 
 const PHASE_DETAILS: Record<string, CyclePhaseDetail> = {
   menstrual: {
-    mucus: "Geralmente não observável durante o sangramento. Após os primeiros dias, pode haver muco residual misturado ao fluxo.",
-    bbt: "Temperatura basal tende a cair para o nível mais baixo do ciclo, refletindo níveis baixos de progesterona.",
-    hormones: "FSH começa a subir para recrutar novos folículos. Estrogênio e progesterona estão em seus níveis mais baixos.",
+    mucus: "Geralmente não observável durante o período de sangramento. Pode haver presença residual de muco cervical misturado ao fluxo menstrual nos últimos dias da fase.",
+    bbt: "A temperatura corporal basal (TCB) tende a atingir os valores mais baixos do ciclo, compatível com os níveis reduzidos de progesterona nesta fase.",
+    hormones: "O FSH (hormônio folículo-estimulante) inicia elevação para recrutamento folicular. Estradiol e progesterona encontram-se em concentrações basais.",
   },
   folicular: {
-    mucus: "Inicialmente escasso e pegajoso. Torna-se progressivamente mais fluido, transparente e elástico à medida que o estrogênio sobe.",
-    bbt: "Mantém-se em faixa basal baixa (fase fria). Pequenas flutuações são normais.",
-    hormones: "Estrogênio sobe progressivamente. FSH estimula o crescimento folicular. LH permanece baixo, preparando-se para o pico.",
+    mucus: "Inicialmente escasso e de consistência espessa. Torna-se progressivamente mais fluido, transparente e filante à medida que os níveis de estradiol se elevam.",
+    bbt: "Mantém-se na faixa hipotérmica (fase pré-ovulatória). Oscilações discretas são consideradas fisiológicas.",
+    hormones: "Estradiol eleva-se progressivamente. O FSH estimula o crescimento folicular e a seleção do folículo dominante. O LH permanece em níveis basais.",
   },
   "fértil": {
-    mucus: "Clara de ovo: transparente, muito elástico (spinnbarkeit), escorregadio. Sinal mais confiável de fertilidade. Pode esticar vários centímetros entre os dedos.",
-    bbt: "Ainda na faixa baixa, mas pode haver uma leve queda imediatamente antes da ovulação (nem sempre perceptível).",
-    hormones: "Pico de estrogênio. LH começa a subir rapidamente (surge de LH), desencadeando a ovulação em 24-36h.",
+    mucus: "Muco cervical filante (spinnbarkeit), transparente e de alta elasticidade — indicador clínico mais confiável da janela fértil. Pode apresentar extensibilidade de vários centímetros.",
+    bbt: "Permanece na faixa hipotérmica, podendo apresentar discreta depressão (nadir térmico) imediatamente antes da ovulação — achado nem sempre identificável.",
+    hormones: "Pico de estradiol. O LH inicia elevação acentuada (pico de LH), desencadeando a ovulação em aproximadamente 24 a 36 horas.",
   },
   "ovulatória": {
-    mucus: "Pico de muco tipo clara de ovo. Máxima elasticidade e transparência. Pode haver sensação de umidade intensa.",
-    bbt: "Ponto mais baixo seguido de elevação de 0.2-0.5°C nas 24-48h após a ovulação, confirmando que ela ocorreu.",
-    hormones: "Pico máximo de LH (surge). Estrogênio cai temporariamente. Progesterona começa a ser produzida pelo corpo lúteo.",
+    mucus: "Muco cervical em pico de filância e transparência. Máxima receptividade cervical ao trânsito espermático.",
+    bbt: "Nadir térmico seguido de elevação sustentada de 0,2 a 0,5 °C nas 24 a 48 horas subsequentes à ovulação, confirmando a ruptura folicular.",
+    hormones: "Pico máximo de LH. Queda transitória do estradiol. A progesterona começa a ser secretada pelo corpo lúteo recém-formado.",
   },
   "lútea": {
-    mucus: "Torna-se espesso, pegajoso e opaco. Quantidade diminui. Forma uma barreira cervical. Nos últimos dias, pode ficar seco.",
-    bbt: "Elevada (fase quente) devido à progesterona. Se permanece alta por 18+ dias, pode indicar gravidez.",
-    hormones: "Progesterona dominante (produzida pelo corpo lúteo). Estrogênio tem segunda elevação menor. Ambos caem no final se não houver implantação.",
+    mucus: "Muco cervical torna-se espesso, opaco e em menor quantidade, formando tampão cervical. Nos dias finais da fase, pode haver ausência de muco perceptível.",
+    bbt: "Elevada (fase hipertérmica) por ação termogênica da progesterona. Manutenção do platô térmico por 18 dias ou mais pode sugerir gestação.",
+    hormones: "Predomínio de progesterona (secretada pelo corpo lúteo). Estradiol apresenta segunda elevação de menor amplitude. Ambos declinam ao final da fase na ausência de implantação.",
   },
 };
 
