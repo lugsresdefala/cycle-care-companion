@@ -117,7 +117,7 @@ const FertilityCalculator = () => {
     while (cur <= monthEnd) {
       const isToday = isSameDay(cur, today);
       const isPeriod = isWithinInterval(cur, { start: results.nextPeriodStart, end: results.nextPeriodEnd })
-        || isWithinInterval(cur, { start: new Date(lastPeriodStart), end: new Date(lastPeriodEnd) });
+        || (lastPeriodStart && lastPeriodEnd && isWithinInterval(cur, { start: lastPeriodStart, end: lastPeriodEnd }));
       const isFertile = isWithinInterval(cur, { start: results.fertileStart, end: results.fertileEnd });
       const isOvulation = isSameDay(cur, results.ovulationDay);
 
