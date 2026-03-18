@@ -218,24 +218,23 @@ export function calculateGestationalAgeFromTransfer(
 
 export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
   const info: Record<number, DevelopmentInfo> = {
-    4: { title: "Implantação", development: "O blastocisto se implanta no útero. Formação das camadas celulares iniciais.", size: "Semente de papoula (~1mm)", milestone: "Implantação uterina completa" },
-    5: { title: "Início do Coração", development: "Tubo cardíaco primitivo começa a pulsar. Formação do tubo neural.", size: "Semente de gergelim (~2mm)", milestone: "Primeiros batimentos cardíacos" },
-    6: { title: "Brotos dos Membros", development: "Pequenos brotos onde serão os braços e pernas. Formação das vesículas ópticas.", size: "Lentilha (~4mm)", milestone: "Início da formação dos membros" },
-    7: { title: "Formação Facial", development: "Formação do rosto, narinas, lentes dos olhos. O cérebro cresce rapidamente.", size: "Mirtilo (~8mm)", milestone: "Características faciais emergentes" },
-    8: { title: "Movimentos Iniciais", development: "Dedos começam a se separar. Movimentos espontâneos (não sentidos). Todos os órgãos essenciais iniciados.", size: "Framboesa (~1.6cm)", milestone: "Fim do período embrionário" },
-    10: { title: "Período Fetal", development: "Todos os órgãos formados e começam a funcionar. Dedos completamente separados. Unhas começam.", size: "Morango (~3cm)", milestone: "Início do período fetal" },
-    12: { title: "Reflexos", development: "Reflexos aparecem. Genitália externa diferenciando. Rins produzem urina. O feto engole líquido amniótico.", size: "Limão (~5.5cm)", milestone: "Reflexos e movimentos ativos" },
-    16: { title: "Proporções Humanas", development: "Corpo cresce mais rápido que a cabeça. Expressões faciais. Impressões digitais se formam.", size: "Abacate (~12cm)", milestone: "Movimentos podem ser sentidos (multíparas)" },
-    20: { title: "Anatomia Completa", development: "Metade da gestação. Verniz caseoso cobre a pele. Cabelos (lanugo). Ciclos de sono.", size: "Banana (~25cm)", milestone: "Ultrassom morfológico — anatomia fetal visível" },
-    24: { title: "Viabilidade", development: "Pulmões produzem surfactante. Audição funcional. Respostas a estímulos externos.", size: "Espiga de milho (~30cm)", milestone: "Limiar de viabilidade fetal" },
-    28: { title: "3º Trimestre", development: "Olhos abrem. Sistema nervoso em maturação rápida. Camada de gordura subcutânea.", size: "Berinjela (~38cm)", milestone: "Início do terceiro trimestre" },
-    32: { title: "Ganho de Peso", development: "Ganho de peso acelerado (~200g/semana). Pulmões em amadurecimento. Movimentos mais coordenados.", size: "Jicama (~42cm)", milestone: "Maturação pulmonar avançando" },
-    36: { title: "Quase Maduro", development: "Pulmões quase maduros. O feto geralmente assume posição cefálica. Vérnix espesso.", size: "Papaia (~47cm)", milestone: "Posição para o parto" },
-    38: { title: "Termo Inicial", development: "Considerado a termo. Órgãos funcionais. Reflexos de sucção e deglutição maduros.", size: "Melão (~50cm, ~3kg)", milestone: "Pronto para o nascimento" },
-    40: { title: "Data Provável", development: "Maturidade completa. Verniz caseoso absorvido. Pronto para vida extrauterina.", size: "Melancia pequena (~51cm, ~3.4kg)", milestone: "Data provável do parto" },
+    4: { title: "Implantação", development: "Nidação do blastocisto na parede uterina. Diferenciação das camadas germinativas (ectoderma, mesoderma, endoderma).", size: "~1 mm (comparável a semente de papoula)", milestone: "Conclusão da implantação uterina" },
+    5: { title: "Atividade Cardíaca Inicial", development: "O tubo cardíaco primitivo inicia atividade contrátil rítmica. Início da neurulação (formação do tubo neural).", size: "~2 mm (comprimento crânio-caudal)", milestone: "Início da atividade cardíaca embrionária" },
+    6: { title: "Esboços dos Membros", development: "Formação dos esboços dos membros superiores e inferiores. Desenvolvimento das vesículas ópticas.", size: "~4 mm (CCN)", milestone: "Início da formação dos membros" },
+    7: { title: "Morfogênese Facial", development: "Formação das estruturas faciais, fossas nasais e cristalinos. Crescimento acelerado do encéfalo.", size: "~8 mm (CCN)", milestone: "Diferenciação das estruturas craniofaciais" },
+    8: { title: "Fim do Período Embrionário", development: "Separação dos dígitos. Movimentos espontâneos (ainda não perceptíveis). Organogênese essencialmente concluída.", size: "~1,6 cm (CCN)", milestone: "Transição do período embrionário para o fetal" },
+    10: { title: "Período Fetal Inicial", development: "Órgãos formados e em início de maturação funcional. Dígitos completamente separados. Formação das lâminas ungueais.", size: "~3 cm (CCN)", milestone: "Início do período fetal" },
+    12: { title: "Atividade Reflexa", development: "Surgimento de reflexos primitivos. Diferenciação da genitália externa. Início da função renal e deglutição de líquido amniótico.", size: "~5,5 cm (CCN)", milestone: "Reflexos motores e atividade renal" },
+    16: { title: "Proporcionalidade Corporal", development: "Crescimento corporal proporcionalmente mais rápido que o cefálico. Formação das impressões digitais. Expressões faciais rudimentares.", size: "~12 cm (comprimento total)", milestone: "Percepção de movimentos fetais possível em multíparas" },
+    20: { title: "Avaliação Morfológica", development: "Metade da gestação. Deposição de vérnix caseosa sobre a superfície cutânea. Presença de lanugem. Estabelecimento de ciclos de sono-vigília.", size: "~25 cm (comprimento total)", milestone: "Ultrassonografia morfológica de 2º trimestre" },
+    24: { title: "Limiar de Viabilidade", development: "Início da produção de surfactante pelos pneumócitos tipo II. Maturação do sistema auditivo. Respostas a estímulos sensoriais externos.", size: "~30 cm (comprimento total)", milestone: "Limiar de viabilidade extrauterina" },
+    28: { title: "Início do 3º Trimestre", development: "Abertura palpebral. Maturação acelerada do sistema nervoso central. Deposição de tecido adiposo subcutâneo.", size: "~38 cm (comprimento total)", milestone: "Início do terceiro trimestre" },
+    32: { title: "Ganho Ponderal Acelerado", development: "Ganho de peso de aproximadamente 200 g/semana. Maturação pulmonar em progressão. Coordenação motora mais definida.", size: "~42 cm (comprimento total)", milestone: "Progressão da maturidade pulmonar" },
+    36: { title: "Pré-termo Tardio", development: "Maturação pulmonar em fase avançada. O feto habitualmente assume apresentação cefálica. Camada espessa de vérnix caseosa.", size: "~47 cm (comprimento total)", milestone: "Insinuação fetal na pelve materna" },
+    38: { title: "Gestação a Termo", development: "Maturidade funcional dos sistemas orgânicos. Reflexos de sucção e deglutição plenamente desenvolvidos.", size: "~50 cm, ~3.000 g", milestone: "Maturidade para o nascimento" },
+    40: { title: "Data Provável do Parto", development: "Maturidade completa. Reabsorção progressiva da vérnix caseosa. Aptidão para a vida extrauterina.", size: "~51 cm, ~3.400 g", milestone: "Data provável do parto (DPP)" },
   };
 
-  // Find closest week
   const keys = Object.keys(info).map(Number).sort((a, b) => a - b);
   let closest = keys[0];
   for (const k of keys) {
@@ -245,9 +244,9 @@ export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
 
   return info[closest] || {
     title: `Semana ${weeks}`,
-    development: "O desenvolvimento fetal continua conforme esperado para esta fase gestacional.",
-    size: "Consulte seu profissional de saúde para medições atualizadas.",
-    milestone: "Acompanhamento pré-natal regular recomendado.",
+    development: "Desenvolvimento fetal em curso, compatível com a idade gestacional.",
+    size: "Biometria fetal a ser verificada em avaliação ultrassonográfica.",
+    milestone: "Manutenção do acompanhamento pré-natal recomendada.",
   };
 }
 
