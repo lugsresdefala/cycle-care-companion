@@ -26,7 +26,7 @@ const PHASE_CONFIG: Record<string, { color: string; label: string; description: 
   folicular:  { color: "text-folicular",   label: "Folicular",  description: "Desenvolvimento folicular" },
   "fértil":   { color: "text-fertility",   label: "Fértil",     description: "Período de maior probabilidade concepcional" },
   "ovulatória": { color: "text-ovulatory", label: "Ovulatória", description: "Liberação oocitária" },
-  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Fase progesterônica" },
+  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Predominância de progesterona" },
 };
 
 const CYCLE_PHASES = [
