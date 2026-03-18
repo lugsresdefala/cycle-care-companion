@@ -206,10 +206,52 @@ const Index = () => {
               <span>Uso clínico</span>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-lg mx-auto">
-              <strong>Nota:</strong> O IDALIA-CALC é uma ferramenta de apoio clínico. Os resultados são estimativas calculadas
-              e não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
-            </p>
+            {/* Legal Disclaimer */}
+            <div className="glass-card-static p-4 border-destructive/20">
+              <div className="flex items-start gap-2.5">
+                <Shield className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                    Aviso Legal
+                  </h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    O IDALIA-CALC é uma ferramenta de <strong>apoio à decisão clínica</strong> destinada a profissionais
+                    de saúde habilitados. Os resultados são estimativas matemáticas e <strong>não substituem</strong> avaliação,
+                    diagnóstico ou conduta médica. Nenhum dado pessoal ou clínico é coletado — processamento 100% local.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* References summary */}
+            <div className="glass-card-static p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-4 h-4 text-primary" />
+                <span className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                  Base Científica
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {[
+                  { text: "Robinson HP, Fleming JEE. Br J Obstet Gynaecol, 1975", id: "1191154" },
+                  { text: "Hadlock FP et al. Radiology, 1984", id: "6739822" },
+                  { text: "Hadlock FP et al. Am J Obstet Gynecol, 1985", id: "3881966" },
+                  { text: "Shepard MJ et al. Am J Obstet Gynecol, 1982", id: "7058805" },
+                  { text: "INTERGROWTH-21st. Lancet, 2014", id: "25209488" },
+                ].map((ref) => (
+                  <a
+                    key={ref.id}
+                    href={`https://pubmed.ncbi.nlm.nih.gov/${ref.id}/`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-primary/50 flex-shrink-0" />
+                    {ref.text}
+                  </a>
+                ))}
+              </div>
+            </div>
           </motion.div>
         ) : (
           renderModule()
