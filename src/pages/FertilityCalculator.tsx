@@ -312,7 +312,7 @@ const FertilityCalculator = () => {
                     <p className="text-sm font-medium text-foreground tabular-nums">{format(results.fertileEnd, "dd MMM", { locale: ptBR })}</p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Intervalo estimado de maior probabilidade concepcional</p>
+                <p className="text-xs text-muted-foreground">Intervalo estimado de maior probabilidade de concepção</p>
               </div>
 
               <div className="glass-card-static p-5 space-y-3">
