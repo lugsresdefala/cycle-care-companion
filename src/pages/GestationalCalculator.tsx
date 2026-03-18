@@ -23,9 +23,9 @@ import { motion, AnimatePresence } from "framer-motion";
 type CalculationType = "lmp" | "ultrasound" | "transfer";
 
 const TRIMESTER_CONFIG = [
-  { label: "1º Trimestre", range: "Semanas 1–13", description: "Formação dos órgãos" },
-  { label: "2º Trimestre", range: "Semanas 14–27", description: "Crescimento rápido" },
-  { label: "3º Trimestre", range: "Semanas 28–40", description: "Maturação final" },
+  { label: "1º Trimestre", range: "Semanas 1–13", description: "Organogênese" },
+  { label: "2º Trimestre", range: "Semanas 14–27", description: "Crescimento e diferenciação" },
+  { label: "3º Trimestre", range: "Semanas 28–40", description: "Maturação funcional" },
 ];
 
 interface CalcResults {
