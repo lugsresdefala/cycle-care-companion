@@ -360,10 +360,8 @@ const GestationalCalculator = () => {
 
             {/* Visualization */}
             <GestationalVisualization
-              weeks={results.weeks}
-              days={results.days}
-              currentTrimester={results.currentTrimester}
-              progressPercent={results.progressPercent}
+              currentWeek={results.weeks}
+              dueDate={results.dueDateRaw}
             />
 
             {/* Disclaimer */}
