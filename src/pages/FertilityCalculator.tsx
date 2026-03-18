@@ -391,8 +391,9 @@ const FertilityCalculator = () => {
 
             {/* Disclaimer */}
             <p className="text-xs text-muted-foreground leading-relaxed px-1">
-              <strong>Aviso:</strong> Estas são estimativas baseadas em cálculos padrão. Ciclos podem variar por estresse, medicamentos e condições de saúde.
-              Consulte sempre um profissional de saúde para orientações individuais.
+              <strong>Nota técnica:</strong> Os valores apresentados são estimativas baseadas em modelos de cálculo padrão.
+              A duração e regularidade do ciclo menstrual podem ser influenciadas por fatores como estresse, uso de medicamentos e condições clínicas subjacentes.
+              Estes resultados não substituem avaliação médica individualizada.
             </p>
           </motion.div>
         )}

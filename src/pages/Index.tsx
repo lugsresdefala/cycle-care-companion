@@ -19,7 +19,7 @@ const Index = () => {
             <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
               <Heart className="w-4 h-4 text-primary" />
             </div>
-            <span className="font-display text-lg text-foreground tracking-tight">Idalia Calc</span>
+            <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
           </button>
 
           {activeModule && (
@@ -31,7 +31,7 @@ const Index = () => {
                 className={activeModule === "fertility" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}
               >
                 <Heart className="w-3.5 h-3.5 mr-1" />
-                Fertilidade
+                Ciclo Menstrual
               </Button>
               <Button
                 variant={activeModule === "gestational" ? "default" : "ghost"}
@@ -40,7 +40,7 @@ const Index = () => {
                 className={activeModule === "gestational" ? "bg-accent text-accent-foreground" : "text-muted-foreground"}
               >
                 <Baby className="w-3.5 h-3.5 mr-1" />
-                Gestação
+                Idade Gestacional
               </Button>
             </div>
           )}
@@ -63,13 +63,13 @@ const Index = () => {
                 transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <h1 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
-                  Acompanhamento preciso para sua
+                  Calculadoras para
                   <br />
-                  <span className="text-primary">jornada reprodutiva</span>
+                  <span className="text-primary">Saúde Reprodutiva</span>
                 </h1>
                 <p className="text-muted-foreground mt-4 max-w-xl mx-auto leading-relaxed">
-                  Calculadoras baseadas em evidências para ciclo menstrual e gestação.
-                  Resultados claros, conteúdo educativo e privacidade respeitada.
+                  Ferramentas de cálculo para estimativa de período fértil e idade gestacional,
+                  com referências baseadas em diretrizes clínicas vigentes.
                 </p>
               </motion.div>
             </div>
@@ -87,13 +87,13 @@ const Index = () => {
                   <Heart className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl text-foreground">Ciclo & Fertilidade</h2>
+                  <h2 className="font-display text-xl text-foreground">Ciclo Menstrual e Período Fértil</h2>
                   <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    Janela fértil, ovulação estimada, biomarcadores por fase e calendário analítico do ciclo.
+                    Estimativa da janela fértil, data provável de ovulação, previsão da próxima menstruação e identificação de fase do ciclo com base em parâmetros clínicos.
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-primary text-sm font-medium">
-                  Iniciar análise
+                  Acessar calculadora
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </motion.button>
@@ -109,13 +109,14 @@ const Index = () => {
                   <Baby className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl text-foreground">Idade Gestacional</h2>
+                  <h2 className="font-display text-xl text-foreground">Idade Gestacional e DPP</h2>
                   <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    DPP, desenvolvimento fetal, marcos semanais e cuidados pré-natais por trimestre.
+                    Cálculo de idade gestacional por DUM, ultrassonografia ou transferência embrionária,
+                    com data provável do parto e referências de desenvolvimento fetal por semana.
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-accent text-sm font-medium">
-                  Iniciar cálculo
+                  Acessar calculadora
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
               </motion.button>
@@ -125,18 +126,18 @@ const Index = () => {
             <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground py-4">
               <div className="flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
-                <span>Privado e seguro</span>
+                <span>Processamento local</span>
               </div>
               <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-              <span>Baseado em evidências</span>
+              <span>Referências clínicas</span>
               <div className="w-1 h-1 rounded-full bg-muted-foreground/30" />
               <span>Uso educativo</span>
             </div>
 
             {/* Disclaimer */}
             <p className="text-xs text-muted-foreground text-center leading-relaxed max-w-lg mx-auto">
-              O IDALIA-CALC é informativo e educativo. Resultados são estimativas e não configuram
-              diagnóstico ou aconselhamento médico. Consulte sempre um profissional de saúde.
+              <strong>Nota:</strong> O IDALIA-CALC é uma ferramenta informativa e educativa. Os resultados apresentados são estimativas calculadas
+              e não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
             </p>
           </motion.div>
         ) : activeModule === "fertility" ? (
