@@ -244,20 +244,20 @@ const GestationalCalculator = () => {
                   <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
                 </div>
                 <p className="tabular-nums text-lg font-display text-foreground">{results.dueDate}</p>
-                <p className="text-xs text-muted-foreground">DPP calculada (±2 semanas)</p>
+                <p className="text-xs text-muted-foreground">DPP estimada (margem de ±2 semanas)</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Ruler className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Referência de Tamanho</span>
+                  <span className="text-sm font-medium text-foreground">Biometria Comparativa</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.size}</p>
-                <p className="text-xs text-muted-foreground">Estimativa comparativa para a idade gestacional</p>
+                <p className="text-xs text-muted-foreground">Referência aproximada para a idade gestacional</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Baby className="w-4 h-4 text-ovulatory" />
-                  <span className="text-sm font-medium text-foreground">Evento Relevante da Semana</span>
+                  <span className="text-sm font-medium text-foreground">Marco do Desenvolvimento</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.milestone}</p>
               </div>

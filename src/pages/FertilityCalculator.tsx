@@ -312,7 +312,7 @@ const FertilityCalculator = () => {
                     <p className="text-sm font-medium text-foreground tabular-nums">{format(results.fertileEnd, "dd MMM", { locale: ptBR })}</p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Intervalo estimado de maior probabilidade concepcional</p>
+                <p className="text-xs text-muted-foreground">Intervalo estimado de maior probabilidade de concepção</p>
               </div>
 
               <div className="glass-card-static p-5 space-y-3">
@@ -324,7 +324,7 @@ const FertilityCalculator = () => {
                 <p className="text-lg font-display text-foreground tabular-nums">
                   {format(results.ovulationDay, "dd 'de' MMMM", { locale: ptBR })}
                 </p>
-                <p className="text-xs text-muted-foreground">Viabilidade oocitária estimada em ~24 horas</p>
+                <p className="text-xs text-muted-foreground">Viabilidade oocitária estimada em aproximadamente 24 horas</p>
               </div>
             </div>
 

@@ -92,29 +92,29 @@ export interface CyclePhaseDetail {
 
 const PHASE_DETAILS: Record<string, CyclePhaseDetail> = {
   menstrual: {
-    mucus: "Geralmente não observável durante o sangramento. Após os primeiros dias, pode haver muco residual misturado ao fluxo.",
-    bbt: "Temperatura basal tende a cair para o nível mais baixo do ciclo, refletindo níveis baixos de progesterona.",
-    hormones: "FSH começa a subir para recrutar novos folículos. Estrogênio e progesterona estão em seus níveis mais baixos.",
+    mucus: "Geralmente não observável durante o período de sangramento. Pode haver presença residual de muco cervical misturado ao fluxo menstrual nos últimos dias da fase.",
+    bbt: "A temperatura corporal basal (TCB) tende a atingir os valores mais baixos do ciclo, compatível com os níveis reduzidos de progesterona nesta fase.",
+    hormones: "O FSH (hormônio folículo-estimulante) inicia elevação para recrutamento folicular. Estradiol e progesterona encontram-se em concentrações basais.",
   },
   folicular: {
-    mucus: "Inicialmente escasso e pegajoso. Torna-se progressivamente mais fluido, transparente e elástico à medida que o estrogênio sobe.",
-    bbt: "Mantém-se em faixa basal baixa (fase fria). Pequenas flutuações são normais.",
-    hormones: "Estrogênio sobe progressivamente. FSH estimula o crescimento folicular. LH permanece baixo, preparando-se para o pico.",
+    mucus: "Inicialmente escasso e de consistência espessa. Torna-se progressivamente mais fluido, transparente e filante à medida que os níveis de estradiol se elevam.",
+    bbt: "Mantém-se na faixa hipotérmica (fase pré-ovulatória). Oscilações discretas são consideradas fisiológicas.",
+    hormones: "Estradiol eleva-se progressivamente. O FSH estimula o crescimento folicular e a seleção do folículo dominante. O LH permanece em níveis basais.",
   },
   "fértil": {
-    mucus: "Clara de ovo: transparente, muito elástico (spinnbarkeit), escorregadio. Sinal mais confiável de fertilidade. Pode esticar vários centímetros entre os dedos.",
-    bbt: "Ainda na faixa baixa, mas pode haver uma leve queda imediatamente antes da ovulação (nem sempre perceptível).",
-    hormones: "Pico de estrogênio. LH começa a subir rapidamente (surge de LH), desencadeando a ovulação em 24-36h.",
+    mucus: "Muco cervical filante (spinnbarkeit), transparente e de alta elasticidade — indicador clínico mais confiável da janela fértil. Pode apresentar extensibilidade de vários centímetros.",
+    bbt: "Permanece na faixa hipotérmica, podendo apresentar discreta depressão (nadir térmico) imediatamente antes da ovulação — achado nem sempre identificável.",
+    hormones: "Pico de estradiol. O LH inicia elevação acentuada (pico de LH), desencadeando a ovulação em aproximadamente 24 a 36 horas.",
   },
   "ovulatória": {
-    mucus: "Pico de muco tipo clara de ovo. Máxima elasticidade e transparência. Pode haver sensação de umidade intensa.",
-    bbt: "Ponto mais baixo seguido de elevação de 0.2-0.5°C nas 24-48h após a ovulação, confirmando que ela ocorreu.",
-    hormones: "Pico máximo de LH (surge). Estrogênio cai temporariamente. Progesterona começa a ser produzida pelo corpo lúteo.",
+    mucus: "Muco cervical em pico de filância e transparência. Máxima receptividade cervical ao trânsito espermático.",
+    bbt: "Nadir térmico seguido de elevação sustentada de 0,2 a 0,5 °C nas 24 a 48 horas subsequentes à ovulação, confirmando a ruptura folicular.",
+    hormones: "Pico máximo de LH. Queda transitória do estradiol. A progesterona começa a ser secretada pelo corpo lúteo recém-formado.",
   },
   "lútea": {
-    mucus: "Torna-se espesso, pegajoso e opaco. Quantidade diminui. Forma uma barreira cervical. Nos últimos dias, pode ficar seco.",
-    bbt: "Elevada (fase quente) devido à progesterona. Se permanece alta por 18+ dias, pode indicar gravidez.",
-    hormones: "Progesterona dominante (produzida pelo corpo lúteo). Estrogênio tem segunda elevação menor. Ambos caem no final se não houver implantação.",
+    mucus: "Muco cervical torna-se espesso, opaco e em menor quantidade, formando tampão cervical. Nos dias finais da fase, pode haver ausência de muco perceptível.",
+    bbt: "Elevada (fase hipertérmica) por ação termogênica da progesterona. Manutenção do platô térmico por 18 dias ou mais pode sugerir gestação.",
+    hormones: "Predomínio de progesterona (secretada pelo corpo lúteo). Estradiol apresenta segunda elevação de menor amplitude. Ambos declinam ao final da fase na ausência de implantação.",
   },
 };
 
@@ -218,24 +218,23 @@ export function calculateGestationalAgeFromTransfer(
 
 export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
   const info: Record<number, DevelopmentInfo> = {
-    4: { title: "Implantação", development: "O blastocisto se implanta no útero. Formação das camadas celulares iniciais.", size: "Semente de papoula (~1mm)", milestone: "Implantação uterina completa" },
-    5: { title: "Início do Coração", development: "Tubo cardíaco primitivo começa a pulsar. Formação do tubo neural.", size: "Semente de gergelim (~2mm)", milestone: "Primeiros batimentos cardíacos" },
-    6: { title: "Brotos dos Membros", development: "Pequenos brotos onde serão os braços e pernas. Formação das vesículas ópticas.", size: "Lentilha (~4mm)", milestone: "Início da formação dos membros" },
-    7: { title: "Formação Facial", development: "Formação do rosto, narinas, lentes dos olhos. O cérebro cresce rapidamente.", size: "Mirtilo (~8mm)", milestone: "Características faciais emergentes" },
-    8: { title: "Movimentos Iniciais", development: "Dedos começam a se separar. Movimentos espontâneos (não sentidos). Todos os órgãos essenciais iniciados.", size: "Framboesa (~1.6cm)", milestone: "Fim do período embrionário" },
-    10: { title: "Período Fetal", development: "Todos os órgãos formados e começam a funcionar. Dedos completamente separados. Unhas começam.", size: "Morango (~3cm)", milestone: "Início do período fetal" },
-    12: { title: "Reflexos", development: "Reflexos aparecem. Genitália externa diferenciando. Rins produzem urina. O feto engole líquido amniótico.", size: "Limão (~5.5cm)", milestone: "Reflexos e movimentos ativos" },
-    16: { title: "Proporções Humanas", development: "Corpo cresce mais rápido que a cabeça. Expressões faciais. Impressões digitais se formam.", size: "Abacate (~12cm)", milestone: "Movimentos podem ser sentidos (multíparas)" },
-    20: { title: "Anatomia Completa", development: "Metade da gestação. Verniz caseoso cobre a pele. Cabelos (lanugo). Ciclos de sono.", size: "Banana (~25cm)", milestone: "Ultrassom morfológico — anatomia fetal visível" },
-    24: { title: "Viabilidade", development: "Pulmões produzem surfactante. Audição funcional. Respostas a estímulos externos.", size: "Espiga de milho (~30cm)", milestone: "Limiar de viabilidade fetal" },
-    28: { title: "3º Trimestre", development: "Olhos abrem. Sistema nervoso em maturação rápida. Camada de gordura subcutânea.", size: "Berinjela (~38cm)", milestone: "Início do terceiro trimestre" },
-    32: { title: "Ganho de Peso", development: "Ganho de peso acelerado (~200g/semana). Pulmões em amadurecimento. Movimentos mais coordenados.", size: "Jicama (~42cm)", milestone: "Maturação pulmonar avançando" },
-    36: { title: "Quase Maduro", development: "Pulmões quase maduros. O feto geralmente assume posição cefálica. Vérnix espesso.", size: "Papaia (~47cm)", milestone: "Posição para o parto" },
-    38: { title: "Termo Inicial", development: "Considerado a termo. Órgãos funcionais. Reflexos de sucção e deglutição maduros.", size: "Melão (~50cm, ~3kg)", milestone: "Pronto para o nascimento" },
-    40: { title: "Data Provável", development: "Maturidade completa. Verniz caseoso absorvido. Pronto para vida extrauterina.", size: "Melancia pequena (~51cm, ~3.4kg)", milestone: "Data provável do parto" },
+    4: { title: "Implantação", development: "Nidação do blastocisto na parede uterina. Diferenciação das camadas germinativas (ectoderma, mesoderma, endoderma).", size: "~1 mm (comparável a semente de papoula)", milestone: "Conclusão da implantação uterina" },
+    5: { title: "Atividade Cardíaca Inicial", development: "O tubo cardíaco primitivo inicia atividade contrátil rítmica. Início da neurulação (formação do tubo neural).", size: "~2 mm (comprimento crânio-caudal)", milestone: "Início da atividade cardíaca embrionária" },
+    6: { title: "Esboços dos Membros", development: "Formação dos esboços dos membros superiores e inferiores. Desenvolvimento das vesículas ópticas.", size: "~4 mm (CCN)", milestone: "Início da formação dos membros" },
+    7: { title: "Morfogênese Facial", development: "Formação das estruturas faciais, fossas nasais e cristalinos. Crescimento acelerado do encéfalo.", size: "~8 mm (CCN)", milestone: "Diferenciação das estruturas craniofaciais" },
+    8: { title: "Fim do Período Embrionário", development: "Separação dos dígitos. Movimentos espontâneos (ainda não perceptíveis). Organogênese essencialmente concluída.", size: "~1,6 cm (CCN)", milestone: "Transição do período embrionário para o fetal" },
+    10: { title: "Período Fetal Inicial", development: "Órgãos formados e em início de maturação funcional. Dígitos completamente separados. Formação das lâminas ungueais.", size: "~3 cm (CCN)", milestone: "Início do período fetal" },
+    12: { title: "Atividade Reflexa", development: "Surgimento de reflexos primitivos. Diferenciação da genitália externa. Início da função renal e deglutição de líquido amniótico.", size: "~5,5 cm (CCN)", milestone: "Reflexos motores e atividade renal" },
+    16: { title: "Proporcionalidade Corporal", development: "Crescimento corporal proporcionalmente mais rápido que o cefálico. Formação das impressões digitais. Expressões faciais rudimentares.", size: "~12 cm (comprimento total)", milestone: "Percepção de movimentos fetais possível em multíparas" },
+    20: { title: "Avaliação Morfológica", development: "Metade da gestação. Deposição de vérnix caseosa sobre a superfície cutânea. Presença de lanugem. Estabelecimento de ciclos de sono-vigília.", size: "~25 cm (comprimento total)", milestone: "Ultrassonografia morfológica de 2º trimestre" },
+    24: { title: "Limiar de Viabilidade", development: "Início da produção de surfactante pelos pneumócitos tipo II. Maturação do sistema auditivo. Respostas a estímulos sensoriais externos.", size: "~30 cm (comprimento total)", milestone: "Limiar de viabilidade extrauterina" },
+    28: { title: "Início do 3º Trimestre", development: "Abertura palpebral. Maturação acelerada do sistema nervoso central. Deposição de tecido adiposo subcutâneo.", size: "~38 cm (comprimento total)", milestone: "Início do terceiro trimestre" },
+    32: { title: "Ganho Ponderal Acelerado", development: "Ganho de peso de aproximadamente 200 g/semana. Maturação pulmonar em progressão. Coordenação motora mais definida.", size: "~42 cm (comprimento total)", milestone: "Progressão da maturidade pulmonar" },
+    36: { title: "Pré-termo Tardio", development: "Maturação pulmonar em fase avançada. O feto habitualmente assume apresentação cefálica. Camada espessa de vérnix caseosa.", size: "~47 cm (comprimento total)", milestone: "Insinuação fetal na pelve materna" },
+    38: { title: "Gestação a Termo", development: "Maturidade funcional dos sistemas orgânicos. Reflexos de sucção e deglutição plenamente desenvolvidos.", size: "~50 cm, ~3.000 g", milestone: "Maturidade para o nascimento" },
+    40: { title: "Data Provável do Parto", development: "Maturidade completa. Reabsorção progressiva da vérnix caseosa. Aptidão para a vida extrauterina.", size: "~51 cm, ~3.400 g", milestone: "Data provável do parto (DPP)" },
   };
 
-  // Find closest week
   const keys = Object.keys(info).map(Number).sort((a, b) => a - b);
   let closest = keys[0];
   for (const k of keys) {
@@ -245,9 +244,9 @@ export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
 
   return info[closest] || {
     title: `Semana ${weeks}`,
-    development: "O desenvolvimento fetal continua conforme esperado para esta fase gestacional.",
-    size: "Consulte seu profissional de saúde para medições atualizadas.",
-    milestone: "Acompanhamento pré-natal regular recomendado.",
+    development: "Desenvolvimento fetal em curso, compatível com a idade gestacional.",
+    size: "Biometria fetal a ser verificada em avaliação ultrassonográfica.",
+    milestone: "Manutenção do acompanhamento pré-natal recomendada.",
   };
 }
 
@@ -256,30 +255,30 @@ export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
 export function getPrenatalCareRecommendations(weeks: number): PrenatalCare {
   if (weeks < 13) {
     return {
-      nutrition: "Ácido fólico (400-800mcg/dia). Evitar álcool, tabaco e drogas. Limitar cafeína a 200mg/dia. Dieta rica em ferro, cálcio e proteínas.",
-      lifestyle: "Atividade física leve a moderada (caminhada, natação). Evitar esforço excessivo. Manter hidratação adequada. Descanso quando necessário.",
-      warning_signs: "Sangramento vaginal intenso, dor abdominal severa, febre acima de 38°C, perda de líquido. Procure atendimento imediato.",
-      examinations: "Hemograma, tipagem sanguínea, sorologias (HIV, sífilis, hepatites B e C, toxoplasmose, rubéola), glicemia de jejum, urina tipo 1, ultrassom obstétrico inicial.",
-      vaccines: "Verificar carteira vacinal. Hepatite B (se necessário). Influenza (se período sazonal). dTpa a partir de 20 semanas.",
-      special_care: "Evitar medicamentos sem prescrição médica. Suplementação de ácido fólico e ferro conforme orientação. Primeira consulta pré-natal o mais cedo possível.",
+      nutrition: "Suplementação de ácido fólico (400–800 µg/dia). Contraindicação absoluta de álcool, tabaco e substâncias teratogênicas. Limitar cafeína a 200 mg/dia. Dieta equilibrada com aporte adequado de ferro, cálcio e proteínas.",
+      lifestyle: "Atividade física de intensidade leve a moderada (caminhada, natação). Evitar esforço físico extenuante. Manter hidratação adequada.",
+      warning_signs: "Sangramento vaginal volumoso, dor abdominal intensa, febre ≥ 38 °C, perda de líquido por via vaginal. Procurar atendimento obstétrico imediato.",
+      examinations: "Hemograma completo, tipagem sanguínea e fator Rh, sorologias (anti-HIV, VDRL, HBsAg, anti-HCV, IgG/IgM para toxoplasmose e rubéola), glicemia de jejum, exame de urina tipo I (EAS), ultrassonografia obstétrica de 1º trimestre.",
+      vaccines: "Verificar situação vacinal. Hepatite B (completar esquema se necessário). Influenza (se período sazonal). A dTpa é recomendada a partir da 20ª semana.",
+      special_care: "Evitar uso de fármacos sem prescrição médica. Suplementação de ácido fólico e sulfato ferroso conforme orientação. Agendamento da primeira consulta pré-natal o mais precocemente possível.",
     };
   }
   if (weeks < 27) {
     return {
-      nutrition: "Aumentar ingestão calórica em ~300kcal/dia. Manter ferro, cálcio, vitamina D. Omega-3 (DHA). Fibras para prevenir constipação.",
-      lifestyle: "Exercícios moderados continuados. Uso de cinto de segurança abaixo do abdome. Posição lateral para dormir (preferencialmente esquerda).",
-      warning_signs: "Contrações regulares antes de 37 semanas, sangramento, inchaço repentino de rosto/mãos, alterações visuais, cefaleia persistente.",
-      examinations: "Ultrassom morfológico (20-24 sem). Teste de tolerância à glicose (24-28 sem). Hemograma. Urina tipo 1. Acompanhamento de peso e pressão arterial.",
-      vaccines: "dTpa (entre 27 e 36 semanas, idealmente). Influenza se não tomou no 1º trimestre.",
-      special_care: "Atenção a movimentos fetais (começam a ser percebidos). Preparação para o parto pode ser iniciada. Cuidados com a pele (hidratação para prevenir estrias).",
+      nutrition: "Incremento calórico de aproximadamente 300 kcal/dia. Manter aporte de ferro, cálcio, vitamina D e ácidos graxos ômega-3 (DHA). Aumento da ingestão de fibras para prevenção de constipação intestinal.",
+      lifestyle: "Manutenção de atividade física moderada. Uso de cinto de segurança posicionado abaixo do abdome gravídico. Decúbito lateral (preferencialmente esquerdo) para repouso noturno.",
+      warning_signs: "Contrações uterinas regulares antes da 37ª semana, sangramento vaginal, edema súbito de face e/ou extremidades superiores, alterações visuais, cefaleia persistente. Procurar avaliação obstétrica.",
+      examinations: "Ultrassonografia morfológica fetal (20–24 semanas). Teste oral de tolerância à glicose — TOTG 75 g (24–28 semanas). Hemograma. EAS. Monitoramento de ganho ponderal e pressão arterial.",
+      vaccines: "dTpa (entre 27 e 36 semanas, preferencialmente). Influenza, caso não administrada no 1º trimestre.",
+      special_care: "Atenção à percepção de movimentos fetais (habitualmente percebidos a partir desta fase). Possibilidade de iniciar preparação para o parto. Hidratação cutânea para prevenção de estrias.",
     };
   }
   return {
-    nutrition: "Refeições menores e mais frequentes. Manter hidratação. Alimentos ricos em ferro. Evitar alimentos crus ou mal-cozidos.",
-    lifestyle: "Preparar bolsa da maternidade. Conhecer sinais de trabalho de parto. Exercícios de respiração e relaxamento. Descanso adequado.",
-    warning_signs: "Diminuição dos movimentos fetais, contrações regulares com intervalos decrescentes, ruptura da bolsa, sangramento, pressão alta, inchaço severo.",
-    examinations: "Consultas quinzenais (32-36 sem) e semanais (37+ sem). Monitoramento de crescimento fetal. Cardiotocografia se indicado. Cultura para Streptococcus B (35-37 sem).",
-    vaccines: "Completar dTpa se não fez entre 27-36 semanas.",
-    special_care: "Plano de parto. Identificar sinais de trabalho de parto verdadeiro vs falso. Posição do bebê. Preparo perineal se desejado. Apoio emocional e rede de suporte.",
+    nutrition: "Fracionamento das refeições em porções menores e mais frequentes. Manter hidratação. Alimentos com alto teor de ferro. Evitar consumo de alimentos crus ou com cocção insuficiente.",
+    lifestyle: "Organização de itens para a maternidade. Reconhecimento dos sinais de trabalho de parto. Exercícios respiratórios e técnicas de relaxamento.",
+    warning_signs: "Redução da movimentação fetal, contrações uterinas regulares com intervalo decrescente, amniorrexe (ruptura de membranas), sangramento vaginal, elevação pressórica, edema acentuado. Procurar atendimento obstétrico imediato.",
+    examinations: "Consultas quinzenais (32–36 semanas) e semanais (a partir da 37ª semana). Avaliação do crescimento fetal. Cardiotocografia fetal quando indicada. Pesquisa de Streptococcus do grupo B — cultura retovaginal (35–37 semanas).",
+    vaccines: "Completar esquema de dTpa caso não realizado entre 27 e 36 semanas.",
+    special_care: "Elaboração do plano de parto. Diferenciação entre trabalho de parto verdadeiro e falso (pródromos). Avaliação da apresentação fetal. Preparo perineal, se desejado. Rede de apoio emocional e suporte familiar.",
   };
 }
