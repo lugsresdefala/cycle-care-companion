@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
 import CRLCalculator from "@/pages/CRLCalculator";
@@ -24,38 +25,38 @@ const CARDS: { value: ActiveModule; title: string; description: string; icon: Re
   {
     value: "fertility", title: "Ciclo Menstrual e Período Fértil",
     description: "Estimativa da janela fértil, data de ovulação, previsão da próxima menstruação e identificação de fase do ciclo.",
-    icon: <Heart className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
-    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
+    icon: <Heart className="w-6 h-6 text-accent" />, mesh: "mesh-pink",
+    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
   },
   {
     value: "gestational", title: "Idade Gestacional e DPP",
     description: "Cálculo por DUM, ultrassonografia ou transferência embrionária, com referências de desenvolvimento fetal.",
-    icon: <Baby className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
-    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
+    icon: <Baby className="w-6 h-6 text-secondary" />, mesh: "mesh-purple",
+    iconBg: "bg-secondary/15", iconColor: "text-secondary", linkColor: "text-secondary",
   },
   {
     value: "crl", title: "CRL — Comprimento Crânio-Caudal",
     description: "Datação gestacional no 1º trimestre pela medida do CCN (Robinson & Fleming).",
-    icon: <Ruler className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
-    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
-  },
-  {
-    value: "bpd", title: "DBP — Diâmetro Biparietal",
-    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal (Hadlock).",
     icon: <Ruler className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
     iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
   },
   {
+    value: "bpd", title: "DBP — Diâmetro Biparietal",
+    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal (Hadlock).",
+    icon: <Ruler className="w-6 h-6 text-secondary" />, mesh: "mesh-purple",
+    iconBg: "bg-secondary/15", iconColor: "text-secondary", linkColor: "text-secondary",
+  },
+  {
     value: "biometry", title: "Biometria Fetal Composta",
     description: "IG por múltiplas medidas (DBP, CC, CA, CF) — maior acurácia no 2º/3º trimestre.",
-    icon: <Activity className="w-6 h-6 text-accent" />, mesh: "mesh-teal",
-    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
+    icon: <Activity className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
+    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
   },
   {
     value: "efw", title: "Peso Fetal Estimado (PFE)",
     description: "Cálculo do peso fetal pela fórmula de Hadlock (CC, CA, CF), com classificação por percentil.",
-    icon: <Scale className="w-6 h-6 text-primary" />, mesh: "mesh-cyan",
-    iconBg: "bg-primary/15", iconColor: "text-primary", linkColor: "text-primary",
+    icon: <Scale className="w-6 h-6 text-accent" />, mesh: "mesh-pink",
+    iconBg: "bg-accent/15", iconColor: "text-accent", linkColor: "text-accent",
   },
 ];
 
@@ -79,10 +80,8 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/80">
         <div className="container max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => setActiveModule(null)} className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Heart className="w-4 h-4 text-primary" />
-            </div>
+          <button onClick={() => setActiveModule(null)} className="flex items-center gap-2.5">
+            <img src={logo} alt="IDALIA-CALC" className="w-8 h-8 rounded-xl object-cover" />
             <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
           </button>
 
