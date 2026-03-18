@@ -180,7 +180,7 @@ const Index = () => {
                 <img
                   src={logo}
                   alt="IDALIA-CALC"
-                  className="w-24 h-24 rounded-3xl object-cover ring-2 ring-primary/20 shadow-2xl"
+                  className="w-36 h-36 rounded-xl object-cover ring-2 ring-primary/20 shadow-2xl"
                 />
               </motion.div>
               <motion.div
