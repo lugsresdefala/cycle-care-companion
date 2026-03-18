@@ -257,7 +257,7 @@ const GestationalCalculator = () => {
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Baby className="w-4 h-4 text-ovulatory" />
-                  <span className="text-sm font-medium text-foreground">Evento Relevante da Semana</span>
+                  <span className="text-sm font-medium text-foreground">Marco do Desenvolvimento</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.milestone}</p>
               </div>

@@ -324,7 +324,7 @@ const FertilityCalculator = () => {
                 <p className="text-lg font-display text-foreground tabular-nums">
                   {format(results.ovulationDay, "dd 'de' MMMM", { locale: ptBR })}
                 </p>
-                <p className="text-xs text-muted-foreground">Viabilidade oocitária estimada em ~24 horas</p>
+                <p className="text-xs text-muted-foreground">Viabilidade oocitária estimada em aproximadamente 24 horas</p>
               </div>
             </div>
 
