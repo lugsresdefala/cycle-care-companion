@@ -34,6 +34,7 @@ interface CalcResults {
   weeks: number;
   days: number;
   dueDate: string;
+  dueDateRaw: Date;
   firstTrimester: string;
   secondTrimester: string;
   currentTrimester: number;
