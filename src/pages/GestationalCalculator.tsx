@@ -267,7 +267,7 @@ const GestationalCalculator = () => {
             <div className="glass-card-static p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Fim dos Trimestres</span>
+                <span className="text-sm font-medium text-foreground">Limites dos Trimestres</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 {[
