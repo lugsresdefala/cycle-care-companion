@@ -65,7 +65,7 @@ const FertilityCalculator = () => {
       : cycleLength;
 
     const result = calculateFertilePeriod(
-      new Date(lastPeriodStart), new Date(lastPeriodEnd), avgCycleLength, cycleHistory
+      lastPeriodStart, lastPeriodEnd, avgCycleLength, cycleHistory
     );
 
     const today = new Date();
