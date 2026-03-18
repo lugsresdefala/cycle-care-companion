@@ -176,9 +176,9 @@ const FertilityCalculator = () => {
       {/* Input Section */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-cyan">
         <div>
-          <h2 className="font-display text-xl text-foreground">Análise de Fertilidade</h2>
+          <h2 className="font-display text-xl text-foreground">Calculadora de Ciclo Menstrual</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Análise de ciclos com detecção de períodos férteis baseada em biomarcadores.
+            Estimativa de período fértil, data de ovulação e fase do ciclo com base em parâmetros do ciclo menstrual.
           </p>
         </div>
 
