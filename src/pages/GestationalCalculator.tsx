@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import GestationalVisualization from "@/components/GestationalVisualization";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "@/components/DatePicker";
 
 type CalculationType = "lmp" | "ultrasound" | "transfer";
 
