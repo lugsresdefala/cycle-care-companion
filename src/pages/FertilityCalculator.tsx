@@ -184,27 +184,36 @@ const FertilityCalculator = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            { id: "start", label: "Início da Última Menstruação", value: lastPeriodStart, onChange: setLastPeriodStart, tip: "Primeiro dia do seu último ciclo menstrual" },
-            { id: "end", label: "Fim da Última Menstruação", value: lastPeriodEnd, onChange: setLastPeriodEnd, tip: "Último dia de sangramento" },
-          ].map((f) => (
-            <div key={f.id} className="space-y-2">
-              <div className="flex items-center gap-1.5">
-                <Label htmlFor={f.id} className="text-sm text-foreground">{f.label}</Label>
-                <Tooltip>
-                  <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
-                  <TooltipContent>{f.tip}</TooltipContent>
-                </Tooltip>
-              </div>
-              <Input
-                id={f.id}
-                type="date"
-                value={f.value}
-                onChange={(e) => f.onChange(e.target.value)}
-                className="input-glass"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">Início da Última Menstruação</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Primeiro dia do último ciclo menstrual</TooltipContent>
+              </Tooltip>
             </div>
-          ))}
+            <DatePicker
+              date={lastPeriodStart}
+              onSelect={setLastPeriodStart}
+              placeholder="Selecionar data"
+              disabled={(date) => date > new Date()}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">Fim da Última Menstruação</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Último dia de sangramento</TooltipContent>
+              </Tooltip>
+            </div>
+            <DatePicker
+              date={lastPeriodEnd}
+              onSelect={setLastPeriodEnd}
+              placeholder="Selecionar data"
+              disabled={(date) => date > new Date() || (lastPeriodStart ? date < lastPeriodStart : false)}
+            />
+          </div>
         </div>
 
         <div className="flex items-end gap-4">
