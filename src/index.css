@@ -6,58 +6,59 @@
 
 @layer base {
   :root {
-    --background: 222 47% 4%;
-    --foreground: 210 40% 92%;
+    --background: 240 30% 5%;
+    --foreground: 220 30% 92%;
 
-    --card: 222 47% 6%;
-    --card-foreground: 210 40% 92%;
+    --card: 240 28% 7%;
+    --card-foreground: 220 30% 92%;
 
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 92%;
+    --popover: 240 28% 7%;
+    --popover-foreground: 220 30% 92%;
 
-    --primary: 187 55% 55%;
-    --primary-foreground: 222 47% 4%;
+    --primary: 200 70% 58%;
+    --primary-foreground: 240 30% 5%;
 
-    --secondary: 170 40% 40%;
-    --secondary-foreground: 210 40% 95%;
+    --secondary: 280 35% 45%;
+    --secondary-foreground: 220 30% 95%;
 
-    --muted: 222 20% 15%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 240 20% 14%;
+    --muted-foreground: 230 15% 52%;
 
-    --accent: 170 45% 45%;
-    --accent-foreground: 210 40% 95%;
+    --accent: 330 55% 55%;
+    --accent-foreground: 220 30% 95%;
 
     --destructive: 0 65% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 220 30% 98%;
 
-    --border: 220 15% 18%;
-    --input: 220 20% 12%;
-    --ring: 187 55% 55%;
+    --border: 240 15% 16%;
+    --input: 240 20% 11%;
+    --ring: 200 70% 58%;
 
     --radius: 1rem;
 
     /* Custom tokens */
-    --glass: 222 47% 6%;
+    --glass: 240 28% 7%;
     --glass-border: 0 0% 100% / 0.08;
     --glass-border-hover: 0 0% 100% / 0.15;
-    --glow-primary: 187 85% 45%;
-    --glow-accent: 170 65% 42%;
+    --glow-primary: 200 85% 50%;
+    --glow-accent: 330 65% 50%;
+    --glow-secondary: 280 55% 50%;
     --glow-destructive: 0 75% 55%;
-    --fertility: 187 55% 55%;
-    --gestational: 170 45% 45%;
-    --menstrual: 0 65% 60%;
-    --folicular: 215 55% 55%;
-    --ovulatory: 45 70% 55%;
-    --luteal: 170 40% 45%;
+    --fertility: 200 70% 58%;
+    --gestational: 280 35% 50%;
+    --menstrual: 330 55% 55%;
+    --folicular: 220 50% 55%;
+    --ovulatory: 200 60% 55%;
+    --luteal: 280 35% 45%;
 
-    --sidebar-background: 222 47% 5%;
-    --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 187 55% 55%;
-    --sidebar-primary-foreground: 222 47% 4%;
-    --sidebar-accent: 222 30% 12%;
-    --sidebar-accent-foreground: 210 40% 85%;
-    --sidebar-border: 220 15% 18%;
-    --sidebar-ring: 187 55% 55%;
+    --sidebar-background: 240 30% 5%;
+    --sidebar-foreground: 220 30% 85%;
+    --sidebar-primary: 200 70% 58%;
+    --sidebar-primary-foreground: 240 30% 5%;
+    --sidebar-accent: 240 25% 12%;
+    --sidebar-accent-foreground: 220 30% 85%;
+    --sidebar-border: 240 15% 16%;
+    --sidebar-ring: 200 70% 58%;
   }
 }
 
