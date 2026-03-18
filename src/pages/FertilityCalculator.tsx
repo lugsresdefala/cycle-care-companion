@@ -20,6 +20,7 @@ import {
 import { ptBR } from "date-fns/locale";
 import CycleVisualization from "@/components/CycleVisualization";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "@/components/DatePicker";
 
 const PHASE_CONFIG: Record<string, { color: string; label: string; description: string }> = {
   menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Descamação endometrial" },
@@ -49,8 +50,8 @@ interface CalcResults {
 }
 
 const FertilityCalculator = () => {
-  const [lastPeriodStart, setLastPeriodStart] = useState("");
-  const [lastPeriodEnd, setLastPeriodEnd] = useState("");
+  const [lastPeriodStart, setLastPeriodStart] = useState<Date | undefined>();
+  const [lastPeriodEnd, setLastPeriodEnd] = useState<Date | undefined>();
   const [cycleLength, setCycleLength] = useState(28);
   const [cycleHistory] = useState<CycleHistory[]>([]);
   const [expandedSection, setExpandedSection] = useState<string | null>("bodyChanges");
@@ -64,7 +65,7 @@ const FertilityCalculator = () => {
       : cycleLength;
 
     const result = calculateFertilePeriod(
-      new Date(lastPeriodStart), new Date(lastPeriodEnd), avgCycleLength, cycleHistory
+      lastPeriodStart, lastPeriodEnd, avgCycleLength, cycleHistory
     );
 
     const today = new Date();
@@ -72,8 +73,8 @@ const FertilityCalculator = () => {
     let daysUntilNextPhase = 0;
     let nextPhase = "";
 
-    const periodStartDate = new Date(lastPeriodStart);
-    const periodEndDate = new Date(lastPeriodEnd);
+    const periodStartDate = lastPeriodStart;
+    const periodEndDate = lastPeriodEnd;
 
     if (today >= periodStartDate && today <= periodEndDate) {
       currentCyclePhase = "menstrual";
@@ -116,7 +117,7 @@ const FertilityCalculator = () => {
     while (cur <= monthEnd) {
       const isToday = isSameDay(cur, today);
       const isPeriod = isWithinInterval(cur, { start: results.nextPeriodStart, end: results.nextPeriodEnd })
-        || isWithinInterval(cur, { start: new Date(lastPeriodStart), end: new Date(lastPeriodEnd) });
+        || (lastPeriodStart && lastPeriodEnd && isWithinInterval(cur, { start: lastPeriodStart, end: lastPeriodEnd }));
       const isFertile = isWithinInterval(cur, { start: results.fertileStart, end: results.fertileEnd });
       const isOvulation = isSameDay(cur, results.ovulationDay);
 
@@ -183,27 +184,36 @@ const FertilityCalculator = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            { id: "start", label: "Início da Última Menstruação", value: lastPeriodStart, onChange: setLastPeriodStart, tip: "Primeiro dia do seu último ciclo menstrual" },
-            { id: "end", label: "Fim da Última Menstruação", value: lastPeriodEnd, onChange: setLastPeriodEnd, tip: "Último dia de sangramento" },
-          ].map((f) => (
-            <div key={f.id} className="space-y-2">
-              <div className="flex items-center gap-1.5">
-                <Label htmlFor={f.id} className="text-sm text-foreground">{f.label}</Label>
-                <Tooltip>
-                  <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
-                  <TooltipContent>{f.tip}</TooltipContent>
-                </Tooltip>
-              </div>
-              <Input
-                id={f.id}
-                type="date"
-                value={f.value}
-                onChange={(e) => f.onChange(e.target.value)}
-                className="input-glass"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">Início da Última Menstruação</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Primeiro dia do último ciclo menstrual</TooltipContent>
+              </Tooltip>
             </div>
-          ))}
+            <DatePicker
+              date={lastPeriodStart}
+              onSelect={setLastPeriodStart}
+              placeholder="Selecionar data"
+              disabled={(date) => date > new Date()}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">Fim da Última Menstruação</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Último dia de sangramento</TooltipContent>
+              </Tooltip>
+            </div>
+            <DatePicker
+              date={lastPeriodEnd}
+              onSelect={setLastPeriodEnd}
+              placeholder="Selecionar data"
+              disabled={(date) => date > new Date() || (lastPeriodStart ? date < lastPeriodStart : false)}
+            />
+          </div>
         </div>
 
         <div className="flex items-end gap-4">

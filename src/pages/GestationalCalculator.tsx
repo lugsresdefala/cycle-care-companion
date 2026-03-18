@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import GestationalVisualization from "@/components/GestationalVisualization";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "@/components/DatePicker";
 
 type CalculationType = "lmp" | "ultrasound" | "transfer";
 
@@ -43,11 +44,11 @@ interface CalcResults {
 
 const GestationalCalculator = () => {
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
-  const [lmpDate, setLmpDate] = useState("");
-  const [ultrasoundDate, setUltrasoundDate] = useState("");
+  const [lmpDate, setLmpDate] = useState<Date | undefined>();
+  const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
   const [ultrasoundWeeks, setUltrasoundWeeks] = useState(0);
   const [ultrasoundDays, setUltrasoundDays] = useState(0);
-  const [transferDate, setTransferDate] = useState("");
+  const [transferDate, setTransferDate] = useState<Date | undefined>();
   const [embryoDays, setEmbryoDays] = useState("5");
   const [expandedSection, setExpandedSection] = useState<string | null>("development");
   const [results, setResults] = useState<CalcResults | null>(null);
@@ -56,13 +57,13 @@ const GestationalCalculator = () => {
     let result;
     if (calculationType === "lmp") {
       if (!lmpDate) return;
-      result = calculateGestationalAgeFromLMP(new Date(lmpDate));
+      result = calculateGestationalAgeFromLMP(lmpDate);
     } else if (calculationType === "ultrasound") {
       if (!ultrasoundDate) return;
-      result = calculateGestationalAgeFromUltrasound(new Date(ultrasoundDate), ultrasoundWeeks, ultrasoundDays);
+      result = calculateGestationalAgeFromUltrasound(ultrasoundDate, ultrasoundWeeks, ultrasoundDays);
     } else {
       if (!transferDate) return;
-      result = calculateGestationalAgeFromTransfer(new Date(transferDate), parseInt(embryoDays));
+      result = calculateGestationalAgeFromTransfer(transferDate, parseInt(embryoDays));
     }
 
     if (!result) return;
@@ -138,7 +139,12 @@ const GestationalCalculator = () => {
                   <TooltipContent>Primeiro dia do último ciclo menstrual</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="date" value={lmpDate} onChange={(e) => setLmpDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={lmpDate}
+                onSelect={setLmpDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
           </div>
         )}
@@ -147,7 +153,12 @@ const GestationalCalculator = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Data do Ultrassom</Label>
-              <Input type="date" value={ultrasoundDate} onChange={(e) => setUltrasoundDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={ultrasoundDate}
+                onSelect={setUltrasoundDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Idade Gestacional no Ultrassom</Label>
@@ -169,7 +180,12 @@ const GestationalCalculator = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Data da Transferência</Label>
-              <Input type="date" value={transferDate} onChange={(e) => setTransferDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={transferDate}
+                onSelect={setTransferDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Dias do Embrião</Label>
