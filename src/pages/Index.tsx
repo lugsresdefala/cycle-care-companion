@@ -135,14 +135,14 @@ const Index = () => {
               >
                 <h1 className="font-display text-4xl md:text-5xl leading-tight">
                   <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    Calculadoras para
+                    Calculadoras Clínicas
                   </span>
                   <br />
-                  <span className="text-foreground">Medicina Fetal</span>
+                  <span className="text-foreground">em Saúde da Mulher</span>
                 </h1>
                 <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
-                  Ferramentas de biometria e datação gestacional para uso clínico diário,
-                  com referências baseadas em diretrizes internacionais.
+                  Ferramentas de apoio clínico para ciclo reprodutivo, acompanhamento gestacional
+                  e biometria fetal — com referências baseadas em diretrizes internacionais.
                 </p>
               </motion.div>
             </div>
