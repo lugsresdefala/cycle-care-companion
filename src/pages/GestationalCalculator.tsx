@@ -75,6 +75,7 @@ const GestationalCalculator = () => {
       weeks: result.weeks,
       days: result.days,
       dueDate: format(result.dueDate, "dd/MM/yyyy", { locale: ptBR }),
+      dueDateRaw: result.dueDate,
       firstTrimester: format(result.firstTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
       secondTrimester: format(result.secondTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
       currentTrimester: result.currentTrimester,
