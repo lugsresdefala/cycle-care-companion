@@ -241,10 +241,10 @@ const GestationalCalculator = () => {
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">Data do Parto</span>
+                  <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
                 </div>
                 <p className="tabular-nums text-lg font-display text-foreground">{results.dueDate}</p>
-                <p className="text-xs text-muted-foreground">Data provável estimada</p>
+                <p className="text-xs text-muted-foreground">DPP calculada (±2 semanas)</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
