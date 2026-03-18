@@ -76,12 +76,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient background orbs */}
+      <div className="hero-gradient-orb w-[600px] h-[600px] -top-[200px] -left-[200px] fixed" style={{ background: 'radial-gradient(circle, hsla(280, 60%, 40%, 0.3) 0%, transparent 70%)' }} />
+      <div className="hero-gradient-orb w-[500px] h-[500px] top-[30%] -right-[150px] fixed" style={{ background: 'radial-gradient(circle, hsla(200, 70%, 45%, 0.2) 0%, transparent 70%)' }} />
+      <div className="hero-gradient-orb w-[400px] h-[400px] bottom-[10%] left-[20%] fixed" style={{ background: 'radial-gradient(circle, hsla(330, 55%, 45%, 0.15) 0%, transparent 70%)' }} />
+
       {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/80">
+      <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/70">
         <div className="container max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => setActiveModule(null)} className="flex items-center gap-2.5">
-            <img src={logo} alt="IDALIA-CALC" className="w-8 h-8 rounded-xl object-cover" />
+            <img src={logo} alt="IDALIA-CALC" className="w-9 h-9 rounded-xl object-cover ring-1 ring-primary/20" />
             <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
           </button>
 
@@ -105,7 +110,7 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container max-w-4xl mx-auto px-4 py-8">
+      <main className="container max-w-4xl mx-auto px-4 py-8 relative z-10">
         {!activeModule ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -114,18 +119,28 @@ const Index = () => {
             className="space-y-12"
           >
             {/* Hero */}
-            <div className="text-center space-y-4 py-8">
+            <div className="text-center space-y-6 py-12 relative">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex justify-center mb-6"
+              >
+                <img src={logo} alt="IDALIA-CALC" className="w-24 h-24 rounded-3xl object-cover ring-2 ring-primary/20 shadow-2xl" />
+              </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
-                <h1 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
-                  Calculadoras para
+                <h1 className="font-display text-4xl md:text-5xl leading-tight">
+                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    Calculadoras para
+                  </span>
                   <br />
-                  <span className="text-primary">Medicina Fetal</span>
+                  <span className="text-foreground">Medicina Fetal</span>
                 </h1>
-                <p className="text-muted-foreground mt-4 max-w-xl mx-auto leading-relaxed">
+                <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
                   Ferramentas de biometria e datação gestacional para uso clínico diário,
                   com referências baseadas em diretrizes internacionais.
                 </p>
