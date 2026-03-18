@@ -22,11 +22,11 @@ import CycleVisualization from "@/components/CycleVisualization";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PHASE_CONFIG: Record<string, { color: string; label: string; description: string }> = {
-  menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Fase de renovação" },
-  folicular:  { color: "text-folicular",   label: "Folicular",  description: "Fase de crescimento" },
-  "fértil":   { color: "text-fertility",   label: "Fértil",     description: "Janela de fertilidade" },
-  "ovulatória": { color: "text-ovulatory", label: "Ovulatória", description: "Pico de fertilidade" },
-  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Fase de espera" },
+  menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Descamação endometrial" },
+  folicular:  { color: "text-folicular",   label: "Folicular",  description: "Desenvolvimento folicular" },
+  "fértil":   { color: "text-fertility",   label: "Fértil",     description: "Período de maior probabilidade concepcional" },
+  "ovulatória": { color: "text-ovulatory", label: "Ovulatória", description: "Liberação oocitária" },
+  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Fase progesterônica" },
 };
 
 const CYCLE_PHASES = [
@@ -176,9 +176,9 @@ const FertilityCalculator = () => {
       {/* Input Section */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-cyan">
         <div>
-          <h2 className="font-display text-xl text-foreground">Análise de Fertilidade</h2>
+          <h2 className="font-display text-xl text-foreground">Calculadora de Ciclo Menstrual</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Análise de ciclos com detecção de períodos férteis baseada em biomarcadores.
+            Estimativa de período fértil, data de ovulação e fase do ciclo com base em parâmetros do ciclo menstrual.
           </p>
         </div>
 
@@ -312,7 +312,7 @@ const FertilityCalculator = () => {
                     <p className="text-sm font-medium text-foreground tabular-nums">{format(results.fertileEnd, "dd MMM", { locale: ptBR })}</p>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Probabilidade elevada de concepção</p>
+                <p className="text-xs text-muted-foreground">Intervalo estimado de maior probabilidade concepcional</p>
               </div>
 
               <div className="glass-card-static p-5 space-y-3">
@@ -324,7 +324,7 @@ const FertilityCalculator = () => {
                 <p className="text-lg font-display text-foreground tabular-nums">
                   {format(results.ovulationDay, "dd 'de' MMMM", { locale: ptBR })}
                 </p>
-                <p className="text-xs text-muted-foreground">24h de viabilidade máxima do óvulo</p>
+                <p className="text-xs text-muted-foreground">Viabilidade oocitária estimada em ~24 horas</p>
               </div>
             </div>
 
@@ -391,8 +391,9 @@ const FertilityCalculator = () => {
 
             {/* Disclaimer */}
             <p className="text-xs text-muted-foreground leading-relaxed px-1">
-              <strong>Aviso:</strong> Estas são estimativas baseadas em cálculos padrão. Ciclos podem variar por estresse, medicamentos e condições de saúde.
-              Consulte sempre um profissional de saúde para orientações individuais.
+              <strong>Nota técnica:</strong> Os valores apresentados são estimativas baseadas em modelos de cálculo padrão.
+              A duração e regularidade do ciclo menstrual podem ser influenciadas por fatores como estresse, uso de medicamentos e condições clínicas subjacentes.
+              Estes resultados não substituem avaliação médica individualizada.
             </p>
           </motion.div>
         )}

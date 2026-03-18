@@ -23,9 +23,9 @@ import { motion, AnimatePresence } from "framer-motion";
 type CalculationType = "lmp" | "ultrasound" | "transfer";
 
 const TRIMESTER_CONFIG = [
-  { label: "1º Trimestre", range: "Semanas 1–13", description: "Formação dos órgãos" },
-  { label: "2º Trimestre", range: "Semanas 14–27", description: "Crescimento rápido" },
-  { label: "3º Trimestre", range: "Semanas 28–40", description: "Maturação final" },
+  { label: "1º Trimestre", range: "Semanas 1–13", description: "Organogênese" },
+  { label: "2º Trimestre", range: "Semanas 14–27", description: "Crescimento e diferenciação" },
+  { label: "3º Trimestre", range: "Semanas 28–40", description: "Maturação funcional" },
 ];
 
 interface CalcResults {
@@ -90,9 +90,9 @@ const GestationalCalculator = () => {
       {/* Input */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-teal">
         <div>
-          <h2 className="font-display text-xl text-foreground">Análise Gestacional</h2>
+          <h2 className="font-display text-xl text-foreground">Calculadora de Idade Gestacional</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Cálculo de idade gestacional com desenvolvimento fetal e recomendações por fase.
+            Cálculo de idade gestacional, data provável do parto e referências de desenvolvimento fetal por semana gestacional.
           </p>
         </div>
 
@@ -241,23 +241,23 @@ const GestationalCalculator = () => {
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">Data do Parto</span>
+                  <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
                 </div>
                 <p className="tabular-nums text-lg font-display text-foreground">{results.dueDate}</p>
-                <p className="text-xs text-muted-foreground">Data provável estimada</p>
+                <p className="text-xs text-muted-foreground">DPP calculada (±2 semanas)</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Ruler className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Tamanho Fetal</span>
+                  <span className="text-sm font-medium text-foreground">Referência de Tamanho</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.size}</p>
-                <p className="text-xs text-muted-foreground">Comparação aproximada</p>
+                <p className="text-xs text-muted-foreground">Estimativa comparativa para a idade gestacional</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Baby className="w-4 h-4 text-ovulatory" />
-                  <span className="text-sm font-medium text-foreground">Marco da Semana</span>
+                  <span className="text-sm font-medium text-foreground">Evento Relevante da Semana</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.milestone}</p>
               </div>
@@ -267,7 +267,7 @@ const GestationalCalculator = () => {
             <div className="glass-card-static p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Fim dos Trimestres</span>
+                <span className="text-sm font-medium text-foreground">Limites dos Trimestres</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 {[
@@ -351,9 +351,9 @@ const GestationalCalculator = () => {
             {/* Disclaimer */}
             <div className="glass-card-static p-4 border-accent/20">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong>IMPORTANTE:</strong> Esta ferramenta fornece estimativas baseadas em cálculos padrão.
-                As recomendações seguem diretrizes do Ministério da Saúde, Febrasgo e ACOG.
-                Consulte sempre um profissional de saúde para orientação individualizada.
+                <strong>Nota técnica:</strong> Os valores apresentados são estimativas baseadas em métodos de cálculo padronizados.
+                As referências seguem diretrizes do Ministério da Saúde, FEBRASGO e ACOG.
+                Estes resultados não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
               </p>
             </div>
           </motion.div>

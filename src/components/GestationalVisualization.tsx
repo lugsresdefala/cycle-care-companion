@@ -21,7 +21,7 @@ const GestationalVisualization = ({
 }: GestationalVisualizationProps) => {
   return (
     <div className="glass-card-static p-6 space-y-4">
-      <h3 className="font-display text-lg text-foreground">Progresso Gestacional</h3>
+      <h3 className="font-display text-lg text-foreground">Progressão Gestacional</h3>
 
       {/* Progress bar */}
       <div className="relative h-3 bg-muted rounded-full overflow-hidden">
