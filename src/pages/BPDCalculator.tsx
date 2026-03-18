@@ -9,6 +9,7 @@ import { gestationalAgeFromBPD, isValidBPD, dueDateFromGA } from "@/lib/biometry
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 
 const BPD_REFERENCE = [
   { bpd: 20, ga: "12+4" }, { bpd: 26, ga: "14+0" }, { bpd: 35, ga: "16+5" },
@@ -139,11 +140,31 @@ const BPDCalculator = () => {
         )}
       </AnimatePresence>
 
-      <div className="glass-card-static p-4 border-primary/20">
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          <strong>Nota:</strong> O DBP isolado tem acurácia reduzida em apresentações anômalas (dolicocefalia, braquicefalia). Recomenda-se biometria composta para maior precisão.
-        </p>
-      </div>
+      <ScientificFooter
+        references={[
+          {
+            authors: "Hadlock FP, Deter RL, Harrist RB, Park SK",
+            title: "Estimating fetal age: computer-assisted analysis of multiple fetal growth parameters",
+            journal: "Radiology",
+            year: 1984,
+            doi: "10.1148/radiology.152.2.6739822",
+            pubmedId: "6739822",
+          },
+          {
+            authors: "Hadlock FP, Deter RL, Harrist RB, Park SK",
+            title: "Fetal biparietal diameter: a critical re-evaluation of the relation to menstrual age by means of real-time ultrasound",
+            journal: "J Ultrasound Med",
+            year: 1982,
+            doi: "10.7863/jum.1982.1.3.97",
+            pubmedId: "6152941",
+          },
+        ]}
+        units={[
+          { param: "DBP", unit: "mm", description: "Diâmetro biparietal — borda externa a borda interna" },
+          { param: "Idade gestacional", unit: "sem + dias", description: "Semanas completas + dias" },
+        ]}
+        extraDisclaimer="O DBP isolado tem acurácia reduzida em dolicocefalia e braquicefalia. Recomenda-se biometria composta (CC, CA, CF) para maior precisão."
+      />
     </div>
   );
 };

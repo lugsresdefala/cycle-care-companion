@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Info, Scale, Baby, AlertCircle, TrendingUp } from "lucide-react";
 import { estimatedFetalWeight, getEFWPercentiles } from "@/lib/biometry";
 import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
   const [hc, setHc] = useState("");
@@ -170,11 +171,41 @@ const EFWCalculator = () => {
         )}
       </AnimatePresence>
 
-      <div className="glass-card-static p-4 border-primary/20">
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          <strong>Nota:</strong> O PFE tem margem de erro de ±15%. A classificação de percentil é aproximada. Para avaliação precisa, utilizar curvas de crescimento customizadas (INTERGROWTH-21st ou Fenton).
-        </p>
-      </div>
+      <ScientificFooter
+        references={[
+          {
+            authors: "Hadlock FP, Harrist RB, Sharman RS, Deter RL, Park SK",
+            title: "Estimation of fetal weight with the use of head, body, and femur measurements — a prospective study",
+            journal: "Am J Obstet Gynecol",
+            year: 1985,
+            doi: "10.1016/0002-9378(85)90298-4",
+            pubmedId: "3881966",
+          },
+          {
+            authors: "Shepard MJ, Richards VA, Berkowitz RL, Warsof SL, Hobbins JC",
+            title: "An evaluation of two equations for predicting fetal weight by ultrasound",
+            journal: "Am J Obstet Gynecol",
+            year: 1982,
+            doi: "10.1016/0002-9378(82)90272-0",
+            pubmedId: "7058805",
+          },
+          {
+            authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al. (INTERGROWTH-21st)",
+            title: "International standards for fetal growth based on serial ultrasound measurements",
+            journal: "Lancet",
+            year: 2014,
+            doi: "10.1016/S0140-6736(14)61490-2",
+            pubmedId: "25209488",
+          },
+        ]}
+        units={[
+          { param: "CC / CA", unit: "mm", description: "Circunferências em milímetros" },
+          { param: "CF", unit: "mm", description: "Comprimento do fêmur em milímetros" },
+          { param: "Peso fetal", unit: "g / kg", description: "Gramas (primário) e quilogramas" },
+          { param: "IG (para percentil)", unit: "semanas", description: "Semanas completas para classificação" },
+        ]}
+        extraDisclaimer="O PFE tem margem de erro de ±15%. A classificação por percentil é aproximada. Para avaliação precisa, utilize curvas customizadas (INTERGROWTH-21st)."
+      />
     </div>
   );
 };
