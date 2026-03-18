@@ -50,8 +50,8 @@ interface CalcResults {
 }
 
 const FertilityCalculator = () => {
-  const [lastPeriodStart, setLastPeriodStart] = useState("");
-  const [lastPeriodEnd, setLastPeriodEnd] = useState("");
+  const [lastPeriodStart, setLastPeriodStart] = useState<Date | undefined>();
+  const [lastPeriodEnd, setLastPeriodEnd] = useState<Date | undefined>();
   const [cycleLength, setCycleLength] = useState(28);
   const [cycleHistory] = useState<CycleHistory[]>([]);
   const [expandedSection, setExpandedSection] = useState<string | null>("bodyChanges");
