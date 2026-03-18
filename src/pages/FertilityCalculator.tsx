@@ -371,7 +371,12 @@ const FertilityCalculator = () => {
             </CollapsibleSection>
 
             {/* Cycle Visualization */}
-            <CycleVisualization currentPhase={results.currentCyclePhase} cycleLength={cycleLength} />
+            <CycleVisualization
+              cycleLength={cycleLength}
+              currentDay={differenceInDays(new Date(), lastPeriodStart!) + 1}
+              periodLength={lastPeriodEnd && lastPeriodStart ? differenceInDays(lastPeriodEnd, lastPeriodStart) + 1 : 5}
+              ovulationDay={differenceInDays(results.ovulationDay, lastPeriodStart!) + 1}
+            />
 
             {/* Calendar */}
             <CollapsibleSection
