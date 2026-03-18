@@ -153,7 +153,12 @@ const GestationalCalculator = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Data do Ultrassom</Label>
-              <Input type="date" value={ultrasoundDate} onChange={(e) => setUltrasoundDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={ultrasoundDate}
+                onSelect={setUltrasoundDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Idade Gestacional no Ultrassom</Label>
