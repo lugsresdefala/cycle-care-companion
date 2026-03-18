@@ -73,8 +73,8 @@ const FertilityCalculator = () => {
     let daysUntilNextPhase = 0;
     let nextPhase = "";
 
-    const periodStartDate = new Date(lastPeriodStart);
-    const periodEndDate = new Date(lastPeriodEnd);
+    const periodStartDate = lastPeriodStart;
+    const periodEndDate = lastPeriodEnd;
 
     if (today >= periodStartDate && today <= periodEndDate) {
       currentCyclePhase = "menstrual";
