@@ -90,9 +90,9 @@ const GestationalCalculator = () => {
       {/* Input */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-teal">
         <div>
-          <h2 className="font-display text-xl text-foreground">Análise Gestacional</h2>
+          <h2 className="font-display text-xl text-foreground">Calculadora de Idade Gestacional</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Cálculo de idade gestacional com desenvolvimento fetal e recomendações por fase.
+            Cálculo de idade gestacional, data provável do parto e referências de desenvolvimento fetal por semana gestacional.
           </p>
         </div>
 
