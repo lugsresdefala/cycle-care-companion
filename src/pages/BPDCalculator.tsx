@@ -9,6 +9,7 @@ import { gestationalAgeFromBPD, isValidBPD, dueDateFromGA } from "@/lib/biometry
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 
 const BPD_REFERENCE = [
   { bpd: 20, ga: "12+4" }, { bpd: 26, ga: "14+0" }, { bpd: 35, ga: "16+5" },

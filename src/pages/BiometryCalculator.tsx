@@ -9,6 +9,7 @@ import { gestationalAgeFromMultipleBiometry, dueDateFromGA } from "@/lib/biometr
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 
 const BiometryCalculator = () => {
   const [bpd, setBpd] = useState("");

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Info, Scale, Baby, AlertCircle, TrendingUp } from "lucide-react";
 import { estimatedFetalWeight, getEFWPercentiles } from "@/lib/biometry";
 import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
   const [hc, setHc] = useState("");
