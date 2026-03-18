@@ -22,11 +22,11 @@ import CycleVisualization from "@/components/CycleVisualization";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PHASE_CONFIG: Record<string, { color: string; label: string; description: string }> = {
-  menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Fase de renovação" },
-  folicular:  { color: "text-folicular",   label: "Folicular",  description: "Fase de crescimento" },
-  "fértil":   { color: "text-fertility",   label: "Fértil",     description: "Janela de fertilidade" },
-  "ovulatória": { color: "text-ovulatory", label: "Ovulatória", description: "Pico de fertilidade" },
-  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Fase de espera" },
+  menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Descamação endometrial" },
+  folicular:  { color: "text-folicular",   label: "Folicular",  description: "Desenvolvimento folicular" },
+  "fértil":   { color: "text-fertility",   label: "Fértil",     description: "Período de maior probabilidade concepcional" },
+  "ovulatória": { color: "text-ovulatory", label: "Ovulatória", description: "Liberação oocitária" },
+  "lútea":    { color: "text-luteal",      label: "Lútea",      description: "Fase progesterônica" },
 };
 
 const CYCLE_PHASES = [
