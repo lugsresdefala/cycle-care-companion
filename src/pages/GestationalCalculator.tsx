@@ -249,10 +249,10 @@ const GestationalCalculator = () => {
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
                   <Ruler className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Tamanho Fetal</span>
+                  <span className="text-sm font-medium text-foreground">Referência de Tamanho</span>
                 </div>
                 <p className="text-sm text-foreground">{results.developmentInfo.size}</p>
-                <p className="text-xs text-muted-foreground">Comparação aproximada</p>
+                <p className="text-xs text-muted-foreground">Estimativa comparativa para a idade gestacional</p>
               </div>
               <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
