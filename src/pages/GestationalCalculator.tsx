@@ -180,7 +180,12 @@ const GestationalCalculator = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Data da Transferência</Label>
-              <Input type="date" value={transferDate} onChange={(e) => setTransferDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={transferDate}
+                onSelect={setTransferDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
             <div className="space-y-2">
               <Label className="text-sm text-foreground">Dias do Embrião</Label>
