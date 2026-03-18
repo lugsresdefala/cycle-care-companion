@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
 import CRLCalculator from "@/pages/CRLCalculator";
