@@ -34,6 +34,7 @@ interface CalcResults {
   weeks: number;
   days: number;
   dueDate: string;
+  dueDateRaw: Date;
   firstTrimester: string;
   secondTrimester: string;
   currentTrimester: number;
@@ -74,6 +75,7 @@ const GestationalCalculator = () => {
       weeks: result.weeks,
       days: result.days,
       dueDate: format(result.dueDate, "dd/MM/yyyy", { locale: ptBR }),
+      dueDateRaw: result.dueDate,
       firstTrimester: format(result.firstTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
       secondTrimester: format(result.secondTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
       currentTrimester: result.currentTrimester,
@@ -358,10 +360,8 @@ const GestationalCalculator = () => {
 
             {/* Visualization */}
             <GestationalVisualization
-              weeks={results.weeks}
-              days={results.days}
-              currentTrimester={results.currentTrimester}
-              progressPercent={results.progressPercent}
+              currentWeek={results.weeks}
+              dueDate={results.dueDateRaw}
             />
 
             {/* Disclaimer */}
