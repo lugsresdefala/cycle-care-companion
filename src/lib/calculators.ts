@@ -255,30 +255,30 @@ export function getGestationalDevelopmentInfo(weeks: number): DevelopmentInfo {
 export function getPrenatalCareRecommendations(weeks: number): PrenatalCare {
   if (weeks < 13) {
     return {
-      nutrition: "Ácido fólico (400-800mcg/dia). Evitar álcool, tabaco e drogas. Limitar cafeína a 200mg/dia. Dieta rica em ferro, cálcio e proteínas.",
-      lifestyle: "Atividade física leve a moderada (caminhada, natação). Evitar esforço excessivo. Manter hidratação adequada. Descanso quando necessário.",
-      warning_signs: "Sangramento vaginal intenso, dor abdominal severa, febre acima de 38°C, perda de líquido. Procure atendimento imediato.",
-      examinations: "Hemograma, tipagem sanguínea, sorologias (HIV, sífilis, hepatites B e C, toxoplasmose, rubéola), glicemia de jejum, urina tipo 1, ultrassom obstétrico inicial.",
-      vaccines: "Verificar carteira vacinal. Hepatite B (se necessário). Influenza (se período sazonal). dTpa a partir de 20 semanas.",
-      special_care: "Evitar medicamentos sem prescrição médica. Suplementação de ácido fólico e ferro conforme orientação. Primeira consulta pré-natal o mais cedo possível.",
+      nutrition: "Suplementação de ácido fólico (400–800 µg/dia). Contraindicação absoluta de álcool, tabaco e substâncias teratogênicas. Limitar cafeína a 200 mg/dia. Dieta equilibrada com aporte adequado de ferro, cálcio e proteínas.",
+      lifestyle: "Atividade física de intensidade leve a moderada (caminhada, natação). Evitar esforço físico extenuante. Manter hidratação adequada.",
+      warning_signs: "Sangramento vaginal volumoso, dor abdominal intensa, febre ≥ 38 °C, perda de líquido por via vaginal. Procurar atendimento obstétrico imediato.",
+      examinations: "Hemograma completo, tipagem sanguínea e fator Rh, sorologias (anti-HIV, VDRL, HBsAg, anti-HCV, IgG/IgM para toxoplasmose e rubéola), glicemia de jejum, exame de urina tipo I (EAS), ultrassonografia obstétrica de 1º trimestre.",
+      vaccines: "Verificar situação vacinal. Hepatite B (completar esquema se necessário). Influenza (se período sazonal). A dTpa é recomendada a partir da 20ª semana.",
+      special_care: "Evitar uso de fármacos sem prescrição médica. Suplementação de ácido fólico e sulfato ferroso conforme orientação. Agendamento da primeira consulta pré-natal o mais precocemente possível.",
     };
   }
   if (weeks < 27) {
     return {
-      nutrition: "Aumentar ingestão calórica em ~300kcal/dia. Manter ferro, cálcio, vitamina D. Omega-3 (DHA). Fibras para prevenir constipação.",
-      lifestyle: "Exercícios moderados continuados. Uso de cinto de segurança abaixo do abdome. Posição lateral para dormir (preferencialmente esquerda).",
-      warning_signs: "Contrações regulares antes de 37 semanas, sangramento, inchaço repentino de rosto/mãos, alterações visuais, cefaleia persistente.",
-      examinations: "Ultrassom morfológico (20-24 sem). Teste de tolerância à glicose (24-28 sem). Hemograma. Urina tipo 1. Acompanhamento de peso e pressão arterial.",
-      vaccines: "dTpa (entre 27 e 36 semanas, idealmente). Influenza se não tomou no 1º trimestre.",
-      special_care: "Atenção a movimentos fetais (começam a ser percebidos). Preparação para o parto pode ser iniciada. Cuidados com a pele (hidratação para prevenir estrias).",
+      nutrition: "Incremento calórico de aproximadamente 300 kcal/dia. Manter aporte de ferro, cálcio, vitamina D e ácidos graxos ômega-3 (DHA). Aumento da ingestão de fibras para prevenção de constipação intestinal.",
+      lifestyle: "Manutenção de atividade física moderada. Uso de cinto de segurança posicionado abaixo do abdome gravídico. Decúbito lateral (preferencialmente esquerdo) para repouso noturno.",
+      warning_signs: "Contrações uterinas regulares antes da 37ª semana, sangramento vaginal, edema súbito de face e/ou extremidades superiores, alterações visuais, cefaleia persistente. Procurar avaliação obstétrica.",
+      examinations: "Ultrassonografia morfológica fetal (20–24 semanas). Teste oral de tolerância à glicose — TOTG 75 g (24–28 semanas). Hemograma. EAS. Monitoramento de ganho ponderal e pressão arterial.",
+      vaccines: "dTpa (entre 27 e 36 semanas, preferencialmente). Influenza, caso não administrada no 1º trimestre.",
+      special_care: "Atenção à percepção de movimentos fetais (habitualmente percebidos a partir desta fase). Possibilidade de iniciar preparação para o parto. Hidratação cutânea para prevenção de estrias.",
     };
   }
   return {
-    nutrition: "Refeições menores e mais frequentes. Manter hidratação. Alimentos ricos em ferro. Evitar alimentos crus ou mal-cozidos.",
-    lifestyle: "Preparar bolsa da maternidade. Conhecer sinais de trabalho de parto. Exercícios de respiração e relaxamento. Descanso adequado.",
-    warning_signs: "Diminuição dos movimentos fetais, contrações regulares com intervalos decrescentes, ruptura da bolsa, sangramento, pressão alta, inchaço severo.",
-    examinations: "Consultas quinzenais (32-36 sem) e semanais (37+ sem). Monitoramento de crescimento fetal. Cardiotocografia se indicado. Cultura para Streptococcus B (35-37 sem).",
-    vaccines: "Completar dTpa se não fez entre 27-36 semanas.",
-    special_care: "Plano de parto. Identificar sinais de trabalho de parto verdadeiro vs falso. Posição do bebê. Preparo perineal se desejado. Apoio emocional e rede de suporte.",
+    nutrition: "Fracionamento das refeições em porções menores e mais frequentes. Manter hidratação. Alimentos com alto teor de ferro. Evitar consumo de alimentos crus ou com cocção insuficiente.",
+    lifestyle: "Organização de itens para a maternidade. Reconhecimento dos sinais de trabalho de parto. Exercícios respiratórios e técnicas de relaxamento.",
+    warning_signs: "Redução da movimentação fetal, contrações uterinas regulares com intervalo decrescente, amniorrexe (ruptura de membranas), sangramento vaginal, elevação pressórica, edema acentuado. Procurar atendimento obstétrico imediato.",
+    examinations: "Consultas quinzenais (32–36 semanas) e semanais (a partir da 37ª semana). Avaliação do crescimento fetal. Cardiotocografia fetal quando indicada. Pesquisa de Streptococcus do grupo B — cultura retovaginal (35–37 semanas).",
+    vaccines: "Completar esquema de dTpa caso não realizado entre 27 e 36 semanas.",
+    special_care: "Elaboração do plano de parto. Diferenciação entre trabalho de parto verdadeiro e falso (pródromos). Avaliação da apresentação fetal. Preparo perineal, se desejado. Rede de apoio emocional e suporte familiar.",
   };
 }
