@@ -135,25 +135,28 @@ const Index = () => {
               >
                 <h1 className="font-display text-4xl md:text-5xl leading-tight">
                   <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    Calculadoras para
+                    Calculadoras Clínicas
                   </span>
                   <br />
-                  <span className="text-foreground">Medicina Fetal</span>
+                  <span className="text-foreground">em Saúde da Mulher</span>
                 </h1>
                 <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
-                  Ferramentas de biometria e datação gestacional para uso clínico diário,
-                  com referências baseadas em diretrizes internacionais.
+                  Ferramentas de apoio clínico para ciclo reprodutivo, acompanhamento gestacional
+                  e biometria fetal — com referências baseadas em diretrizes internacionais.
                 </p>
               </motion.div>
             </div>
 
-            {/* Category Labels */}
-            <div className="space-y-8">
-              {/* Datação */}
+            {/* Módulos por nível */}
+            <div className="space-y-10">
+              {/* Saúde Reprodutiva */}
               <div className="space-y-4">
-                <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium px-1">Datação Gestacional</h3>
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-accent" />
+                  <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Saúde Reprodutiva</h3>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {CARDS.filter(c => ["fertility", "gestational", "crl", "bpd", "biometry"].includes(c.value as string)).map((card, i) => (
+                  {CARDS.filter(c => c.value === "fertility").map((card, i) => (
                     <motion.button
                       key={card.value}
                       initial={{ opacity: 0, y: 10 }}
@@ -178,16 +181,51 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Crescimento */}
+              {/* Acompanhamento Gestacional */}
               <div className="space-y-4">
-                <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium px-1">Crescimento Fetal</h3>
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-secondary" />
+                  <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Acompanhamento Gestacional</h3>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {CARDS.filter(c => c.value === "efw").map((card, i) => (
+                  {CARDS.filter(c => c.value === "gestational").map((card, i) => (
                     <motion.button
                       key={card.value}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ delay: 0.25 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => setActiveModule(card.value)}
+                      className={`glass-card p-6 text-left space-y-3 ${card.mesh} group cursor-pointer`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center`}>
+                        {card.icon}
+                      </div>
+                      <div>
+                        <h2 className="font-display text-base text-foreground">{card.title}</h2>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{card.description}</p>
+                      </div>
+                      <div className={`flex items-center gap-1 ${card.linkColor} text-xs font-medium`}>
+                        Acessar
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Biometria Fetal */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-2 h-2 rounded-full bg-primary" />
+                  <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Biometria Fetal</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {CARDS.filter(c => ["crl", "bpd", "biometry", "efw"].includes(c.value as string)).map((card, i) => (
+                    <motion.button
+                      key={card.value}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.35 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                       onClick={() => setActiveModule(card.value)}
                       className={`glass-card p-6 text-left space-y-3 ${card.mesh} group cursor-pointer`}
                     >
