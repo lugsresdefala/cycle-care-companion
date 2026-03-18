@@ -57,13 +57,13 @@ const GestationalCalculator = () => {
     let result;
     if (calculationType === "lmp") {
       if (!lmpDate) return;
-      result = calculateGestationalAgeFromLMP(new Date(lmpDate));
+      result = calculateGestationalAgeFromLMP(lmpDate);
     } else if (calculationType === "ultrasound") {
       if (!ultrasoundDate) return;
-      result = calculateGestationalAgeFromUltrasound(new Date(ultrasoundDate), ultrasoundWeeks, ultrasoundDays);
+      result = calculateGestationalAgeFromUltrasound(ultrasoundDate, ultrasoundWeeks, ultrasoundDays);
     } else {
       if (!transferDate) return;
-      result = calculateGestationalAgeFromTransfer(new Date(transferDate), parseInt(embryoDays));
+      result = calculateGestationalAgeFromTransfer(transferDate, parseInt(embryoDays));
     }
 
     if (!result) return;
