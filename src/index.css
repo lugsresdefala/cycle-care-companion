@@ -103,15 +103,15 @@
   }
 
   .mesh-cyan {
-    background-image: radial-gradient(at 0% 0%, hsla(187, 85%, 45%, 0.15) 0, transparent 50%);
+    background-image: radial-gradient(at 0% 0%, hsla(200, 85%, 50%, 0.15) 0, transparent 50%);
   }
 
-  .mesh-teal {
-    background-image: radial-gradient(at 0% 0%, hsla(170, 65%, 42%, 0.15) 0, transparent 50%);
+  .mesh-purple {
+    background-image: radial-gradient(at 0% 0%, hsla(280, 55%, 50%, 0.15) 0, transparent 50%);
   }
 
-  .mesh-red {
-    background-image: radial-gradient(at 0% 0%, hsla(0, 75%, 55%, 0.12) 0, transparent 50%);
+  .mesh-pink {
+    background-image: radial-gradient(at 0% 0%, hsla(330, 55%, 50%, 0.12) 0, transparent 50%);
   }
 
   .tech-gradient {
