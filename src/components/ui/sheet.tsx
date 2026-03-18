@@ -47,15 +47,11 @@ const sheetVariants = cva(
   },
 );
 
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {
-  className?: string;
-  children?: React.ReactNode;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SheetContentProps = any;
 
-const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
-  ({ side = "right", className, children, ...props }: SheetContentProps, ref) => (
+const SheetContent = React.forwardRef<any, any>(
+  ({ side = "right", className, children, ...props }: any, ref: any) => (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
