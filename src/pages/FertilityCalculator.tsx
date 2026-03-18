@@ -20,6 +20,7 @@ import {
 import { ptBR } from "date-fns/locale";
 import CycleVisualization from "@/components/CycleVisualization";
 import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "@/components/DatePicker";
 
 const PHASE_CONFIG: Record<string, { color: string; label: string; description: string }> = {
   menstrual:  { color: "text-menstrual",   label: "Menstrual",  description: "Descamação endometrial" },
