@@ -44,11 +44,11 @@ interface CalcResults {
 
 const GestationalCalculator = () => {
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
-  const [lmpDate, setLmpDate] = useState("");
-  const [ultrasoundDate, setUltrasoundDate] = useState("");
+  const [lmpDate, setLmpDate] = useState<Date | undefined>();
+  const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
   const [ultrasoundWeeks, setUltrasoundWeeks] = useState(0);
   const [ultrasoundDays, setUltrasoundDays] = useState(0);
-  const [transferDate, setTransferDate] = useState("");
+  const [transferDate, setTransferDate] = useState<Date | undefined>();
   const [embryoDays, setEmbryoDays] = useState("5");
   const [expandedSection, setExpandedSection] = useState<string | null>("development");
   const [results, setResults] = useState<CalcResults | null>(null);
