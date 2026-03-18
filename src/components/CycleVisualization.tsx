@@ -17,7 +17,7 @@ const CycleVisualization = ({ currentPhase, cycleLength }: CycleVisualizationPro
 
   return (
     <div className="glass-card-static p-6 space-y-4">
-      <h3 className="font-display text-lg text-foreground">Ciclo Visual</h3>
+      <h3 className="font-display text-lg text-foreground">Representação do Ciclo</h3>
       <div className="flex rounded-full overflow-hidden h-3 gap-0.5">
         {PHASES.map((phase, i) => (
           <motion.div
