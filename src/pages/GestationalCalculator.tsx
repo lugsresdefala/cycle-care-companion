@@ -139,7 +139,12 @@ const GestationalCalculator = () => {
                   <TooltipContent>Primeiro dia do último ciclo menstrual</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="date" value={lmpDate} onChange={(e) => setLmpDate(e.target.value)} className="input-glass" />
+              <DatePicker
+                date={lmpDate}
+                onSelect={setLmpDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
             </div>
           </div>
         )}
