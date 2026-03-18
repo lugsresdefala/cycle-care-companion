@@ -80,10 +80,8 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/80">
         <div className="container max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => setActiveModule(null)} className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Heart className="w-4 h-4 text-primary" />
-            </div>
+          <button onClick={() => setActiveModule(null)} className="flex items-center gap-2.5">
+            <img src={logo} alt="IDALIA-CALC" className="w-8 h-8 rounded-xl object-cover" />
             <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
           </button>
 
