@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import {
   Info, Calendar, Baby, Stethoscope, Syringe, HeartPulse,
-  Salad, Ruler, ChevronDown, AlertCircle
+  Salad, Ruler, ChevronDown, ChevronUp, AlertCircle
 } from "lucide-react";
 import {
   calculateGestationalAgeFromLMP,
@@ -91,18 +91,10 @@ const GestationalCalculator = () => {
   return (
     <div className="space-y-6">
       {/* Input */}
-      <div className="glass-card-static p-5 sm:p-6 space-y-5 mesh-teal">
+      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-teal">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-8 h-8 rounded-xl bg-secondary/15 flex items-center justify-center">
-              <Baby className="w-4 h-4 text-secondary" />
-            </div>
-            <div>
-              <h2 className="font-display text-lg text-foreground leading-tight">Calculadora de Idade Gestacional</h2>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">DPP & Desenvolvimento Fetal</p>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <h2 className="font-display text-xl text-foreground">Calculadora de Idade Gestacional</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             Cálculo de idade gestacional, data provável do parto e referências de desenvolvimento fetal por semana gestacional.
           </p>
         </div>
@@ -210,9 +202,8 @@ const GestationalCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary flex items-center gap-2">
-          <Baby className="w-4 h-4" />
-          Calcular Idade Gestacional
+        <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+          Calcular
         </Button>
       </div>
 
@@ -226,99 +217,67 @@ const GestationalCalculator = () => {
             className="space-y-6"
           >
             {/* Hero Banner */}
-            <div className="glass-card-static p-5 sm:p-6 mesh-teal relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none">
-                <div className="absolute inset-0 bg-secondary/5 rounded-bl-[3rem]" />
-              </div>
-
-              <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-lg bg-secondary/25 flex items-center justify-center">
-                      <Baby className="w-3.5 h-3.5 text-secondary" />
-                    </div>
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{trimCfg?.label} · {trimCfg?.range}</span>
+            <div className="glass-card-static p-6 md:p-8 mesh-teal min-h-[200px] flex flex-col justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Baby className="w-4 h-4 text-accent" />
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">{trimCfg?.label}</span>
                   </div>
-                  <div className="flex items-baseline gap-2 animate-count-up">
-                    <span className="number-display text-5xl font-display text-foreground">{results.weeks}</span>
-                    <span className="text-base text-muted-foreground">sem</span>
-                    <span className="number-display text-3xl font-display text-foreground ml-1">{results.days}</span>
-                    <span className="text-base text-muted-foreground">dias</span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
+                    <span className="text-sm text-muted-foreground">sem</span>
+                    <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
+                    <span className="text-sm text-muted-foreground">dias</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{trimCfg?.description}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{trimCfg?.description} · {trimCfg?.range}</p>
                 </div>
-
-                <div className="flex gap-4">
-                  <div className="stat-card text-center min-w-[72px]">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Progresso</p>
-                    <p className="number-display text-2xl font-display text-secondary">{results.progressPercent}%</p>
-                    <p className="text-[10px] text-muted-foreground">da gravidez</p>
-                  </div>
-                  <div className="stat-card text-center min-w-[72px]">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">DPP</p>
-                    <p className="number-display text-sm font-display text-foreground leading-snug">{results.dueDate}</p>
-                    <p className="text-[10px] text-muted-foreground">estimada</p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Progresso</p>
+                  <p className="tabular-nums text-3xl font-display text-accent">{results.progressPercent}%</p>
                 </div>
               </div>
 
-              {/* Progress bar with trimester segments */}
-              <div className="relative mt-5 space-y-2">
-                <div className="h-3 bg-muted/60 rounded-full overflow-hidden relative">
+              {/* Progress bar */}
+              <div className="mt-6 space-y-2">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${results.progressPercent}%` }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full rounded-full relative overflow-hidden"
-                    style={{
-                      background: "linear-gradient(90deg, hsl(220,50%,55%) 0%, hsl(280,35%,50%) 45%, hsl(200,70%,58%) 100%)"
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-shimmer" />
-                  </motion.div>
-                  {/* Trimester dividers */}
-                  <div className="absolute top-0 h-full w-px bg-background/40" style={{ left: "32.5%" }} />
-                  <div className="absolute top-0 h-full w-px bg-background/40" style={{ left: "67.5%" }} />
+                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    className="h-full bg-gradient-to-r from-folicular via-accent to-primary rounded-full glow-accent"
+                  />
                 </div>
-                <div className="flex text-[10px] text-muted-foreground">
-                  <span className={`flex-1 ${results.currentTrimester === 1 ? "text-foreground font-semibold" : ""}`}>1º Trim.</span>
-                  <span className={`flex-1 text-center ${results.currentTrimester === 2 ? "text-foreground font-semibold" : ""}`}>2º Trim.</span>
-                  <span className={`flex-1 text-center ${results.currentTrimester === 3 ? "text-foreground font-semibold" : ""}`}>3º Trim.</span>
-                  <span className="text-right">40sem</span>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>1º Trim</span><span>2º Trim</span><span>3º Trim</span><span>40sem</span>
                 </div>
               </div>
             </div>
 
             {/* Key Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="stat-card space-y-2 border border-secondary/20">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-secondary/20 flex items-center justify-center">
-                    <Calendar className="w-3.5 h-3.5 text-secondary" />
-                  </div>
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">DPP</span>
+                  <Calendar className="w-4 h-4 text-accent" />
+                  <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
                 </div>
                 <p className="tabular-nums text-lg font-display text-foreground">{results.dueDate}</p>
-                <p className="text-[10px] text-muted-foreground leading-relaxed">Data provável do parto (±2 semanas)</p>
+                <p className="text-xs text-muted-foreground">DPP estimada (margem de ±2 semanas)</p>
               </div>
-              <div className="stat-card space-y-2 border border-primary/20">
+              <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-primary/20 flex items-center justify-center">
-                    <Ruler className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tamanho</span>
+                  <Ruler className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">Biometria Comparativa</span>
                 </div>
-                <p className="text-sm text-foreground leading-snug">{results.developmentInfo.size}</p>
-                <p className="text-[10px] text-muted-foreground">Referência comparativa</p>
+                <p className="text-sm text-foreground">{results.developmentInfo.size}</p>
+                <p className="text-xs text-muted-foreground">Referência aproximada para a idade gestacional</p>
               </div>
-              <div className="stat-card space-y-2 border border-accent/20">
+              <div className="glass-card-static p-5 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-accent/20 flex items-center justify-center">
-                    <Baby className="w-3.5 h-3.5 text-accent" />
-                  </div>
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Marco</span>
+                  <Baby className="w-4 h-4 text-ovulatory" />
+                  <span className="text-sm font-medium text-foreground">Marco do Desenvolvimento</span>
                 </div>
-                <p className="text-sm text-foreground leading-snug">{results.developmentInfo.milestone}</p>
+                <p className="text-sm text-foreground">{results.developmentInfo.milestone}</p>
               </div>
             </div>
 
@@ -429,20 +388,13 @@ const CollapsibleSection = ({
   <div className="glass-card-static overflow-hidden">
     <button
       onClick={onToggle}
-      className="collapsible-header"
+      className="w-full flex items-center justify-between p-4 tech-gradient hover:bg-muted/20 transition-colors"
     >
-      <div className="flex items-center gap-2.5">
-        <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${isOpen ? "bg-secondary/20" : "bg-muted/40"}`}>
-          {icon}
-        </div>
-        <span className="text-sm font-semibold text-foreground">{title}</span>
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="text-sm font-medium text-foreground">{title}</span>
       </div>
-      <motion.div
-        animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-      </motion.div>
+      {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
     </button>
     <AnimatePresence>
       {isOpen && (
@@ -451,9 +403,7 @@ const CollapsibleSection = ({
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          style={{ overflow: "hidden" }}
         >
-          <div className="border-t border-border/30" />
           {children}
         </motion.div>
       )}
