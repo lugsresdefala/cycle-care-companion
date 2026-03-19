@@ -2,17 +2,55 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
     <title>Idalia Calc — Acompanhamento Reprodutivo</title>
     <meta name="description" content="Calculadoras baseadas em evidências para ciclo menstrual e gestação. Resultados precisos, conteúdo educativo e privacidade." />
     <meta name="author" content="Idalia Calc" />
+    <meta name="keywords" content="calculadora gestacional, período fértil, biometria fetal, idade gestacional, ovulação, ciclo menstrual" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0a0f1e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Idalia Calc" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Idalia Calc" />
+    <meta name="msapplication-TileColor" content="#0a0f1e" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph -->
     <meta property="og:title" content="Idalia Calc — Acompanhamento Reprodutivo" />
     <meta property="og:description" content="Calculadoras de fertilidade e gestação baseadas em evidências." />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Idalia Calc — Saúde Reprodutiva" />
+    <meta name="twitter:description" content="Calculadoras clínicas de fertilidade e gestação." />
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
