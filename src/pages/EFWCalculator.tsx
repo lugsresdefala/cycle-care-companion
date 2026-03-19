@@ -106,7 +106,7 @@ const EFWCalculator = () => {
             className="space-y-4"
           >
             {/* Weight result */}
-            <div className="glass-card-static p-6 md:p-8 mesh-cyan">
+            <div className="glass-card-static p-6 md:p-8 mesh-coral">
               <div className="flex items-center gap-2 mb-2">
                 <Scale className="w-5 h-5 text-primary" />
                 <span className="text-xs uppercase tracking-wider text-muted-foreground">Peso Fetal Estimado</span>

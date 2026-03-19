@@ -87,7 +87,7 @@ const CRLCalculator = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-4"
           >
-            <div className="glass-card-static p-6 md:p-8 mesh-teal">
+            <div className="glass-card-static p-6 md:p-8 mesh-navy">
               <div className="flex items-center gap-2 mb-2">
                 <Baby className="w-4 h-4 text-accent" />
                 <span className="text-xs uppercase tracking-wider text-muted-foreground">Idade Gestacional Estimada</span>

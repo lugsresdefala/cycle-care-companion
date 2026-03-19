@@ -175,7 +175,7 @@ const FertilityCalculator = () => {
   return (
     <div className="space-y-6">
       {/* Input Section */}
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-cyan">
+      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h2 className="font-display text-xl text-foreground">Calculadora de Ciclo Menstrual</h2>
           <p className="text-sm text-muted-foreground mt-1">
@@ -256,7 +256,7 @@ const FertilityCalculator = () => {
             className="space-y-6"
           >
             {/* Hero Phase Banner */}
-            <div className="glass-card-static p-6 md:p-8 mesh-cyan min-h-[200px] flex flex-col justify-between">
+            <div className="glass-card-static p-6 md:p-8 mesh-coral min-h-[200px] flex flex-col justify-between">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
