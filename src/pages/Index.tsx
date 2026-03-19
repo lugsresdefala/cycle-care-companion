@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity,
-  BookOpen, ChevronLeft, Home, Sparkles, Download
+  BookOpen, ChevronLeft, Home, Sparkles, Download, Lock, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
@@ -207,15 +207,15 @@ const Index = () => {
               </div>
 
               {/* Desktop nav tabs */}
-              <div className="hidden sm:flex gap-1">
+              <div className="hidden sm:flex gap-1 bg-muted/30 rounded-xl p-1">
                 {NAV_ITEMS.map((item) => (
                   <button
                     key={item.value}
                     onClick={() => setActiveModule(item.value)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                       activeModule === item.value
-                        ? "bg-primary text-primary-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        ? "bg-primary/90 text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     }`}
                   >
                     {item.icon}
@@ -323,16 +323,17 @@ const Index = () => {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25, duration: 0.5 }}
-                  className="flex items-center justify-center gap-4 sm:gap-6 flex-wrap"
+                  className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap"
                 >
                   {[
-                    { label: "6", desc: "Calculadoras" },
-                    { label: "100%", desc: "Local" },
-                    { label: "5+", desc: "Fórmulas" },
+                    { label: "6", desc: "Calculadoras", icon: <Zap className="w-3 h-3" /> },
+                    { label: "100%", desc: "Local", icon: <Lock className="w-3 h-3" /> },
+                    { label: "5+", desc: "Fórmulas Validadas", icon: <Sparkles className="w-3 h-3" /> },
                   ].map((s) => (
-                    <div key={s.label} className="text-center">
-                      <div className="text-xl sm:text-2xl font-display font-bold text-primary tabular-nums">{s.label}</div>
-                      <div className="text-xs text-muted-foreground">{s.desc}</div>
+                    <div key={s.label} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/40 border border-border/50">
+                      <span className="text-primary">{s.icon}</span>
+                      <span className="text-sm font-display font-bold text-primary tabular-nums">{s.label}</span>
+                      <span className="text-xs text-muted-foreground">{s.desc}</span>
                     </div>
                   ))}
                 </motion.div>
@@ -405,18 +406,25 @@ const Index = () => {
                         transition={{ delay: 0.45 + i * 0.06, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                         onClick={() => setActiveModule(card.value)}
                         className={`module-card ${card.mesh} group text-left`}
+                        style={{ "--card-accent": card.accentColor } as React.CSSProperties}
                       >
                         <div className="space-y-3">
                           <div className="flex items-start justify-between">
                             <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center flex-shrink-0 ${card.iconColor} transition-transform duration-300 group-hover:scale-110`}>
                               {card.icon}
                             </div>
+                            <div
+                              className="w-7 h-7 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+                              style={{ background: card.accentColor }}
+                            >
+                              <ArrowRight className={`w-3.5 h-3.5 ${card.iconColor}`} />
+                            </div>
                           </div>
                           <div>
                             <h2 className="font-display text-sm sm:text-base text-foreground leading-snug">
                               {card.title}
                             </h2>
-                            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed line-clamp-2">
                               {card.description}
                             </p>
                           </div>
@@ -440,13 +448,17 @@ const Index = () => {
               >
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Shield className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <span>100% processamento local — nenhum dado coletado</span>
+                    <div className="w-5 h-5 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-3 h-3 text-primary" />
+                    </div>
+                    <span>100% processamento local — nenhum dado é coletado ou transmitido</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="px-2 py-0.5 rounded-full border border-border/60 text-muted-foreground">Hadlock</span>
-                    <span className="px-2 py-0.5 rounded-full border border-border/60 text-muted-foreground">Robinson</span>
-                    <span className="px-2 py-0.5 rounded-full border border-border/60 text-muted-foreground">Shepard</span>
+                  <div className="flex items-center gap-2 text-xs">
+                    {["Hadlock", "Robinson", "Shepard", "INTERGROWTH"].map((ref) => (
+                      <span key={ref} className="px-2 py-0.5 rounded-full bg-muted/40 border border-border/50 text-muted-foreground font-medium">
+                        {ref}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </motion.div>
