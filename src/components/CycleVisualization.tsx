@@ -143,14 +143,14 @@ const CycleVisualization = ({
               })}
 
               {/* Center Info */}
-              <circle cx={CX} cy={CY} r={56} fill="hsla(225, 25%, 6%, 0.85)" />
-              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(220, 20%, 92%)">
+              <circle cx={CX} cy={CY} r={56} fill="hsla(30, 25%, 97%, 0.9)" />
+              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(220, 30%, 15%)">
                 {selectedDay}
               </text>
-              <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.stroke} fontWeight="600">
+              <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.fill} fontWeight="600">
                 {currentPhaseConfig.label}
               </text>
-              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(220, 12%, 50%)">
+              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(220, 12%, 45%)">
                 de {cycleLength} dias
               </text>
             </svg>
