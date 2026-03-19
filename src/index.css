@@ -82,68 +82,74 @@
 @layer components {
   .glass-card {
     @apply border rounded-xl;
-    background: linear-gradient(135deg, hsla(240, 28%, 10%, 0.8) 0%, hsla(260, 25%, 8%, 0.7) 50%, hsla(240, 28%, 6%, 0.8) 100%);
+    background: linear-gradient(135deg, hsla(225, 22%, 10%, 0.85) 0%, hsla(240, 20%, 8%, 0.75) 50%, hsla(225, 22%, 7%, 0.85) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-color: hsla(220, 50%, 60%, 0.1);
+    border-color: hsla(220, 50%, 50%, 0.1);
     box-shadow: 
       0 10px 30px -5px rgba(0, 0, 0, 0.5),
-      0 0 0 1px hsla(220, 50%, 60%, 0.05),
-      inset 0 1px 0 hsla(220, 50%, 80%, 0.05);
+      0 0 0 1px hsla(220, 50%, 50%, 0.05),
+      inset 0 1px 0 hsla(220, 50%, 70%, 0.04);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .glass-card:hover {
-    border-color: hsla(220, 50%, 70%, 0.2);
+    border-color: hsla(220, 55%, 55%, 0.18);
     transform: translateY(-3px);
     box-shadow: 
       0 20px 40px -10px rgba(0, 0, 0, 0.6),
-      0 0 20px hsla(200, 70%, 58%, 0.08),
-      0 0 0 1px hsla(220, 50%, 60%, 0.1),
-      inset 0 1px 0 hsla(220, 50%, 80%, 0.08);
+      0 0 20px hsla(220, 65%, 45%, 0.08),
+      0 0 0 1px hsla(220, 55%, 55%, 0.1),
+      inset 0 1px 0 hsla(220, 50%, 70%, 0.06);
   }
 
   .glass-card-static {
     @apply border rounded-xl;
-    background: linear-gradient(135deg, hsla(240, 28%, 10%, 0.7) 0%, hsla(260, 25%, 8%, 0.6) 100%);
+    background: linear-gradient(135deg, hsla(225, 22%, 10%, 0.75) 0%, hsla(240, 20%, 8%, 0.65) 100%);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border-color: hsla(220, 50%, 60%, 0.08);
+    border-color: hsla(220, 50%, 50%, 0.07);
     box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
   }
 
-  .mesh-cyan {
+  .mesh-navy {
     background-image: 
-      radial-gradient(at 0% 0%, hsla(200, 85%, 55%, 0.18) 0, transparent 55%),
-      radial-gradient(at 100% 80%, hsla(280, 50%, 40%, 0.08) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(220, 70%, 45%, 0.18) 0, transparent 55%),
+      radial-gradient(at 100% 80%, hsla(265, 45%, 40%, 0.08) 0, transparent 50%);
   }
 
   .mesh-purple {
     background-image: 
-      radial-gradient(at 0% 0%, hsla(280, 60%, 50%, 0.18) 0, transparent 55%),
-      radial-gradient(at 100% 80%, hsla(200, 60%, 50%, 0.08) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(265, 55%, 48%, 0.18) 0, transparent 55%),
+      radial-gradient(at 100% 80%, hsla(220, 55%, 45%, 0.08) 0, transparent 50%);
   }
 
-  .mesh-pink {
+  .mesh-coral {
     background-image: 
-      radial-gradient(at 0% 0%, hsla(330, 60%, 50%, 0.16) 0, transparent 55%),
-      radial-gradient(at 100% 80%, hsla(260, 50%, 45%, 0.08) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(8, 70%, 55%, 0.16) 0, transparent 55%),
+      radial-gradient(at 100% 80%, hsla(28, 60%, 50%, 0.08) 0, transparent 50%);
+  }
+
+  .mesh-warm {
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(28, 65%, 52%, 0.16) 0, transparent 55%),
+      radial-gradient(at 100% 80%, hsla(8, 60%, 55%, 0.08) 0, transparent 50%);
   }
 
   .tech-gradient {
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%);
   }
 
   .glow-primary {
-    box-shadow: 0 0 15px hsla(200, 85%, 50%, 0.4), 0 0 30px hsla(200, 85%, 50%, 0.15);
+    box-shadow: 0 0 15px hsla(220, 75%, 50%, 0.35), 0 0 30px hsla(220, 75%, 50%, 0.12);
   }
 
   .glow-accent {
-    box-shadow: 0 0 15px hsla(330, 65%, 50%, 0.4), 0 0 30px hsla(330, 65%, 50%, 0.15);
+    box-shadow: 0 0 15px hsla(8, 80%, 58%, 0.35), 0 0 30px hsla(8, 80%, 58%, 0.12);
   }
 
   .glow-secondary {
-    box-shadow: 0 0 15px hsla(280, 55%, 50%, 0.4), 0 0 30px hsla(280, 55%, 50%, 0.15);
+    box-shadow: 0 0 15px hsla(265, 55%, 50%, 0.35), 0 0 30px hsla(265, 55%, 50%, 0.12);
   }
 
   .input-glass {

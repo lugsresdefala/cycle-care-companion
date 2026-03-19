@@ -122,17 +122,17 @@ const Index = () => {
       {/* Ambient background orbs */}
       <div
         className="hero-gradient-orb w-[600px] h-[600px] -top-[200px] -left-[200px] fixed"
-        style={{ background: "radial-gradient(circle, hsla(280, 60%, 40%, 0.3) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, hsla(220, 65%, 40%, 0.25) 0%, transparent 70%)" }}
       />
 
       <div
         className="hero-gradient-orb w-[500px] h-[500px] top-[30%] -right-[150px] fixed"
-        style={{ background: "radial-gradient(circle, hsla(200, 70%, 45%, 0.2) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, hsla(265, 45%, 40%, 0.18) 0%, transparent 70%)" }}
       />
 
       <div
         className="hero-gradient-orb w-[400px] h-[400px] bottom-[10%] left-[20%] fixed"
-        style={{ background: "radial-gradient(circle, hsla(330, 55%, 45%, 0.15) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle, hsla(8, 65%, 50%, 0.12) 0%, transparent 70%)" }}
       />
 
       {/* Header */}
