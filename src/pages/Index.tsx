@@ -192,11 +192,11 @@ const Index = () => {
                 transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <h1 className="font-display text-4xl md:text-5xl leading-tight">
-                  <span className="bg-gradient-to-br from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    Calculadoras para
+                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    Calculadoras Clínicas
                   </span>
                   <br />
-                  <span className="text-foreground text-4xl font-bold">Saúde Reprodutiva & Medicina Fetal</span>
+                  <span className="text-foreground text-3xl md:text-4xl font-bold">Saúde da Mulher</span>
                 </h1>
                 <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
                   Ferramentas de biometria e datação gestacional para uso clínico diário, com referências baseadas em
