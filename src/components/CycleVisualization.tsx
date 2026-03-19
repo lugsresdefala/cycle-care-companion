@@ -129,7 +129,7 @@ const CycleVisualization = ({
                     <circle
                       cx={x} cy={y}
                       r={isSelected ? 9 : isOvulation ? 7 : 5}
-                      fill={isOvulation ? "hsl(28, 70%, 52%)" : isCurrent ? "hsl(220, 65%, 45%)" : isSelected ? "hsl(8, 72%, 62%)" : "rgba(255,255,255,0.15)"}
+                      fill={isOvulation ? "hsl(28, 70%, 52%)" : isCurrent ? "hsl(220, 65%, 38%)" : isSelected ? "hsl(8, 72%, 58%)" : "rgba(0,0,0,0.1)"}
                       stroke={isSelected ? "hsl(8, 72%, 62%)" : isOvulation ? "hsl(28, 70%, 52%)" : "none"}
                       strokeWidth={isSelected ? 2 : 0}
                     />
