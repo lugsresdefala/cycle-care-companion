@@ -99,7 +99,7 @@ const CycleVisualization = ({
           <div className="relative flex-shrink-0" style={{ width: 260, height: 260 }}>
             <svg width="260" height="260" viewBox="0 0 300 300">
               {/* Track ring */}
-              <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={28} />
+              <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth={28} />
 
               {/* Phase arcs */}
               {(Object.entries(phases) as [string, { start: number; end: number }][]).map(([key, phase]) => (
