@@ -99,7 +99,7 @@ const CycleVisualization = ({
           <div className="relative flex-shrink-0" style={{ width: 260, height: 260 }}>
             <svg width="260" height="260" viewBox="0 0 300 300">
               {/* Track ring */}
-              <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={28} />
+              <circle cx={CX} cy={CY} r={R} fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth={28} />
 
               {/* Phase arcs */}
               {(Object.entries(phases) as [string, { start: number; end: number }][]).map(([key, phase]) => (
@@ -129,7 +129,7 @@ const CycleVisualization = ({
                     <circle
                       cx={x} cy={y}
                       r={isSelected ? 9 : isOvulation ? 7 : 5}
-                      fill={isOvulation ? "hsl(28, 70%, 52%)" : isCurrent ? "hsl(220, 65%, 45%)" : isSelected ? "hsl(8, 72%, 62%)" : "rgba(255,255,255,0.15)"}
+                      fill={isOvulation ? "hsl(28, 70%, 52%)" : isCurrent ? "hsl(220, 65%, 38%)" : isSelected ? "hsl(8, 72%, 58%)" : "rgba(0,0,0,0.1)"}
                       stroke={isSelected ? "hsl(8, 72%, 62%)" : isOvulation ? "hsl(28, 70%, 52%)" : "none"}
                       strokeWidth={isSelected ? 2 : 0}
                     />
@@ -143,14 +143,14 @@ const CycleVisualization = ({
               })}
 
               {/* Center Info */}
-              <circle cx={CX} cy={CY} r={56} fill="hsla(225, 25%, 6%, 0.85)" />
-              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(220, 20%, 92%)">
+              <circle cx={CX} cy={CY} r={56} fill="hsla(30, 25%, 97%, 0.9)" />
+              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(220, 30%, 15%)">
                 {selectedDay}
               </text>
-              <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.stroke} fontWeight="600">
+              <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.fill} fontWeight="600">
                 {currentPhaseConfig.label}
               </text>
-              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(220, 12%, 50%)">
+              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(220, 12%, 45%)">
                 de {cycleLength} dias
               </text>
             </svg>
