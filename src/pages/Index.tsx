@@ -139,8 +139,8 @@ const Index = () => {
       <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/70">
         <div className="container max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => setActiveModule(null)} className="flex items-center gap-2.5">
-            <img src={logo} alt="IDALIA-CALC" className="w-12 h-12 rounded-xl object-cover ring-1 ring-primary/20" />
-            <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
+            <img src={logo} alt="IDALIA-CALC" className="w-10 h-10 rounded-full object-cover" />
+            <span className="font-display text-lg text-foreground tracking-tight">IDALIA<span className="text-accent font-normal italic">Calc</span></span>
           </button>
 
           {activeModule && (
@@ -182,7 +182,8 @@ const Index = () => {
                 <img
                   src={logo}
                   alt="IDALIA-CALC"
-                  className="w-64 h-64 rounded-xl object-cover ring-2 ring-primary/40 shadow-2xl"
+                  className="w-56 h-56 rounded-full object-cover shadow-2xl"
+                  style={{ filter: "drop-shadow(0 0 40px hsla(220, 65%, 45%, 0.3))" }}
                 />
               </motion.div>
               <motion.div
@@ -191,11 +192,11 @@ const Index = () => {
                 transition={{ delay: 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               >
                 <h1 className="font-display text-4xl md:text-5xl leading-tight">
-                  <span className="bg-gradient-to-br from-primary via-secondary to-accent bg-clip-text text-transparent">
-                    Calculadoras para
+                  <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                    Calculadoras Clínicas
                   </span>
                   <br />
-                  <span className="text-foreground text-4xl font-bold">Saúde Reprodutiva & Medicina Fetal</span>
+                  <span className="text-foreground text-3xl md:text-4xl font-bold">Saúde da Mulher</span>
                 </h1>
                 <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
                   Ferramentas de biometria e datação gestacional para uso clínico diário, com referências baseadas em
