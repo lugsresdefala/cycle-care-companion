@@ -17,10 +17,10 @@ interface CycleVisualizationProps {
 }
 
 const PHASE_COLORS: Record<string, { fill: string; stroke: string; label: string }> = {
-  menstrual:  { fill: "#ef4444", stroke: "#fca5a5", label: "Menstrual" },
-  follicular: { fill: "#3b82f6", stroke: "#93c5fd", label: "Folicular" },
-  ovulatory:  { fill: "#eab308", stroke: "#fde047", label: "Ovulatória" },
-  luteal:     { fill: "#14b8a6", stroke: "#5eead4", label: "Lútea" },
+  menstrual:  { fill: "hsl(8, 72%, 62%)",   stroke: "hsl(8, 72%, 78%)",   label: "Menstrual" },
+  follicular: { fill: "hsl(220, 65%, 45%)",  stroke: "hsl(220, 65%, 70%)", label: "Folicular" },
+  ovulatory:  { fill: "hsl(28, 70%, 52%)",   stroke: "hsl(28, 70%, 72%)",  label: "Ovulatória" },
+  luteal:     { fill: "hsl(265, 40%, 48%)",  stroke: "hsl(265, 40%, 72%)", label: "Lútea" },
 };
 
 const CycleVisualization = ({
@@ -50,20 +50,20 @@ const CycleVisualization = ({
 
   const getFertilityLevel = (day: number) => {
     const dist = Math.abs(day - ovulationDay);
-    if (dist === 0) return { level: 100, label: "Pico de Fertilidade", color: "#10b981" };
-    if (dist <= 1)  return { level: 90,  label: "Muito Alta",          color: "#34d399" };
-    if (dist <= 3)  return { level: 70,  label: "Alta",                color: "#fbbf24" };
-    if (dist <= 5)  return { level: 40,  label: "Moderada",            color: "#f97316" };
-    return { level: 10, label: "Baixa", color: "#6b7280" };
+    if (dist === 0) return { level: 100, label: "Pico de Fertilidade", color: "hsl(8, 72%, 62%)" };
+    if (dist <= 1)  return { level: 90,  label: "Muito Alta",          color: "hsl(8, 72%, 68%)" };
+    if (dist <= 3)  return { level: 70,  label: "Alta",                color: "hsl(28, 70%, 52%)" };
+    if (dist <= 5)  return { level: 40,  label: "Moderada",            color: "hsl(265, 40%, 48%)" };
+    return { level: 10, label: "Baixa", color: "hsl(220, 12%, 50%)" };
   };
 
   const getDayCharacteristics = (day: number) => {
     const phase = getCurrentPhase(day);
     const map: Record<string, { mucus: string; temperature: string; hormones: string; mucusColor: string; tempColor: string; hormonColor: string }> = {
-      menstrual:  { mucus: "Ausente",        temperature: "Baixa",       hormones: "Estrogênio baixo",      mucusColor: "text-gray-400",    tempColor: "text-blue-400",   hormonColor: "text-red-400" },
-      follicular: { mucus: "Cremoso",        temperature: "Estável",     hormones: "Estrogênio crescente",  mucusColor: "text-blue-300",    tempColor: "text-blue-400",   hormonColor: "text-blue-400" },
-      ovulatory:  { mucus: "Clara de ovo",   temperature: "Pico baixo",  hormones: "Pico de LH",            mucusColor: "text-cyan-400",    tempColor: "text-yellow-400", hormonColor: "text-yellow-400" },
-      luteal:     { mucus: "Espesso",        temperature: "Elevada",     hormones: "Progesterona alta",     mucusColor: "text-teal-300",    tempColor: "text-red-400",    hormonColor: "text-teal-400" },
+      menstrual:  { mucus: "Ausente",        temperature: "Baixa",       hormones: "Estrogênio baixo",      mucusColor: "text-muted-foreground", tempColor: "text-primary",         hormonColor: "text-accent" },
+      follicular: { mucus: "Cremoso",        temperature: "Estável",     hormones: "Estrogênio crescente",  mucusColor: "text-primary",          tempColor: "text-primary",         hormonColor: "text-primary" },
+      ovulatory:  { mucus: "Clara de ovo",   temperature: "Pico baixo",  hormones: "Pico de LH",            mucusColor: "text-accent",           tempColor: "text-accent",          hormonColor: "text-accent" },
+      luteal:     { mucus: "Espesso",        temperature: "Elevada",     hormones: "Progesterona alta",     mucusColor: "text-secondary",        tempColor: "text-accent",          hormonColor: "text-secondary" },
     };
     return map[phase];
   };
@@ -88,8 +88,8 @@ const CycleVisualization = ({
   return (
     <div className="space-y-5">
       {/* Circular Diagram + Info */}
-      <div className="glass-card p-5 border-cyan-500/20 rounded-2xl">
-        <h3 className="text-base font-semibold text-cyan-300 mb-4 flex items-center gap-2">
+      <div className="glass-card p-5 border-primary/20 rounded-2xl">
+        <h3 className="text-base font-semibold text-primary mb-4 flex items-center gap-2">
           <Calendar className="h-5 w-5" />
           Visualização do Ciclo Menstrual
         </h3>
@@ -129,12 +129,12 @@ const CycleVisualization = ({
                     <circle
                       cx={x} cy={y}
                       r={isSelected ? 9 : isOvulation ? 7 : 5}
-                      fill={isOvulation ? "#fbbf24" : isCurrent ? "#0ea5e9" : isSelected ? "#f59e0b" : "rgba(255,255,255,0.15)"}
-                      stroke={isSelected ? "#fbbf24" : isOvulation ? "#f59e0b" : "none"}
+                      fill={isOvulation ? "hsl(28, 70%, 52%)" : isCurrent ? "hsl(220, 65%, 45%)" : isSelected ? "hsl(8, 72%, 62%)" : "rgba(255,255,255,0.15)"}
+                      stroke={isSelected ? "hsl(8, 72%, 62%)" : isOvulation ? "hsl(28, 70%, 52%)" : "none"}
                       strokeWidth={isSelected ? 2 : 0}
                     />
                     {(day === 1 || day % 7 === 0 || day === ovulationDay) && (
-                      <text x={x} y={y - 13} textAnchor="middle" fontSize="9" fill="rgba(147,197,253,0.8)" fontWeight="600">
+                      <text x={x} y={y - 13} textAnchor="middle" fontSize="9" fill="hsl(220, 20%, 70%)" fontWeight="600">
                         {day}
                       </text>
                     )}
@@ -143,14 +143,14 @@ const CycleVisualization = ({
               })}
 
               {/* Center Info */}
-              <circle cx={CX} cy={CY} r={56} fill="rgba(2,8,20,0.75)" />
-              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="white">
+              <circle cx={CX} cy={CY} r={56} fill="hsla(225, 25%, 6%, 0.85)" />
+              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(220, 20%, 92%)">
                 {selectedDay}
               </text>
               <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.stroke} fontWeight="600">
                 {currentPhaseConfig.label}
               </text>
-              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="rgba(147,197,253,0.6)">
+              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(220, 12%, 50%)">
                 de {cycleLength} dias
               </text>
             </svg>
@@ -170,21 +170,21 @@ const CycleVisualization = ({
                   }}
                 >
                   <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.fill }} />
-                  <span className="text-xs text-blue-200">{cfg.label}</span>
+                  <span className="text-xs text-foreground/70">{cfg.label}</span>
                 </div>
               ))}
             </div>
 
             {/* Fertility Meter */}
-            <div className="glass-panel rounded-xl p-4 border border-green-500/20">
+            <div className="glass-card-static rounded-xl p-4 border-accent/20">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-green-300" />
-                  <span className="text-sm font-medium text-green-300">Fertilidade — Dia {selectedDay}</span>
+                  <Heart className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-medium text-accent">Fertilidade — Dia {selectedDay}</span>
                 </div>
-                <span className="text-base font-bold text-white">{fertility.level}%</span>
+                <span className="text-base font-bold text-foreground">{fertility.level}%</span>
               </div>
-              <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden">
+              <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                 <div
                   className="absolute left-0 top-0 h-full rounded-full transition-all duration-500"
                   style={{ width: `${fertility.level}%`, backgroundColor: fertility.color }}
@@ -194,32 +194,32 @@ const CycleVisualization = ({
             </div>
 
             {/* Biological Characteristics */}
-            <div className="glass-panel rounded-xl p-4 border border-blue-500/20">
+            <div className="glass-card-static rounded-xl p-4 border-primary/20">
               <div className="flex items-center gap-2 mb-3">
-                <CircleDot className="h-4 w-4 text-blue-300" />
-                <span className="text-sm font-medium text-blue-200">Biomarcadores</span>
+                <CircleDot className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Biomarcadores</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Droplets className={`h-3.5 w-3.5 ${characteristics.mucusColor}`} />
-                    <span className="text-xs text-gray-400">Muco</span>
+                    <span className="text-xs text-muted-foreground">Muco</span>
                   </div>
-                  <span className="text-xs font-medium text-white">{characteristics.mucus}</span>
+                  <span className="text-xs font-medium text-foreground">{characteristics.mucus}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Thermometer className={`h-3.5 w-3.5 ${characteristics.tempColor}`} />
-                    <span className="text-xs text-gray-400">Temperatura</span>
+                    <span className="text-xs text-muted-foreground">Temperatura</span>
                   </div>
-                  <span className="text-xs font-medium text-white">{characteristics.temperature}</span>
+                  <span className="text-xs font-medium text-foreground">{characteristics.temperature}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Activity className={`h-3.5 w-3.5 ${characteristics.hormonColor}`} />
-                    <span className="text-xs text-gray-400">Hormônios</span>
+                    <span className="text-xs text-muted-foreground">Hormônios</span>
                   </div>
-                  <span className="text-xs font-medium text-white">{characteristics.hormones}</span>
+                  <span className="text-xs font-medium text-foreground">{characteristics.hormones}</span>
                 </div>
               </div>
             </div>
@@ -228,8 +228,8 @@ const CycleVisualization = ({
       </div>
 
       {/* Linear Timeline */}
-      <div className="glass-card p-4 border-blue-500/20 rounded-2xl">
-        <h4 className="text-sm font-medium text-blue-300 mb-3 flex items-center gap-2">
+      <div className="glass-card p-4 border-primary/20 rounded-2xl">
+        <h4 className="text-sm font-medium text-primary mb-3 flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           Timeline do Ciclo — clique para selecionar
         </h4>
@@ -247,16 +247,16 @@ const CycleVisualization = ({
                   key={day}
                   onClick={() => setSelectedDay(day)}
                   className={`flex-shrink-0 w-7 h-16 rounded-lg cursor-pointer transition-all duration-150 relative
-                    ${isSelected ? "scale-110 ring-2 ring-yellow-400 z-10" : "hover:scale-105"}
-                    ${isCurrent ? "ring-2 ring-cyan-400" : ""}
+                    ${isSelected ? "scale-110 ring-2 ring-accent z-10" : "hover:scale-105"}
+                    ${isCurrent ? "ring-2 ring-primary" : ""}
                   `}
                   style={{ backgroundColor: cfg.fill, opacity: isSelected ? 1 : 0.45 }}
                 >
                   {isOvulation && (
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-accent rounded-full animate-pulse" />
                   )}
                   <div className="w-full h-full rounded-lg flex items-end justify-center pb-1">
-                    <span className="text-xs font-semibold text-white/90">{day}</span>
+                    <span className="text-xs font-semibold text-foreground/90">{day}</span>
                   </div>
                 </div>
               );
@@ -267,7 +267,7 @@ const CycleVisualization = ({
           {(Object.entries(PHASE_COLORS) as [string, typeof PHASE_COLORS[string]][]).map(([key, cfg]) => (
             <div key={key} className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cfg.fill }} />
-              <span className="text-xs text-blue-400/70">{cfg.label}</span>
+              <span className="text-xs text-muted-foreground">{cfg.label}</span>
             </div>
           ))}
         </div>

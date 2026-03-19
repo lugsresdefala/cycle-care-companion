@@ -50,7 +50,7 @@ const EFWCalculator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-cyan">
+      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h2 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h2>
           <p className="text-sm text-muted-foreground mt-1">

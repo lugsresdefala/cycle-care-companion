@@ -35,7 +35,7 @@ const CRLCalculator = () => {
 
   return (
     <div className="space-y-6">
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-teal">
+      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Calculadora CRL</h2>
           <p className="text-sm text-muted-foreground mt-1">
