@@ -5,8 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import {
-  Info, Droplets, Thermometer, ChevronDown, ChevronUp,
-  Calendar as CalendarIcon, Activity, Heart, Clock, Sparkles,
+  Info, Droplets, Thermometer, ChevronDown,
+  Calendar as CalendarIcon, Activity, Heart, Clock, Sparkles, ArrowRight,
 } from "lucide-react";
 import {
   calculateFertilePeriod,
@@ -172,9 +172,14 @@ const FertilityCalculator = () => {
       {/* ─── Input Section ─────────────────────────────── */}
       <div className="glass-card-static p-5 sm:p-6 space-y-5 mesh-cyan">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Heart className="w-4 h-4 text-accent" />
-            <h2 className="font-display text-lg text-foreground">Calculadora de Ciclo Menstrual</h2>
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="w-8 h-8 rounded-xl bg-accent/15 flex items-center justify-center">
+              <Heart className="w-4 h-4 text-accent" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg text-foreground leading-tight">Calculadora de Ciclo Menstrual</h2>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Período Fértil & Ovulação</p>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Estimativa de período fértil, data de ovulação e fase do ciclo com base em parâmetros do ciclo menstrual.
@@ -252,11 +257,14 @@ const FertilityCalculator = () => {
             onClick={handleCalculate}
             disabled={!canCalculate}
             className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
-              canCalculate ? "bg-primary text-primary-foreground hover:bg-primary/90 glow-primary" : "opacity-50 cursor-not-allowed"
+              canCalculate
+                ? "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent"
+                : "opacity-40 cursor-not-allowed"
             }`}
           >
             <Sparkles className="w-4 h-4" />
             Calcular Ciclo
+            {canCalculate && <ArrowRight className="w-3.5 h-3.5 ml-0.5" />}
           </Button>
         </div>
       </div>
@@ -271,50 +279,61 @@ const FertilityCalculator = () => {
             className="space-y-4"
           >
             {/* Hero Phase Banner */}
-            <div className={`glass-card-static p-5 sm:p-6 mesh-cyan border ${phaseConfig?.bgColor}`}>
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div>
+            <div className={`glass-card-static p-5 sm:p-6 border ${phaseConfig?.bgColor} relative overflow-hidden`}>
+              {/* Subtle background gradient */}
+              <div className="absolute inset-0 pointer-events-none mesh-cyan opacity-60" />
+
+              <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Heart className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Fase Atual</span>
+                    <div className={`status-dot ${phaseConfig?.color}`} style={{ background: "currentColor" }} />
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Fase Atual do Ciclo</span>
                   </div>
-                  <h2 className={`font-display text-2xl sm:text-3xl capitalize ${phaseConfig?.color}`}>
+                  <h2 className={`font-display text-2xl sm:text-3xl capitalize ${phaseConfig?.color} animate-count-up`}>
                     {results.currentCyclePhase}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{phaseConfig?.description}</p>
                 </div>
-                <div className="flex gap-5 sm:gap-6">
+
+                <div className="flex gap-4 sm:gap-5">
                   {results.daysUntilNextPhase > 0 && (
-                    <div className="text-center">
-                      <p className="tabular-nums text-2xl font-display text-foreground">{results.daysUntilNextPhase}</p>
+                    <div className="stat-card text-center min-w-[64px]">
+                      <p className="number-display text-2xl font-display text-foreground">{results.daysUntilNextPhase}</p>
                       <p className="text-[10px] text-muted-foreground">dias para</p>
-                      <p className="text-xs text-primary capitalize font-medium">{results.nextPhase}</p>
+                      <p className="text-xs text-primary capitalize font-semibold">{results.nextPhase}</p>
                     </div>
                   )}
-                  <div className="text-center">
-                    <p className="tabular-nums text-2xl font-display text-foreground">{cycleLength}</p>
+                  <div className="stat-card text-center min-w-[56px]">
+                    <p className="number-display text-2xl font-display text-foreground">{cycleLength}</p>
                     <p className="text-[10px] text-muted-foreground">dias</p>
-                    <p className="text-[10px] text-muted-foreground">do ciclo</p>
+                    <p className="text-[10px] text-muted-foreground/70">ciclo</p>
                   </div>
                 </div>
               </div>
 
               {/* Phase progress bar */}
-              <div className="mt-5 space-y-2">
-                <div className="flex rounded-full overflow-hidden h-2 gap-px">
+              <div className="relative mt-5 space-y-2">
+                <div className="flex rounded-full overflow-hidden h-2.5 gap-0.5">
                   {CYCLE_PHASES.map((p) => (
                     <div
                       key={p.key}
-                      className={`${p.color} transition-opacity duration-300 ${
-                        results.currentCyclePhase === p.key ? "opacity-100" : "opacity-22"
+                      className={`phase-segment ${p.color} transition-all duration-500 ${
+                        results.currentCyclePhase === p.key ? "opacity-100 brightness-110" : "opacity-25"
                       }`}
                       style={{ width: `${p.pct}%` }}
                     />
                   ))}
                 </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground">
+                <div className="flex justify-between">
                   {CYCLE_PHASES.map((p) => (
-                    <span key={p.key} className={results.currentCyclePhase === p.key ? "text-primary font-medium" : ""}>
+                    <span
+                      key={p.key}
+                      className={`text-[10px] transition-colors duration-300 ${
+                        results.currentCyclePhase === p.key
+                          ? "text-foreground font-semibold"
+                          : "text-muted-foreground/60"
+                      }`}
+                    >
                       {p.label}
                     </span>
                   ))}
@@ -325,28 +344,34 @@ const FertilityCalculator = () => {
             {/* Key Date Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {/* Fertile Window */}
-              <div className="glass-card-static p-4 space-y-3 border border-fertility/20">
+              <div className="glass-card-static p-4 space-y-3 border border-fertility/25 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none">
+                  <div className="absolute inset-0 bg-fertility/5 rounded-bl-3xl" />
+                </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-fertility/20 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-fertility/20 flex items-center justify-center">
                     <Heart className="w-4 h-4 text-fertility" />
                   </div>
-                  <span className="font-semibold text-sm text-foreground">Janela Fértil</span>
+                  <div>
+                    <span className="font-semibold text-sm text-foreground">Janela Fértil</span>
+                    <p className="text-[10px] text-muted-foreground">6 dias de maior fertilidade</p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Início</p>
-                    <p className="text-base font-display text-foreground tabular-nums">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Início</p>
+                    <p className="text-lg font-display text-foreground tabular-nums">
                       {format(results.fertileStart, "dd MMM", { locale: ptBR })}
                     </p>
                   </div>
-                  <div className="flex-1 flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="flex-1 h-0.5 rounded-full bg-fertility/40" />
+                  <div className="flex-1 flex items-center gap-0.5">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="flex-1 h-1 rounded-full bg-fertility/50" />
                     ))}
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Fim</p>
-                    <p className="text-base font-display text-foreground tabular-nums">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Fim</p>
+                    <p className="text-lg font-display text-foreground tabular-nums">
                       {format(results.fertileEnd, "dd MMM", { locale: ptBR })}
                     </p>
                   </div>
@@ -357,17 +382,23 @@ const FertilityCalculator = () => {
               </div>
 
               {/* Ovulation */}
-              <div className="glass-card-static p-4 space-y-3 border border-ovulatory/20">
+              <div className="glass-card-static p-4 space-y-3 border border-primary/25 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none">
+                  <div className="absolute inset-0 bg-primary/5 rounded-bl-3xl" />
+                </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-ovulatory/20 flex items-center justify-center">
-                    <Activity className="w-4 h-4 text-ovulatory" />
+                  <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                    <Activity className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="font-semibold text-sm text-foreground">Dia da Ovulação</span>
-                  <Badge variant="outline" className="text-[10px] border-ovulatory/30 text-ovulatory ml-auto">
+                  <div>
+                    <span className="font-semibold text-sm text-foreground">Dia da Ovulação</span>
+                    <p className="text-[10px] text-muted-foreground">pico de fertilidade</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] border-primary/30 text-primary ml-auto">
                     Estimado
                   </Badge>
                 </div>
-                <p className="text-xl font-display text-foreground tabular-nums">
+                <p className="text-xl font-display text-foreground tabular-nums capitalize">
                   {format(results.ovulationDay, "dd 'de' MMMM", { locale: ptBR })}
                 </p>
                 <p className="text-[10px] text-muted-foreground leading-relaxed">
@@ -491,15 +522,18 @@ const CollapsibleSection = ({
   <div className="glass-card-static overflow-hidden">
     <button
       onClick={onToggle}
-      className="w-full flex items-center justify-between p-4 tech-gradient hover:bg-muted/20 transition-colors"
+      className="collapsible-header"
     >
-      <div className="flex items-center gap-2">
-        {icon}
+      <div className="flex items-center gap-2.5">
+        <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors ${isOpen ? "bg-primary/20" : "bg-muted/40"}`}>
+          {icon}
+        </div>
         <span className="text-sm font-semibold text-foreground">{title}</span>
+        {isOpen && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-ring" />}
       </div>
       <motion.div
         animate={{ rotate: isOpen ? 180 : 0 }}
-        transition={{ duration: 0.2, ease: "easeInOut" }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
         <ChevronDown className="w-4 h-4 text-muted-foreground" />
       </motion.div>
@@ -513,6 +547,7 @@ const CollapsibleSection = ({
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           style={{ overflow: "hidden" }}
         >
+          <div className="border-t border-border/30" />
           {children}
         </motion.div>
       )}
