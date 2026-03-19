@@ -139,8 +139,8 @@ const Index = () => {
       <header className="border-b border-border/50 backdrop-blur-xl sticky top-0 z-50 bg-background/70">
         <div className="container max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => setActiveModule(null)} className="flex items-center gap-2.5">
-            <img src={logo} alt="IDALIA-CALC" className="w-12 h-12 rounded-xl object-cover ring-1 ring-primary/20" />
-            <span className="font-display text-lg text-foreground tracking-tight">IDALIA-CALC</span>
+            <img src={logo} alt="IDALIA-CALC" className="w-10 h-10 rounded-full object-cover" />
+            <span className="font-display text-lg text-foreground tracking-tight">IDALIA<span className="text-accent font-normal italic">Calc</span></span>
           </button>
 
           {activeModule && (
