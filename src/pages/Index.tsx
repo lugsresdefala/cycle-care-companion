@@ -182,7 +182,8 @@ const Index = () => {
                 <img
                   src={logo}
                   alt="IDALIA-CALC"
-                  className="w-64 h-64 rounded-xl object-cover ring-2 ring-primary/40 shadow-2xl"
+                  className="w-56 h-56 rounded-full object-cover shadow-2xl"
+                  style={{ filter: "drop-shadow(0 0 40px hsla(220, 65%, 45%, 0.3))" }}
                 />
               </motion.div>
               <motion.div
