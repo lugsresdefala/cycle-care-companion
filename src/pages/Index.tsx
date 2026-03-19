@@ -196,7 +196,7 @@ const Index = () => {
                     Calculadoras Clínicas
                   </span>
                   <br />
-                  <span className="text-foreground text-3xl md:text-4xl font-bold">Saúde da Mulher</span>
+                  <span className="text-foreground text-3xl md:text-4xl font-bold">Saúde Reprodutiva e Medicina Fetal</span>
                 </h1>
                 <p className="text-muted-foreground mt-5 max-w-xl mx-auto leading-relaxed">
                   Ferramentas de biometria e datação gestacional para uso clínico diário, com referências baseadas em
