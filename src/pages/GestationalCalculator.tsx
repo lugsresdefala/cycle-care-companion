@@ -208,7 +208,7 @@ const GestationalCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
           Calcular
         </Button>
       </div>
