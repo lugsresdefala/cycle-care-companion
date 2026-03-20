@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp, User, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
@@ -149,6 +152,8 @@ const item = {
 };
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState<ActiveModule>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -239,9 +244,24 @@ const Index = () => {
               className="shrink-0 text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
             >
               <ChevronRight className="w-3 h-3 rotate-180" />
-              <span className="hidden xs:inline">Início</span>
+              <span className="hidden xs:inline">Inicio</span>
             </button>
           )}
+
+          {/* Auth buttons */}
+          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-1.5 text-xs">
+                <User className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Painel</span>
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1.5 text-xs">
+                <LogIn className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Entrar</span>
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
