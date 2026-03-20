@@ -33,6 +33,7 @@ const PERCENTILE_COLORS = {
 };
 
 const GrowthCurveCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [measurements, setMeasurements] = useState<Measurement[]>([
     { id: crypto.randomUUID(), ga: "", value: "" },
@@ -55,7 +56,7 @@ const GrowthCurveCalculator = () => {
     setMeasurements((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: val } : m)));
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const valid: { ga: number; value: number }[] = [];
     for (const m of measurements) {
       const ga = parseFloat(m.ga);
@@ -71,6 +72,8 @@ const GrowthCurveCalculator = () => {
       setError("Insira pelo menos uma medida válida.");
       return;
     }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setAssessments(valid.map((v) => assessGrowth(selectedParam, v.ga, v.value)));
   };

@@ -56,7 +56,7 @@ const GestationalCalculator = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>("development");
   const [results, setResults] = useState<CalcResults | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     let result;
     if (calculationType === "lmp") {
       if (!lmpDate) return;
@@ -70,6 +70,8 @@ const GestationalCalculator = () => {
     }
 
     if (!result) return;
+    const ok = await consumeToken();
+    if (!ok) return;
     const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
 
     setResults({

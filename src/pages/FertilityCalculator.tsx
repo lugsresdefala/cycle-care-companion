@@ -59,8 +59,11 @@ const FertilityCalculator = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>("bodyChanges");
   const [results, setResults] = useState<CalcResults | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     if (!lastPeriodStart || !lastPeriodEnd) return;
+
+    const ok = await consumeToken();
+    if (!ok) return;
 
     const avgCycleLength = cycleHistory.length > 1 ?
     Math.round(cycleHistory.reduce((acc, c) => acc + c.cycleLength, 0) / cycleHistory.length) :
