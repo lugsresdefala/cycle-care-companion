@@ -153,6 +153,7 @@ const Index = () => {
       case "bpd":         return <BPDCalculator />;
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
+      case "doppler":     return <DopplerCalculator />;
       default:            return null;
     }
   };
