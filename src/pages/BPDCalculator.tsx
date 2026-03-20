@@ -80,7 +80,7 @@ const BPDCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>
