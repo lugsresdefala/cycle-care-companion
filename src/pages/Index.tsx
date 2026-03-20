@@ -21,6 +21,7 @@ const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; sh
   { value: "biometry",    label: "Biometria",           icon: <Activity className="w-3 h-3" />,  short: "Bio" },
   { value: "efw",         label: "PFE",                icon: <Scale className="w-3 h-3" />,     short: "PFE" },
   { value: "doppler",     label: "Doppler",            icon: <Waves className="w-3 h-3" />,     short: "Dop" },
+  { value: "growth",      label: "Crescimento",        icon: <TrendingUp className="w-3 h-3" />, short: "Curva" },
 ];
 
 const CARDS: {
