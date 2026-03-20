@@ -660,6 +660,7 @@ const DopplerCalculator = () => {
           { param: "IR (RI)", unit: "adimensional", description: "Índice de Resistência — (S-D)/S" },
           { param: "S/D", unit: "razão", description: "Relação entre pico sistólico e diastólico" },
           { param: "RCP (CPR)", unit: "razão", description: "IP ACM / IP AU" },
+          { param: "PIV (DV)", unit: "adimensional", description: "Pulsatility Index for Veins — ducto venoso" },
           { param: "IG", unit: "semanas", description: "Semanas completas de gestação" },
         ]}
         extraDisclaimer="Os valores de referência são aproximações baseadas nas publicações citadas. Para avaliação precisa, consulte as tabelas originais e correlacione com o contexto clínico."

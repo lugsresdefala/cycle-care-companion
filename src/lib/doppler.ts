@@ -229,6 +229,51 @@ export function calculateCPR(mcaPI: number, uaPI: number, gaWeeks: number): CPRR
   return { cpr, mcaPI, uaPI, percentile, interpretation, severity };
 }
 
+// ---- Ductus Venosus PIV Reference Ranges (Kessler 2006 / DeVore 2021) ----
+const DV_PIV_REFS: Record<number, { p5: number; p50: number; p95: number }> = {
+  20: { p5: 0.34, p50: 0.54, p95: 0.84 },
+  22: { p5: 0.32, p50: 0.51, p95: 0.80 },
+  24: { p5: 0.30, p50: 0.48, p95: 0.76 },
+  26: { p5: 0.28, p50: 0.46, p95: 0.73 },
+  28: { p5: 0.26, p50: 0.44, p95: 0.70 },
+  30: { p5: 0.25, p50: 0.42, p95: 0.67 },
+  32: { p5: 0.24, p50: 0.40, p95: 0.64 },
+  34: { p5: 0.23, p50: 0.39, p95: 0.62 },
+  36: { p5: 0.22, p50: 0.38, p95: 0.60 },
+  38: { p5: 0.21, p50: 0.37, p95: 0.58 },
+  40: { p5: 0.20, p50: 0.36, p95: 0.56 },
+};
+
+export function evaluateDuctusVenosusPIV(piv: number, gaWeeks: number): DopplerResult {
+  const ga = getClosestGA(DV_PIV_REFS, gaWeeks);
+  const refs = DV_PIV_REFS[ga];
+  const { percentile, severity } = classifyPI(piv, refs, true);
+
+  let interpretation = "PIV do ducto venoso dentro dos limites normais — função cardíaca fetal preservada.";
+  if (severity === "warning")
+    interpretation = "PIV discretamente elevado — possível aumento da pós-carga cardíaca. Acompanhamento recomendado.";
+  if (severity === "critical")
+    interpretation = "PIV significativamente elevado — sugere disfunção cardíaca fetal. Avaliar onda 'a' reversa e considerar monitorização intensiva.";
+
+  return { value: piv, percentile, interpretation, severity };
+}
+
+export function evaluateDuctusVenosusWaveA(waveAReversed: boolean, gaWeeks: number): DopplerResult {
+  if (waveAReversed) {
+    const severity: "critical" = "critical";
+    const interpretation = gaWeeks < 14
+      ? "Onda 'a' reversa no 1º trimestre — associada a aneuploidias e cardiopatias congênitas. Correlacionar com translucência nucal e cariótipo."
+      : "Onda 'a' reversa — indica aumento significativo da pressão atrial direita e possível insuficiência cardíaca fetal. Risco de óbito perinatal aumentado.";
+    return { value: 0, percentile: "Onda A reversa", interpretation, severity };
+  }
+  return {
+    value: 1,
+    percentile: "Onda A positiva",
+    interpretation: "Onda 'a' anterógrada — padrão normal de fluxo no ducto venoso.",
+    severity: "normal",
+  };
+}
+
 // ---- Reference table getters (for visualization) ----
 export function getUAPiRefs(gaWeeks: number) {
   return UA_PI_REFS[getClosestGA(UA_PI_REFS, gaWeeks)];
@@ -241,4 +286,7 @@ export function getUtAPiRefs(gaWeeks: number) {
 }
 export function getCPRRefs(gaWeeks: number) {
   return CPR_REFS[getClosestGA(CPR_REFS, gaWeeks)];
+}
+export function getDVPivRefs(gaWeeks: number) {
+  return DV_PIV_REFS[getClosestGA(DV_PIV_REFS, gaWeeks)];
 }
