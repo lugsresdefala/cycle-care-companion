@@ -477,7 +477,7 @@ function CPRTab({ consumeToken, disabled }: TokenGateProps) {
 }
 
 // ── Ductus Venosus Tab ──
-function DuctusVenosusTab() {
+function DuctusVenosusTab({ consumeToken, disabled }: TokenGateProps) {
   const [piv, setPiv] = useState("");
   const [ga, setGa] = useState("");
   const [waveAReversed, setWaveAReversed] = useState(false);
@@ -488,13 +488,15 @@ function DuctusVenosusTab() {
     refs?: { p5: number; p50: number; p95: number };
   } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
       setError("Informe a IG entre 11 e 42 semanas.");
       return;
     }
     const pivVal = piv ? parseFloat(piv) : NaN;
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
 
     const waveAResult = evaluateDuctusVenosusWaveA(waveAReversed, gaVal);
