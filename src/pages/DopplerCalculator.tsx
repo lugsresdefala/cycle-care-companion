@@ -640,6 +640,20 @@ const DopplerCalculator = () => {
             doi: "10.1002/uog.108",
             pubmedId: "12858311",
           },
+          {
+            authors: "Kessler J, Rasmussen S, Hanson M, Kiserud T",
+            title: "Longitudinal reference ranges for ductus venosus flow velocities and waveform indices",
+            journal: "Ultrasound Obstet Gynecol",
+            year: 2006,
+            doi: "10.1002/uog.3886",
+            pubmedId: "17019750",
+          },
+          {
+            authors: "DeVore GR",
+            title: "Ductus venosus Doppler assessment: role in screening and monitoring",
+            journal: "Semin Perinatol",
+            year: 2021,
+          },
         ]}
         units={[
           { param: "IP (PI)", unit: "adimensional", description: "Índice de Pulsatilidade — (S-D)/Média" },
