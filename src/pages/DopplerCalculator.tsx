@@ -14,10 +14,13 @@ import {
   evaluateMCAPI,
   evaluateUterineArteryPI,
   calculateCPR,
+  evaluateDuctusVenosusPIV,
+  evaluateDuctusVenosusWaveA,
   getUAPiRefs,
   getMCAPiRefs,
   getUtAPiRefs,
   getCPRRefs,
+  getDVPivRefs,
   type DopplerResult,
   type CPRResult,
 } from "@/lib/doppler";
