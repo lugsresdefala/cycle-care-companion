@@ -52,7 +52,7 @@ interface CalcResults {
 }
 
 const FertilityCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("fertility");
   const [lastPeriodStart, setLastPeriodStart] = useState<Date | undefined>();
   const [lastPeriodEnd, setLastPeriodEnd] = useState<Date | undefined>();
   const [cycleLength, setCycleLength] = useState(28);
