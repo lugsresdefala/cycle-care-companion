@@ -20,16 +20,19 @@ const CRL_REFERENCE = [
 ];
 
 const CRLCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [crl, setCrl] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const ga = gestationalAgeFromCRL(value);
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
