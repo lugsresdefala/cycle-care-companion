@@ -309,18 +309,20 @@ function MCATab({ consumeToken, disabled }: TokenGateProps) {
 }
 
 // ── Uterine Artery Tab ──
-function UterineArteryTab() {
+function UterineArteryTab({ consumeToken, disabled }: TokenGateProps) {
   const [pi, setPi] = useState("");
   const [ga, setGa] = useState("");
   const [notch, setNotch] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const piVal = parseFloat(pi);
     if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) { setError("IG entre 11 e 42 semanas."); return; }
     if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP da artéria uterina."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setResult({ res: evaluateUterineArteryPI(piVal, gaVal, notch), refs: getUtAPiRefs(gaVal) });
   };
