@@ -464,6 +464,103 @@ function CPRTab() {
   );
 }
 
+// ── Ductus Venosus Tab ──
+function DuctusVenosusTab() {
+  const [piv, setPiv] = useState("");
+  const [ga, setGa] = useState("");
+  const [waveAReversed, setWaveAReversed] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<{
+    pivResult?: DopplerResult;
+    waveAResult: DopplerResult;
+    refs?: { p5: number; p50: number; p95: number };
+  } | null>(null);
+
+  const handleCalc = () => {
+    const gaVal = parseInt(ga);
+    if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
+      setError("Informe a IG entre 11 e 42 semanas.");
+      return;
+    }
+    const pivVal = piv ? parseFloat(piv) : NaN;
+    setError("");
+
+    const waveAResult = evaluateDuctusVenosusWaveA(waveAReversed, gaVal);
+    const pivResult = !isNaN(pivVal) && pivVal > 0 ? evaluateDuctusVenosusPIV(pivVal, gaVal) : undefined;
+    const refs = gaVal >= 20 ? getDVPivRefs(gaVal) : undefined;
+
+    setResult({ pivResult, waveAResult, refs });
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <div>
+          <h3 className="font-display text-lg text-foreground">Ducto Venoso (DV)</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Avaliação do fluxo venoso fetal — marcador de função cardíaca e descompensação hemodinâmica.
+          </p>
+          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">
+            Kessler et al., 2006 / DeVore, 2021
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">IG (sem)</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Idade gestacional (11–42)</TooltipContent>
+              </Tooltip>
+            </div>
+            <Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <Label className="text-sm text-foreground">PIV</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Pulsatility Index for Veins (opcional se ≥ 20 sem)</TooltipContent>
+              </Tooltip>
+            </div>
+            <Input type="number" step={0.01} value={piv} onChange={(e) => setPiv(e.target.value)} placeholder="PIV" className="input-glass tabular-nums" />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Switch checked={waveAReversed} onCheckedChange={setWaveAReversed} />
+          <Label className="text-sm text-foreground">Onda "a" reversa (fluxo retrógrado)</Label>
+        </div>
+
+        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
+
+        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+          <Waves className="w-4 h-4 mr-1" /> Avaliar DV
+        </Button>
+      </div>
+
+      <AnimatePresence>
+        {result && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+            <ResultCard label="Onda 'a' — Ducto Venoso" result={result.waveAResult} />
+            {result.pivResult && (
+              <>
+                <ResultCard label="PIV — Ducto Venoso" result={result.pivResult} />
+                {result.refs && (
+                  <div className="glass-card-static p-4">
+                    <RefBar value={result.pivResult.value} refs={result.refs} label="PIV — Ducto Venoso" />
+                  </div>
+                )}
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ── Main Component ──
 const DopplerCalculator = () => {
   return (
