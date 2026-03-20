@@ -370,7 +370,7 @@ function UterineArteryTab({ consumeToken, disabled }: TokenGateProps) {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
           <Heart className="w-4 h-4 mr-1" /> Avaliar Uterina
         </Button>
       </div>
