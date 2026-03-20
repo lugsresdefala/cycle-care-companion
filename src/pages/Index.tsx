@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves } from "lucide-react";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
@@ -8,8 +8,9 @@ import CRLCalculator from "@/pages/CRLCalculator";
 import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
+import DopplerCalculator from "@/pages/DopplerCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw";
+type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler";
 
 const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
   { value: "fertility",   label: "Ciclo Menstrual",    icon: <Heart className="w-3 h-3" />,     short: "Ciclo" },
@@ -18,6 +19,7 @@ const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; sh
   { value: "bpd",         label: "DBP",                icon: <Ruler className="w-3 h-3" />,     short: "DBP" },
   { value: "biometry",    label: "Biometria",           icon: <Activity className="w-3 h-3" />,  short: "Bio" },
   { value: "efw",         label: "PFE",                icon: <Scale className="w-3 h-3" />,     short: "PFE" },
+  { value: "doppler",     label: "Doppler",            icon: <Waves className="w-3 h-3" />,     short: "Dop" },
 ];
 
 const CARDS: {
@@ -97,6 +99,17 @@ const CARDS: {
     accentColor: "text-accent",
     tag: "Crescimento",
   },
+  {
+    value: "doppler",
+    title: "Doppler Obstétrico",
+    description: "Velocimetria Doppler das artérias umbilical, cerebral média, uterina e razão cerebroplacentária (RCP).",
+    icon: <Waves className="w-5 h-5" />,
+    cardClass: "glass-card-blue",
+    iconBg: "bg-primary/12",
+    iconColor: "text-primary",
+    accentColor: "text-primary",
+    tag: "Hemodinâmica",
+  },
 ];
 
 const SECTIONS = [
@@ -106,9 +119,9 @@ const SECTIONS = [
     values: ["fertility", "gestational", "crl", "bpd", "biometry"] as ActiveModule[],
   },
   {
-    label: "Crescimento Fetal",
-    subtitle: "Biometria e peso",
-    values: ["efw"] as ActiveModule[],
+    label: "Crescimento e Hemodinâmica",
+    subtitle: "Peso fetal e Doppler",
+    values: ["efw", "doppler"] as ActiveModule[],
   },
 ];
 
@@ -119,7 +132,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
 };
 
 const Index = () => {
@@ -140,6 +153,7 @@ const Index = () => {
       case "bpd":         return <BPDCalculator />;
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
+      case "doppler":     return <DopplerCalculator />;
       default:            return null;
     }
   };
