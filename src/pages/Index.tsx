@@ -99,6 +99,17 @@ const CARDS: {
     accentColor: "text-accent",
     tag: "Crescimento",
   },
+  {
+    value: "doppler",
+    title: "Doppler Obstétrico",
+    description: "Velocimetria Doppler das artérias umbilical, cerebral média, uterina e razão cerebroplacentária (RCP).",
+    icon: <Waves className="w-5 h-5" />,
+    cardClass: "glass-card-blue",
+    iconBg: "bg-primary/12",
+    iconColor: "text-primary",
+    accentColor: "text-primary",
+    tag: "Hemodinâmica",
+  },
 ];
 
 const SECTIONS = [
