@@ -174,6 +174,7 @@ const FertilityCalculator = () => {
 
   return (
     <div className="space-y-5">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
 
       {/* ─── Input Section ─────────────────────────────── */}
       <div className="glass-card-static p-5 sm:p-6 space-y-5 mesh-cyan">
