@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
@@ -22,7 +23,7 @@ const EFWCalculator = () => {
     percentiles: { p10: number; p50: number; p90: number } | null;
   } | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const hcVal = parseFloat(hc);
     const acVal = parseFloat(ac);
     const flVal = parseFloat(fl);
@@ -35,6 +36,8 @@ const EFWCalculator = () => {
     if (acVal < 40 || acVal > 400) { setError("CA deve estar entre 40 e 400 mm."); return; }
     if (flVal < 10 || flVal > 85) { setError("CF deve estar entre 10 e 85 mm."); return; }
 
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const efw = estimatedFetalWeight({ hc: hcVal, ac: acVal, fl: flVal });
     const gaW = gaWeeks ? parseInt(gaWeeks) : null;
