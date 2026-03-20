@@ -577,8 +577,13 @@ function DuctusVenosusTab({ consumeToken, disabled }: TokenGateProps) {
 
 // ── Main Component ──
 const DopplerCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const disabled = blocked || needsLogin || consuming;
+  const gateProps = { consumeToken, disabled };
+
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Waves className="w-5 h-5 text-primary" />
@@ -613,11 +618,11 @@ const DopplerCalculator = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ua"><UmbilicalArteryTab /></TabsContent>
-        <TabsContent value="mca"><MCATab /></TabsContent>
-        <TabsContent value="uta"><UterineArteryTab /></TabsContent>
-        <TabsContent value="cpr"><CPRTab /></TabsContent>
-        <TabsContent value="dv"><DuctusVenosusTab /></TabsContent>
+        <TabsContent value="ua"><UmbilicalArteryTab {...gateProps} /></TabsContent>
+        <TabsContent value="mca"><MCATab {...gateProps} /></TabsContent>
+        <TabsContent value="uta"><UterineArteryTab {...gateProps} /></TabsContent>
+        <TabsContent value="cpr"><CPRTab {...gateProps} /></TabsContent>
+        <TabsContent value="dv"><DuctusVenosusTab {...gateProps} /></TabsContent>
       </Tabs>
 
       <ScientificFooter
