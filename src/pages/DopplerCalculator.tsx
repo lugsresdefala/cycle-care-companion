@@ -117,7 +117,9 @@ function RefBar({
 }
 
 // ── Umbilical Artery Tab ──
-function UmbilicalArteryTab() {
+interface TokenGateProps { consumeToken: () => Promise<boolean>; disabled: boolean; }
+
+function UmbilicalArteryTab({ consumeToken, disabled }: TokenGateProps) {
   const [pi, setPi] = useState("");
   const [ri, setRi] = useState("");
   const [sd, setSd] = useState("");
@@ -130,7 +132,7 @@ function UmbilicalArteryTab() {
     refs: { p5: number; p50: number; p95: number };
   } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
       setError("Informe a IG entre 20 e 42 semanas.");
@@ -144,6 +146,8 @@ function UmbilicalArteryTab() {
       setError("Informe ao menos um índice: IP, IR ou S/D.");
       return;
     }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setResults({
       piResult: !isNaN(piVal) ? evaluateUmbilicalArteryPI(piVal, gaVal) : undefined,
