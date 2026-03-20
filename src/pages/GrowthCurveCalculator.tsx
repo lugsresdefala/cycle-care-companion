@@ -1,4 +1,6 @@
 import { useState, useMemo } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +33,7 @@ const PERCENTILE_COLORS = {
 };
 
 const GrowthCurveCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [measurements, setMeasurements] = useState<Measurement[]>([
     { id: crypto.randomUUID(), ga: "", value: "" },
@@ -53,7 +56,7 @@ const GrowthCurveCalculator = () => {
     setMeasurements((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: val } : m)));
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const valid: { ga: number; value: number }[] = [];
     for (const m of measurements) {
       const ga = parseFloat(m.ga);
@@ -69,6 +72,8 @@ const GrowthCurveCalculator = () => {
       setError("Insira pelo menos uma medida válida.");
       return;
     }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setAssessments(valid.map((v) => assessGrowth(selectedParam, v.ga, v.value)));
   };
@@ -117,6 +122,7 @@ const GrowthCurveCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       {/* ── Parameter selector ── */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-blue">
         <div>
@@ -209,7 +215,7 @@ const GrowthCurveCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <TrendingUp className="w-4 h-4 mr-1" /> Plotar na Curva
         </Button>
       </div>

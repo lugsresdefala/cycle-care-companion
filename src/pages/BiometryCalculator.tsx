@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const BiometryCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [bpd, setBpd] = useState("");
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
@@ -22,7 +25,7 @@ const BiometryCalculator = () => {
     estimates: { label: string; weeks: number; days: number }[];
   } | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const params = {
       bpd: bpd ? parseFloat(bpd) : undefined,
       hc: hc ? parseFloat(hc) : undefined,
@@ -34,7 +37,6 @@ const BiometryCalculator = () => {
       setError("Insira ao menos uma medida biométrica.");
       return;
     }
-    setError("");
 
     const ga = gestationalAgeFromMultipleBiometry(params);
     if (ga.estimates.length === 0) {
@@ -42,6 +44,9 @@ const BiometryCalculator = () => {
       return;
     }
 
+    const ok = await consumeToken();
+    if (!ok) return;
+    setError("");
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
   };
 
@@ -54,6 +59,7 @@ const BiometryCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Biometria Fetal Composta</h2>
@@ -91,7 +97,7 @@ const BiometryCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
           <Ruler className="w-4 h-4 mr-1" /> Calcular IG Composta
         </Button>
       </div>

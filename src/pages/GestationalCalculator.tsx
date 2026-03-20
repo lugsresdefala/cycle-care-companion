@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +46,7 @@ interface CalcResults {
 }
 
 const GestationalCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
   const [lmpDate, setLmpDate] = useState<Date | undefined>();
   const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
@@ -54,7 +57,7 @@ const GestationalCalculator = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>("development");
   const [results, setResults] = useState<CalcResults | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     let result;
     if (calculationType === "lmp") {
       if (!lmpDate) return;
@@ -68,6 +71,8 @@ const GestationalCalculator = () => {
     }
 
     if (!result) return;
+    const ok = await consumeToken();
+    if (!ok) return;
     const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
 
     setResults({
@@ -90,6 +95,7 @@ const GestationalCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       {/* Input */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
@@ -202,7 +208,7 @@ const GestationalCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
           Calcular
         </Button>
       </div>

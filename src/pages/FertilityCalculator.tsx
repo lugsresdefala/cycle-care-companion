@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +52,7 @@ interface CalcResults {
 }
 
 const FertilityCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [lastPeriodStart, setLastPeriodStart] = useState<Date | undefined>();
   const [lastPeriodEnd, setLastPeriodEnd] = useState<Date | undefined>();
   const [cycleLength, setCycleLength] = useState(28);
@@ -57,8 +60,11 @@ const FertilityCalculator = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>("bodyChanges");
   const [results, setResults] = useState<CalcResults | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     if (!lastPeriodStart || !lastPeriodEnd) return;
+
+    const ok = await consumeToken();
+    if (!ok) return;
 
     const avgCycleLength = cycleHistory.length > 1 ?
     Math.round(cycleHistory.reduce((acc, c) => acc + c.cycleLength, 0) / cycleHistory.length) :
@@ -168,6 +174,7 @@ const FertilityCalculator = () => {
 
   return (
     <div className="space-y-5">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
 
       {/* ─── Input Section ─────────────────────────────── */}
       <div className="glass-card-static p-5 sm:p-6 space-y-5 mesh-cyan">
@@ -255,7 +262,7 @@ const FertilityCalculator = () => {
 
           <Button
             onClick={handleCalculate}
-            disabled={!canCalculate}
+            disabled={!canCalculate || blocked || needsLogin || consuming}
             className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
             canCalculate ?
             "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent" :

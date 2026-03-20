@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,16 +20,19 @@ const CRL_REFERENCE = [
 ];
 
 const CRLCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [crl, setCrl] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const ga = gestationalAgeFromCRL(value);
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
@@ -35,6 +40,7 @@ const CRLCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Calculadora CRL</h2>
@@ -73,7 +79,7 @@ const CRLCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>

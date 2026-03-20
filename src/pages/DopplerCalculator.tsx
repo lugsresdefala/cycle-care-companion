@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -115,7 +117,9 @@ function RefBar({
 }
 
 // ── Umbilical Artery Tab ──
-function UmbilicalArteryTab() {
+interface TokenGateProps { consumeToken: () => Promise<boolean>; disabled: boolean; }
+
+function UmbilicalArteryTab({ consumeToken, disabled }: TokenGateProps) {
   const [pi, setPi] = useState("");
   const [ri, setRi] = useState("");
   const [sd, setSd] = useState("");
@@ -128,7 +132,7 @@ function UmbilicalArteryTab() {
     refs: { p5: number; p50: number; p95: number };
   } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
       setError("Informe a IG entre 20 e 42 semanas.");
@@ -142,6 +146,8 @@ function UmbilicalArteryTab() {
       setError("Informe ao menos um índice: IP, IR ou S/D.");
       return;
     }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setResults({
       piResult: !isNaN(piVal) ? evaluateUmbilicalArteryPI(piVal, gaVal) : undefined,
@@ -197,7 +203,7 @@ function UmbilicalArteryTab() {
           </div>
         )}
 
-        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <Activity className="w-4 h-4 mr-1" /> Avaliar
         </Button>
       </div>
@@ -228,17 +234,19 @@ function UmbilicalArteryTab() {
 }
 
 // ── MCA Tab ──
-function MCATab() {
+function MCATab({ consumeToken, disabled }: TokenGateProps) {
   const [pi, setPi] = useState("");
   const [ga, setGa] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const piVal = parseFloat(pi);
     if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
     if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP da ACM."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setResult({ res: evaluateMCAPI(piVal, gaVal), refs: getMCAPiRefs(gaVal) });
   };
@@ -281,7 +289,7 @@ function MCATab() {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary disabled:opacity-50">
           <Brain className="w-4 h-4 mr-1" /> Avaliar ACM
         </Button>
       </div>
@@ -301,18 +309,20 @@ function MCATab() {
 }
 
 // ── Uterine Artery Tab ──
-function UterineArteryTab() {
+function UterineArteryTab({ consumeToken, disabled }: TokenGateProps) {
   const [pi, setPi] = useState("");
   const [ga, setGa] = useState("");
   const [notch, setNotch] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const piVal = parseFloat(pi);
     if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) { setError("IG entre 11 e 42 semanas."); return; }
     if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP da artéria uterina."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     setResult({ res: evaluateUterineArteryPI(piVal, gaVal, notch), refs: getUtAPiRefs(gaVal) });
   };
@@ -360,7 +370,7 @@ function UterineArteryTab() {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
           <Heart className="w-4 h-4 mr-1" /> Avaliar Uterina
         </Button>
       </div>
@@ -380,20 +390,22 @@ function UterineArteryTab() {
 }
 
 // ── CPR Tab ──
-function CPRTab() {
+function CPRTab({ consumeToken, disabled }: TokenGateProps) {
   const [mcaPi, setMcaPi] = useState("");
   const [uaPi, setUaPi] = useState("");
   const [ga, setGa] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ res: CPRResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const mcaVal = parseFloat(mcaPi);
     const uaVal = parseFloat(uaPi);
     if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
     if (isNaN(mcaVal) || mcaVal <= 0) { setError("Informe o IP da ACM."); return; }
     if (isNaN(uaVal) || uaVal <= 0) { setError("Informe o IP da AU."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const res = calculateCPR(mcaVal, uaVal, gaVal);
     setResult({ res, refs: getCPRRefs(gaVal) });
@@ -429,7 +441,7 @@ function CPRTab() {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <ArrowRightLeft className="w-4 h-4 mr-1" /> Calcular RCP
         </Button>
       </div>
@@ -465,7 +477,7 @@ function CPRTab() {
 }
 
 // ── Ductus Venosus Tab ──
-function DuctusVenosusTab() {
+function DuctusVenosusTab({ consumeToken, disabled }: TokenGateProps) {
   const [piv, setPiv] = useState("");
   const [ga, setGa] = useState("");
   const [waveAReversed, setWaveAReversed] = useState(false);
@@ -476,13 +488,15 @@ function DuctusVenosusTab() {
     refs?: { p5: number; p50: number; p95: number };
   } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
       setError("Informe a IG entre 11 e 42 semanas.");
       return;
     }
     const pivVal = piv ? parseFloat(piv) : NaN;
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
 
     const waveAResult = evaluateDuctusVenosusWaveA(waveAReversed, gaVal);
@@ -535,7 +549,7 @@ function DuctusVenosusTab() {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <Waves className="w-4 h-4 mr-1" /> Avaliar DV
         </Button>
       </div>
@@ -563,8 +577,13 @@ function DuctusVenosusTab() {
 
 // ── Main Component ──
 const DopplerCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const disabled = blocked || needsLogin || consuming;
+  const gateProps = { consumeToken, disabled };
+
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Waves className="w-5 h-5 text-primary" />
@@ -599,11 +618,11 @@ const DopplerCalculator = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ua"><UmbilicalArteryTab /></TabsContent>
-        <TabsContent value="mca"><MCATab /></TabsContent>
-        <TabsContent value="uta"><UterineArteryTab /></TabsContent>
-        <TabsContent value="cpr"><CPRTab /></TabsContent>
-        <TabsContent value="dv"><DuctusVenosusTab /></TabsContent>
+        <TabsContent value="ua"><UmbilicalArteryTab {...gateProps} /></TabsContent>
+        <TabsContent value="mca"><MCATab {...gateProps} /></TabsContent>
+        <TabsContent value="uta"><UterineArteryTab {...gateProps} /></TabsContent>
+        <TabsContent value="cpr"><CPRTab {...gateProps} /></TabsContent>
+        <TabsContent value="dv"><DuctusVenosusTab {...gateProps} /></TabsContent>
       </Tabs>
 
       <ScientificFooter

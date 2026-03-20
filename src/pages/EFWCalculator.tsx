@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
@@ -20,7 +23,7 @@ const EFWCalculator = () => {
     percentiles: { p10: number; p50: number; p90: number } | null;
   } | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const hcVal = parseFloat(hc);
     const acVal = parseFloat(ac);
     const flVal = parseFloat(fl);
@@ -33,6 +36,8 @@ const EFWCalculator = () => {
     if (acVal < 40 || acVal > 400) { setError("CA deve estar entre 40 e 400 mm."); return; }
     if (flVal < 10 || flVal > 85) { setError("CF deve estar entre 10 e 85 mm."); return; }
 
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const efw = estimatedFetalWeight({ hc: hcVal, ac: acVal, fl: flVal });
     const gaW = gaWeeks ? parseInt(gaWeeks) : null;
@@ -50,6 +55,7 @@ const EFWCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h2 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h2>
@@ -92,7 +98,7 @@ const EFWCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <Scale className="w-4 h-4 mr-1" /> Calcular PFE
         </Button>
       </div>

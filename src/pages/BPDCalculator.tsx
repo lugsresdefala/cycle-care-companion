@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,16 +21,19 @@ const BPD_REFERENCE = [
 ];
 
 const BPDCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [bpd, setBpd] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const value = parseFloat(bpd);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const ga = gestationalAgeFromBPD(value);
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
@@ -36,6 +41,7 @@ const BPDCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-purple">
         <div>
           <h2 className="font-display text-xl text-foreground">Calculadora DBP</h2>
@@ -74,7 +80,7 @@ const BPDCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>
