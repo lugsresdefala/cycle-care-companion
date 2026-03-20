@@ -112,6 +112,17 @@ const CARDS: {
     accentColor: "text-primary",
     tag: "Hemodinâmica",
   },
+  {
+    value: "growth",
+    title: "Curva de Crescimento Fetal",
+    description: "Percentis INTERGROWTH-21st para PFE, CC, CA, CF e DBP com gráfico interativo e avaliação longitudinal.",
+    icon: <TrendingUp className="w-5 h-5" />,
+    cardClass: "glass-card-purple",
+    iconBg: "bg-secondary/12",
+    iconColor: "text-secondary",
+    accentColor: "text-secondary",
+    tag: "INTERGROWTH-21st",
+  },
 ];
 
 const SECTIONS = [
