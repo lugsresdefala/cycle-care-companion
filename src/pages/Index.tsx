@@ -152,6 +152,8 @@ const item = {
 };
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState<ActiveModule>(null);
   const [scrolled, setScrolled] = useState(false);
 
