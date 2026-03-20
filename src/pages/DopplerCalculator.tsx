@@ -441,7 +441,7 @@ function CPRTab({ consumeToken, disabled }: TokenGateProps) {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <ArrowRightLeft className="w-4 h-4 mr-1" /> Calcular RCP
         </Button>
       </div>
