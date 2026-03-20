@@ -119,9 +119,9 @@ const SECTIONS = [
     values: ["fertility", "gestational", "crl", "bpd", "biometry"] as ActiveModule[],
   },
   {
-    label: "Crescimento Fetal",
-    subtitle: "Biometria e peso",
-    values: ["efw"] as ActiveModule[],
+    label: "Crescimento e Hemodinâmica",
+    subtitle: "Peso fetal e Doppler",
+    values: ["efw", "doppler"] as ActiveModule[],
   },
 ];
 
