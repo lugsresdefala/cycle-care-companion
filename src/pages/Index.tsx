@@ -133,8 +133,8 @@ const SECTIONS = [
   },
   {
     label: "Crescimento e Hemodinâmica",
-    subtitle: "Peso fetal e Doppler",
-    values: ["efw", "doppler"] as ActiveModule[],
+    subtitle: "Peso fetal, Doppler e curvas",
+    values: ["efw", "doppler", "growth"] as ActiveModule[],
   },
 ];
 
