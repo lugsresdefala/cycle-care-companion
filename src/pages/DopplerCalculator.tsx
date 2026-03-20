@@ -390,20 +390,22 @@ function UterineArteryTab({ consumeToken, disabled }: TokenGateProps) {
 }
 
 // ── CPR Tab ──
-function CPRTab() {
+function CPRTab({ consumeToken, disabled }: TokenGateProps) {
   const [mcaPi, setMcaPi] = useState("");
   const [uaPi, setUaPi] = useState("");
   const [ga, setGa] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ res: CPRResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
-  const handleCalc = () => {
+  const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const mcaVal = parseFloat(mcaPi);
     const uaVal = parseFloat(uaPi);
     if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
     if (isNaN(mcaVal) || mcaVal <= 0) { setError("Informe o IP da ACM."); return; }
     if (isNaN(uaVal) || uaVal <= 0) { setError("Informe o IP da AU."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const res = calculateCPR(mcaVal, uaVal, gaVal);
     setResult({ res, refs: getCPRRefs(gaVal) });
