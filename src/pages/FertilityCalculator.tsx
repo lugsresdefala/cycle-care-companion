@@ -262,7 +262,7 @@ const FertilityCalculator = () => {
 
           <Button
             onClick={handleCalculate}
-            disabled={!canCalculate}
+            disabled={!canCalculate || blocked || needsLogin || consuming}
             className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
             canCalculate ?
             "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent" :
