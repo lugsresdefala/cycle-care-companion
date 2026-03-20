@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp } from "lucide-react";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
@@ -9,8 +9,9 @@ import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
+import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler";
+type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler" | "growth";
 
 const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
   { value: "fertility",   label: "Ciclo Menstrual",    icon: <Heart className="w-3 h-3" />,     short: "Ciclo" },
@@ -20,6 +21,7 @@ const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; sh
   { value: "biometry",    label: "Biometria",           icon: <Activity className="w-3 h-3" />,  short: "Bio" },
   { value: "efw",         label: "PFE",                icon: <Scale className="w-3 h-3" />,     short: "PFE" },
   { value: "doppler",     label: "Doppler",            icon: <Waves className="w-3 h-3" />,     short: "Dop" },
+  { value: "growth",      label: "Crescimento",        icon: <TrendingUp className="w-3 h-3" />, short: "Curva" },
 ];
 
 const CARDS: {
@@ -110,6 +112,17 @@ const CARDS: {
     accentColor: "text-primary",
     tag: "Hemodinâmica",
   },
+  {
+    value: "growth",
+    title: "Curva de Crescimento Fetal",
+    description: "Percentis INTERGROWTH-21st para PFE, CC, CA, CF e DBP com gráfico interativo e avaliação longitudinal.",
+    icon: <TrendingUp className="w-5 h-5" />,
+    cardClass: "glass-card-purple",
+    iconBg: "bg-secondary/12",
+    iconColor: "text-secondary",
+    accentColor: "text-secondary",
+    tag: "INTERGROWTH-21st",
+  },
 ];
 
 const SECTIONS = [
@@ -120,8 +133,8 @@ const SECTIONS = [
   },
   {
     label: "Crescimento e Hemodinâmica",
-    subtitle: "Peso fetal e Doppler",
-    values: ["efw", "doppler"] as ActiveModule[],
+    subtitle: "Peso fetal, Doppler e curvas",
+    values: ["efw", "doppler", "growth"] as ActiveModule[],
   },
 ];
 
@@ -154,6 +167,7 @@ const Index = () => {
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
       case "doppler":     return <DopplerCalculator />;
+      case "growth":      return <GrowthCurveCalculator />;
       default:            return null;
     }
   };
