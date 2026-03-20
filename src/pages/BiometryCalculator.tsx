@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const BiometryCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [bpd, setBpd] = useState("");
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
@@ -24,7 +25,7 @@ const BiometryCalculator = () => {
     estimates: { label: string; weeks: number; days: number }[];
   } | null>(null);
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const params = {
       bpd: bpd ? parseFloat(bpd) : undefined,
       hc: hc ? parseFloat(hc) : undefined,
@@ -36,7 +37,6 @@ const BiometryCalculator = () => {
       setError("Insira ao menos uma medida biométrica.");
       return;
     }
-    setError("");
 
     const ga = gestationalAgeFromMultipleBiometry(params);
     if (ga.estimates.length === 0) {
@@ -44,6 +44,9 @@ const BiometryCalculator = () => {
       return;
     }
 
+    const ok = await consumeToken();
+    if (!ok) return;
+    setError("");
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
   };
 
