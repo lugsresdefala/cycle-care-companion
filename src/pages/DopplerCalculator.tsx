@@ -203,7 +203,7 @@ function UmbilicalArteryTab({ consumeToken, disabled }: TokenGateProps) {
           </div>
         )}
 
-        <Button onClick={handleCalc} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <Activity className="w-4 h-4 mr-1" /> Avaliar
         </Button>
       </div>
