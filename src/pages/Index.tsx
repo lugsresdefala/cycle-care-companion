@@ -8,8 +8,9 @@ import CRLCalculator from "@/pages/CRLCalculator";
 import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
+import DopplerCalculator from "@/pages/DopplerCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw";
+type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler";
 
 const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
   { value: "fertility",   label: "Ciclo Menstrual",    icon: <Heart className="w-3 h-3" />,     short: "Ciclo" },
