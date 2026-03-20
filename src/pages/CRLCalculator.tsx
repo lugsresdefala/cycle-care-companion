@@ -79,7 +79,7 @@ const CRLCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>
