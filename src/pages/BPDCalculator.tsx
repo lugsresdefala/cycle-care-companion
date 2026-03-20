@@ -21,16 +21,19 @@ const BPD_REFERENCE = [
 ];
 
 const BPDCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [bpd, setBpd] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const value = parseFloat(bpd);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
+    const ok = await consumeToken();
+    if (!ok) return;
     setError("");
     const ga = gestationalAgeFromBPD(value);
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
