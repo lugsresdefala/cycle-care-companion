@@ -167,6 +167,7 @@ const Index = () => {
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
       case "doppler":     return <DopplerCalculator />;
+      case "growth":      return <GrowthCurveCalculator />;
       default:            return null;
     }
   };
