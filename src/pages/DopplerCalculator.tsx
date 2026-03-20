@@ -576,7 +576,7 @@ const DopplerCalculator = () => {
       </div>
 
       <Tabs defaultValue="ua" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto">
+        <TabsList className="grid w-full grid-cols-5 h-auto">
           <TabsTrigger value="ua" className="text-xs py-2 px-1">
             <Activity className="w-3 h-3 mr-1 hidden sm:inline" />
             AU
@@ -593,12 +593,17 @@ const DopplerCalculator = () => {
             <ArrowRightLeft className="w-3 h-3 mr-1 hidden sm:inline" />
             RCP
           </TabsTrigger>
+          <TabsTrigger value="dv" className="text-xs py-2 px-1">
+            <Waves className="w-3 h-3 mr-1 hidden sm:inline" />
+            DV
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="ua"><UmbilicalArteryTab /></TabsContent>
         <TabsContent value="mca"><MCATab /></TabsContent>
         <TabsContent value="uta"><UterineArteryTab /></TabsContent>
         <TabsContent value="cpr"><CPRTab /></TabsContent>
+        <TabsContent value="dv"><DuctusVenosusTab /></TabsContent>
       </Tabs>
 
       <ScientificFooter
