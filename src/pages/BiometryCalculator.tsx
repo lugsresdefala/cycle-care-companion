@@ -59,6 +59,7 @@ const BiometryCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Biometria Fetal Composta</h2>
