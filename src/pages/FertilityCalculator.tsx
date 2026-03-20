@@ -52,6 +52,7 @@ interface CalcResults {
 }
 
 const FertilityCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const [lastPeriodStart, setLastPeriodStart] = useState<Date | undefined>();
   const [lastPeriodEnd, setLastPeriodEnd] = useState<Date | undefined>();
   const [cycleLength, setCycleLength] = useState(28);
