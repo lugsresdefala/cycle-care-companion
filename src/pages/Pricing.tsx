@@ -197,7 +197,7 @@ const Pricing = () => {
                     <div className="space-y-2">
                       {mode.features.map((f) => (
                         <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                           {f}
                         </div>
                       ))}
