@@ -9,8 +9,9 @@ import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
+import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler";
+type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler" | "growth";
 
 const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
   { value: "fertility",   label: "Ciclo Menstrual",    icon: <Heart className="w-3 h-3" />,     short: "Ciclo" },
