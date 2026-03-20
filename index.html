@@ -2,17 +2,60 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Idalia Calc — Acompanhamento Reprodutivo</title>
-    <meta name="description" content="Calculadoras baseadas em evidências para ciclo menstrual e gestação. Resultados precisos, conteúdo educativo e privacidade." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <title>Idalia Calc — Saúde Reprodutiva</title>
+    <meta name="description" content="Calculadoras baseadas em evidências para período fértil e gestação. Resultados precisos, conteúdo educativo e privacidade.">
     <meta name="author" content="Idalia Calc" />
-    <meta property="og:title" content="Idalia Calc — Acompanhamento Reprodutivo" />
-    <meta property="og:description" content="Calculadoras de fertilidade e gestação baseadas em evidências." />
+    <meta name="keywords" content="calculadora gestacional, período fértil, biometria fetal, idade gestacional, ovulação, ciclo menstrual" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0a0f1e" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Idalia Calc" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Idalia Calc" />
+    <meta name="msapplication-TileColor" content="#0a0f1e" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph -->
+    
+    
     <meta property="og:type" content="website" />
-  </head>
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c4e55b21-49cd-4e6a-8266-1c6a6b8cc860?Expires=1773972736&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=Awd1abtk52ErpNT9TNggW%2FE5%2F3xUukelx8CEuGjxw%2Fnu%2B4dln%2B6AGKUosrILmkaL0V%2F0d%2FHye6q4doIwQktkrS5b2XIAy08Rg%2Fe6f6sZrQct5GET7%2FAlUA5bogDDz63QiExKjsjVJDNSUbvfhQWMVaQo9grg3nxzdhZXBcW0nN2d1IJ1JXOfpA6hIAdfIJE1exXpoj75ZLs1HOejNNTJl2xPWUcHeiu8n4fePJKamvUS%2BgozosRxrUNLH%2FvONh0bXW1sEgiaCPP0pgFzUseh%2BsP%2BCTNwxdq9zPiiYxC60ZN5A5uVi1Ue%2Fa5nAO6druKvjCrwhM7fCLFQ0JDYM4nbMA%3D%3D">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta property="og:title" content="Idalia Calc — Saúde Reprodutiva">
+  <meta name="twitter:title" content="Idalia Calc — Saúde Reprodutiva">
+  <meta property="og:description" content="Calculadoras baseadas em evidências para período fértil e gestação. Resultados precisos, conteúdo educativo e privacidade.">
+  <meta name="twitter:description" content="Calculadoras baseadas em evidências para período fértil e gestação. Resultados precisos, conteúdo educativo e privacidade.">
+  <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c4e55b21-49cd-4e6a-8266-1c6a6b8cc860?Expires=1773972736&amp;GoogleAccessId=go-api-on-aws%40gpt-engineer-390607.iam.gserviceaccount.com&amp;Signature=Awd1abtk52ErpNT9TNggW%2FE5%2F3xUukelx8CEuGjxw%2Fnu%2B4dln%2B6AGKUosrILmkaL0V%2F0d%2FHye6q4doIwQktkrS5b2XIAy08Rg%2Fe6f6sZrQct5GET7%2FAlUA5bogDDz63QiExKjsjVJDNSUbvfhQWMVaQo9grg3nxzdhZXBcW0nN2d1IJ1JXOfpA6hIAdfIJE1exXpoj75ZLs1HOejNNTJl2xPWUcHeiu8n4fePJKamvUS%2BgozosRxrUNLH%2FvONh0bXW1sEgiaCPP0pgFzUseh%2BsP%2BCTNwxdq9zPiiYxC60ZN5A5uVi1Ue%2Fa5nAO6druKvjCrwhM7fCLFQ0JDYM4nbMA%3D%3D">
+</head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
