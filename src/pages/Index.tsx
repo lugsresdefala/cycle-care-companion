@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp } from "lucide-react";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
