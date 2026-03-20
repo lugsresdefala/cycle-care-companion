@@ -289,7 +289,7 @@ function MCATab({ consumeToken, disabled }: TokenGateProps) {
 
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
 
-        <Button onClick={handleCalc} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary">
+        <Button onClick={handleCalc} disabled={disabled} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary disabled:opacity-50">
           <Brain className="w-4 h-4 mr-1" /> Avaliar ACM
         </Button>
       </div>
