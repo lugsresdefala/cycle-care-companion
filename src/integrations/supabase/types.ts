@@ -14,16 +14,235 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      exam_history: {
+        Row: {
+          calc_type: Database["public"]["Enums"]["calculation_type"]
+          created_at: string
+          doctor_id: string
+          gestational_age_days: number | null
+          gestational_age_weeks: number | null
+          id: string
+          input_data: Json
+          notes: string | null
+          patient_id: string | null
+          result_data: Json
+        }
+        Insert: {
+          calc_type: Database["public"]["Enums"]["calculation_type"]
+          created_at?: string
+          doctor_id: string
+          gestational_age_days?: number | null
+          gestational_age_weeks?: number | null
+          id?: string
+          input_data?: Json
+          notes?: string | null
+          patient_id?: string | null
+          result_data?: Json
+        }
+        Update: {
+          calc_type?: Database["public"]["Enums"]["calculation_type"]
+          created_at?: string
+          doctor_id?: string
+          gestational_age_days?: number | null
+          gestational_age_weeks?: number | null
+          id?: string
+          input_data?: Json
+          notes?: string | null
+          patient_id?: string | null
+          result_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patients: {
+        Row: {
+          age: number | null
+          created_at: string
+          doctor_id: string
+          id: string
+          medical_record_id: string | null
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          doctor_id: string
+          id?: string
+          medical_record_id?: string | null
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          medical_record_id?: string | null
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          crm_number: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          specialty: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          crm_number?: string | null
+          full_name?: string
+          id: string
+          phone?: string | null
+          specialty?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          crm_number?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          specialty?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_months: number
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number
+          stripe_price_id: string | null
+          tier: Database["public"]["Enums"]["plan_tier"]
+          tokens_per_period: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents?: number
+          stripe_price_id?: string | null
+          tier: Database["public"]["Enums"]["plan_tier"]
+          tokens_per_period?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          stripe_price_id?: string | null
+          tier?: Database["public"]["Enums"]["plan_tier"]
+          tokens_per_period?: number
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          end_date: string
+          id: string
+          plan_id: string
+          start_date: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tokens_remaining: number
+          tokens_used: number
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          end_date: string
+          id?: string
+          plan_id: string
+          start_date?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tokens_remaining?: number
+          tokens_used?: number
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          end_date?: string
+          id?: string
+          plan_id?: string
+          start_date?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tokens_remaining?: number
+          tokens_used?: number
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_remaining_tokens: { Args: { _user_id: string }; Returns: number }
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      is_in_trial: { Args: { _user_id: string }; Returns: boolean }
+      use_token: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      calculation_type:
+        | "biometry"
+        | "bpd"
+        | "crl"
+        | "efw"
+        | "doppler"
+        | "growth_curve"
+        | "gestational"
+        | "fertility"
+      plan_tier: "free_trial" | "basic" | "professional" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +369,18 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      calculation_type: [
+        "biometry",
+        "bpd",
+        "crl",
+        "efw",
+        "doppler",
+        "growth_curve",
+        "gestational",
+        "fertility",
+      ],
+      plan_tier: ["free_trial", "basic", "professional", "premium"],
+    },
   },
 } as const
