@@ -16,22 +16,15 @@ import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
 
 type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler" | "growth";
 
-const NAV_ITEMS: { value: ActiveModule; label: string; icon: React.ReactNode; short: string }[] = [
-  { value: "fertility",   label: "Ciclo Menstrual",    icon: <Heart className="w-3 h-3" />,     short: "Ciclo" },
-  { value: "gestational", label: "Idade Gestacional",  icon: <Baby className="w-3 h-3" />,      short: "IG" },
-  { value: "crl",         label: "CRL",                icon: <Ruler className="w-3 h-3" />,     short: "CRL" },
-  { value: "bpd",         label: "DBP",                icon: <Ruler className="w-3 h-3" />,     short: "DBP" },
-  { value: "biometry",    label: "Biometria",           icon: <Activity className="w-3 h-3" />,  short: "Bio" },
-  { value: "efw",         label: "PFE",                icon: <Scale className="w-3 h-3" />,     short: "PFE" },
-  { value: "doppler",     label: "Doppler",            icon: <Waves className="w-3 h-3" />,     short: "Dop" },
-  { value: "growth",      label: "Crescimento",        icon: <TrendingUp className="w-3 h-3" />, short: "Curva" },
-];
-
+/* ── Single source of truth for all calculators ── */
 const CARDS: {
   value: ActiveModule;
   title: string;
   description: string;
   icon: React.ReactNode;
+  navIcon: React.ReactNode;
+  navLabel: string;
+  navShort: string;
   cardClass: string;
   iconBg: string;
   iconColor: string;
@@ -41,8 +34,11 @@ const CARDS: {
   {
     value: "fertility",
     title: "Ciclo Menstrual e Período Fértil",
-    description: "Estimativa da janela fértil, data de ovulação, previsão da próxima menstruação e identificação de fase do ciclo.",
+    description: "Estimativa da janela fértil, data de ovulação e previsão da próxima menstruação.",
     icon: <Heart className="w-5 h-5" />,
+    navIcon: <Heart className="w-3 h-3" />,
+    navLabel: "Ciclo Menstrual",
+    navShort: "Ciclo",
     cardClass: "glass-card-warm",
     iconBg: "bg-accent/12",
     iconColor: "text-accent",
@@ -52,8 +48,11 @@ const CARDS: {
   {
     value: "gestational",
     title: "Idade Gestacional e DPP",
-    description: "Cálculo por DUM, ultrassonografia ou transferência embrionária, com referências de desenvolvimento fetal.",
+    description: "Cálculo por DUM, ultrassonografia ou transferência embrionária.",
     icon: <Baby className="w-5 h-5" />,
+    navIcon: <Baby className="w-3 h-3" />,
+    navLabel: "Idade Gestacional",
+    navShort: "IG",
     cardClass: "glass-card-purple",
     iconBg: "bg-secondary/12",
     iconColor: "text-secondary",
@@ -63,8 +62,11 @@ const CARDS: {
   {
     value: "crl",
     title: "CRL — Comprimento Crânio-Caudal",
-    description: "Datação gestacional no 1º trimestre pela medida do CCN segundo Robinson & Fleming.",
+    description: "Datação gestacional no 1º trimestre pela medida do CCN.",
     icon: <Ruler className="w-5 h-5" />,
+    navIcon: <Ruler className="w-3 h-3" />,
+    navLabel: "CRL",
+    navShort: "CRL",
     cardClass: "glass-card-blue",
     iconBg: "bg-primary/12",
     iconColor: "text-primary",
@@ -74,8 +76,11 @@ const CARDS: {
   {
     value: "bpd",
     title: "DBP — Diâmetro Biparietal",
-    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal segundo Hadlock.",
+    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal.",
     icon: <Ruler className="w-5 h-5" />,
+    navIcon: <Ruler className="w-3 h-3" />,
+    navLabel: "DBP",
+    navShort: "DBP",
     cardClass: "glass-card-purple",
     iconBg: "bg-secondary/12",
     iconColor: "text-secondary",
@@ -85,8 +90,11 @@ const CARDS: {
   {
     value: "biometry",
     title: "Biometria Fetal Composta",
-    description: "IG por múltiplas medidas (DBP, CC, CA, CF) — maior acurácia no 2º e 3º trimestre.",
+    description: "IG por múltiplas medidas (DBP, CC, CA, CF) — maior acurácia.",
     icon: <Activity className="w-5 h-5" />,
+    navIcon: <Activity className="w-3 h-3" />,
+    navLabel: "Biometria",
+    navShort: "Bio",
     cardClass: "glass-card-blue",
     iconBg: "bg-primary/12",
     iconColor: "text-primary",
@@ -96,8 +104,11 @@ const CARDS: {
   {
     value: "efw",
     title: "Peso Fetal Estimado (PFE)",
-    description: "Cálculo do peso fetal pela fórmula de Hadlock (CC, CA, CF), com classificação por percentil.",
+    description: "Cálculo do peso fetal com classificação por percentil.",
     icon: <Scale className="w-5 h-5" />,
+    navIcon: <Scale className="w-3 h-3" />,
+    navLabel: "PFE",
+    navShort: "PFE",
     cardClass: "glass-card-warm",
     iconBg: "bg-accent/12",
     iconColor: "text-accent",
@@ -107,8 +118,11 @@ const CARDS: {
   {
     value: "doppler",
     title: "Doppler Obstétrico",
-    description: "Velocimetria Doppler das artérias umbilical, cerebral média, uterina e razão cerebroplacentária (RCP).",
+    description: "Velocimetria das artérias umbilical, cerebral média e uterina (RCP).",
     icon: <Waves className="w-5 h-5" />,
+    navIcon: <Waves className="w-3 h-3" />,
+    navLabel: "Doppler",
+    navShort: "Dop",
     cardClass: "glass-card-blue",
     iconBg: "bg-primary/12",
     iconColor: "text-primary",
@@ -118,8 +132,11 @@ const CARDS: {
   {
     value: "growth",
     title: "Curva de Crescimento Fetal",
-    description: "Percentis INTERGROWTH-21st para PFE, CC, CA, CF e DBP com gráfico interativo e avaliação longitudinal.",
+    description: "Percentis INTERGROWTH-21st com gráfico interativo e avaliação longitudinal.",
     icon: <TrendingUp className="w-5 h-5" />,
+    navIcon: <TrendingUp className="w-3 h-3" />,
+    navLabel: "Crescimento",
+    navShort: "Curva",
     cardClass: "glass-card-purple",
     iconBg: "bg-secondary/12",
     iconColor: "text-secondary",
@@ -150,6 +167,14 @@ const item = {
   hidden: { opacity: 0, y: 14 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
 };
+
+const REFERENCES = [
+  { text: "Robinson HP, Fleming JEE — Br J Obstet Gynaecol, 1975", id: "1191154", tag: "CRL" },
+  { text: "Hadlock FP et al. — Radiology, 1984", id: "6739822", tag: "Biometria" },
+  { text: "Hadlock FP et al. — Am J Obstet Gynecol, 1985", id: "3881966", tag: "PFE" },
+  { text: "Shepard MJ et al. — Am J Obstet Gynecol, 1982", id: "7058805", tag: "PFE" },
+  { text: "INTERGROWTH-21st — Lancet, 2014", id: "25209488", tag: "Crescimento" },
+];
 
 const Index = () => {
   const { user } = useAuth();
@@ -202,7 +227,6 @@ const Index = () => {
         }`}
       >
         <div className="container max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          {/* Logo + brand */}
           <button
             onClick={() => setActiveModule(null)}
             className="flex items-center gap-2.5 group shrink-0"
@@ -218,26 +242,25 @@ const Index = () => {
             </span>
           </button>
 
-          {/* Nav pills — shown only when a module is active */}
+          {/* Nav pills — derived from CARDS */}
           {activeModule && (
             <div className="flex gap-1 overflow-x-auto no-scrollbar">
-              {NAV_ITEMS.map((nav) => (
+              {CARDS.map((card) => (
                 <button
-                  key={nav.value}
-                  onClick={() => setActiveModule(nav.value)}
+                  key={card.value}
+                  onClick={() => setActiveModule(card.value)}
                   className={`nav-pill whitespace-nowrap ${
-                    activeModule === nav.value ? "nav-pill-active" : "nav-pill-inactive"
+                    activeModule === card.value ? "nav-pill-active" : "nav-pill-inactive"
                   }`}
                 >
-                  {nav.icon}
-                  <span className="hidden sm:inline">{nav.label}</span>
-                  <span className="sm:hidden">{nav.short}</span>
+                  {card.navIcon}
+                  <span className="hidden sm:inline">{card.navLabel}</span>
+                  <span className="sm:hidden">{card.navShort}</span>
                 </button>
               ))}
             </div>
           )}
 
-          {/* Back link when module active (mobile) */}
           {activeModule && (
             <button
               onClick={() => setActiveModule(null)}
@@ -248,7 +271,6 @@ const Index = () => {
             </button>
           )}
 
-          {/* Auth buttons */}
           <div className="flex items-center gap-1.5 shrink-0 ml-auto">
             {user ? (
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-1.5 text-xs">
@@ -272,56 +294,21 @@ const Index = () => {
             initial="hidden"
             animate="show"
             variants={container}
-            className="space-y-14"
+            className="space-y-12"
           >
-            {/* ── Hero ── */}
-            <motion.div variants={item} className="text-center space-y-7 pt-8 pb-4 relative">
-              {/* Logo with ring effect */}
-              <div className="flex justify-center mb-8">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-                  className="logo-ring"
-                >
-                  <img
-                    src={logo}
-                    alt="IDALIA Calc"
-                    className="w-52 h-52 md:w-60 md:h-60 rounded-full object-cover relative z-10"
-                    style={{
-                      boxShadow: "0 0 0 6px hsla(218,72%,27%,0.07), 0 0 0 12px hsla(218,72%,27%,0.03), 0 20px 60px -10px rgba(15,30,70,0.25)",
-                    }}
-                  />
-                </motion.div>
-              </div>
-
-              {/* Brand name */}
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-4"
-              >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/6 text-xs font-medium text-primary mb-2">
-                  <Microscope className="w-3 h-3" />
-                  Calculadoras Clínicas Certificadas
-                </div>
-
-                <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight text-balance">
-                  <span className="gradient-text-brand">
-                    Saúde Reprodutiva
-                  </span>
-                  <br />
-                  <span className="text-foreground font-bold text-2xl sm:text-3xl md:text-4xl">
-                    & Medicina Fetal
-                  </span>
-                </h1>
-
-                <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto leading-relaxed text-balance">
-                  Ferramentas de biometria e datação gestacional para uso clínico diário,
-                  fundamentadas em diretrizes internacionais.
-                </p>
-              </motion.div>
+            {/* ── Hero (compact — logo already in header) ── */}
+            <motion.div variants={item} className="text-center space-y-4 pt-6 pb-2">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight text-balance">
+                <span className="gradient-text-brand">Saúde Reprodutiva</span>
+                <br />
+                <span className="text-foreground font-bold text-2xl sm:text-3xl md:text-4xl">
+                  & Medicina Fetal
+                </span>
+              </h1>
+              <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto leading-relaxed text-balance">
+                Calculadoras clínicas de biometria e datação gestacional,
+                fundamentadas em diretrizes internacionais.
+              </p>
             </motion.div>
 
             {/* ── Calculator sections ── */}
@@ -332,7 +319,6 @@ const Index = () => {
                 );
                 return (
                   <div key={section.label} className="space-y-4">
-                    {/* Section header */}
                     <div className="flex items-center gap-3 px-1">
                       <div className="divider-fade flex-1" />
                       <div className="text-center">
@@ -342,7 +328,6 @@ const Index = () => {
                       <div className="divider-fade flex-1" />
                     </div>
 
-                    {/* Cards grid */}
                     <div className={`grid gap-4 ${
                       sectionCards.length === 1
                         ? "grid-cols-1 max-w-sm mx-auto"
@@ -358,12 +343,9 @@ const Index = () => {
                           className={`${card.cardClass} p-5 text-left group cursor-pointer w-full`}
                         >
                           <div className="flex items-start gap-4">
-                            {/* Icon block */}
                             <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0 ${card.iconColor} mt-0.5 transition-transform duration-300 group-hover:scale-110`}>
                               {card.icon}
                             </div>
-
-                            {/* Content */}
                             <div className="flex-1 min-w-0 space-y-1.5">
                               <div className="flex items-start justify-between gap-2">
                                 <h2 className="font-display text-sm font-semibold text-foreground leading-snug">
@@ -390,9 +372,8 @@ const Index = () => {
               })}
             </motion.div>
 
-            {/* ── Footer: Trust + References + Disclaimer ── */}
+            {/* ── Footer: Trust + References + Disclaimer (single card) ── */}
             <motion.div variants={item} className="glass-card-static p-5 space-y-5">
-              {/* Trust badges */}
               <div className="flex items-center justify-center flex-wrap gap-3 sm:gap-5">
                 <div className="badge-primary">
                   <Shield className="w-3 h-3" />
@@ -410,19 +391,12 @@ const Index = () => {
 
               <div className="divider-fade" />
 
-              {/* References */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-primary" />
                   <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Referências</h4>
                 </div>
-                {[
-                  { text: "Robinson HP, Fleming JEE — Br J Obstet Gynaecol, 1975", id: "1191154", tag: "CRL" },
-                  { text: "Hadlock FP et al. — Radiology, 1984", id: "6739822", tag: "Biometria" },
-                  { text: "Hadlock FP et al. — Am J Obstet Gynecol, 1985", id: "3881966", tag: "PFE" },
-                  { text: "Shepard MJ et al. — Am J Obstet Gynecol, 1982", id: "7058805", tag: "PFE" },
-                  { text: "INTERGROWTH-21st — Lancet, 2014", id: "25209488", tag: "Crescimento" },
-                ].map((ref) => (
+                {REFERENCES.map((ref) => (
                   <a
                     key={ref.id}
                     href={`https://pubmed.ncbi.nlm.nih.gov/${ref.id}/`}
@@ -443,7 +417,6 @@ const Index = () => {
 
               <div className="divider-fade" />
 
-              {/* Disclaimer */}
               <div className="flex items-start gap-2.5">
                 <Shield className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
