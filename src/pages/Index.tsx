@@ -390,9 +390,10 @@ const Index = () => {
               })}
             </motion.div>
 
-            {/* ── Trust bar ── */}
-            <motion.div variants={item}>
-              <div className="flex items-center justify-center flex-wrap gap-3 sm:gap-5 py-2">
+            {/* ── Footer: Trust + References + Disclaimer ── */}
+            <motion.div variants={item} className="glass-card-static p-5 space-y-5">
+              {/* Trust badges */}
+              <div className="flex items-center justify-center flex-wrap gap-3 sm:gap-5">
                 <div className="badge-primary">
                   <Shield className="w-3 h-3" />
                   Processamento local
@@ -406,26 +407,15 @@ const Index = () => {
                   Uso clínico
                 </div>
               </div>
-              <p className="text-center text-xs text-muted-foreground/70 mt-2">
-                Hadlock · Robinson · Shepard · INTERGROWTH-21st
-              </p>
-            </motion.div>
-
-            {/* ── Scientific references ── */}
-            <motion.div variants={item} className="glass-card-static p-5 space-y-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-semibold text-foreground">Base Científica</h4>
-                  <p className="text-xs text-muted-foreground">Referências revisadas por pares</p>
-                </div>
-              </div>
 
               <div className="divider-fade" />
 
+              {/* References */}
               <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Referências</h4>
+                </div>
                 {[
                   { text: "Robinson HP, Fleming JEE — Br J Obstet Gynaecol, 1975", id: "1191154", tag: "CRL" },
                   { text: "Hadlock FP et al. — Radiology, 1984", id: "6739822", tag: "Biometria" },
@@ -450,27 +440,15 @@ const Index = () => {
                   </a>
                 ))}
               </div>
-            </motion.div>
 
-            {/* ── Legal disclaimer ── */}
-            <motion.div variants={item}>
-              <div className="glass-card-static p-4 border border-destructive/20 rounded-2xl">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Shield className="w-4 h-4 text-destructive" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Aviso Legal</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      O <strong className="text-foreground">IDALIA-CALC</strong> é uma ferramenta de{" "}
-                      <strong className="text-foreground">apoio à decisão clínica</strong> destinada a
-                      profissionais de saúde habilitados. Os resultados são estimativas matemáticas e{" "}
-                      <strong className="text-foreground">não substituem</strong> avaliação, diagnóstico
-                      ou conduta médica. Nenhum dado pessoal ou clínico é coletado —
-                      processamento 100% local.
-                    </p>
-                  </div>
-                </div>
+              <div className="divider-fade" />
+
+              {/* Disclaimer */}
+              <div className="flex items-start gap-2.5">
+                <Shield className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <strong className="text-foreground">Aviso Legal</strong> — O IDALIA-CALC é uma ferramenta de apoio à decisão clínica destinada a profissionais habilitados. Os resultados são estimativas matemáticas e <strong className="text-foreground">não substituem</strong> avaliação, diagnóstico ou conduta médica. Processamento 100% local.
+                </p>
               </div>
             </motion.div>
           </motion.div>
