@@ -298,6 +298,11 @@ const Index = () => {
           >
             {/* ── Hero (compact — logo already in header) ── */}
             <motion.div variants={item} className="text-center space-y-4 pt-6 pb-2">
+              <img
+                src={logo}
+                alt="IDALIA Calc"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mx-auto shadow-lg ring-4 ring-primary/10"
+              />
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight text-balance">
                 <span className="gradient-text-brand">Saúde Reprodutiva</span>
                 <br />
