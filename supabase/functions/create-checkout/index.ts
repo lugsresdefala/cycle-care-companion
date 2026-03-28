@@ -49,13 +49,17 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://idalia.lovable.app";
 
+    // Session expires in 30 minutes to avoid stale checkouts
+    const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
-      success_url: `${origin}/dashboard?checkout=success`,
-      cancel_url: `${origin}/pricing?checkout=canceled`,
+      success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing?checkout=canceled&session_id={CHECKOUT_SESSION_ID}`,
+      expires_at: expiresAt,
       metadata: { user_id: user.id },
     });
 
