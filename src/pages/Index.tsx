@@ -8,8 +8,6 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
-import CRLCalculator from "@/pages/CRLCalculator";
-import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
