@@ -19,6 +19,7 @@ const BiometryCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
