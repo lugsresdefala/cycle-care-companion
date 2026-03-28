@@ -17,6 +17,7 @@ const EFWCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
   const [gaWeeks, setGaWeeks] = useState("");
