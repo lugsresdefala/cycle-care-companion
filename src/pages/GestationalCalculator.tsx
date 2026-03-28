@@ -48,6 +48,7 @@ interface CalcResults {
 
 const GestationalCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("gestational");
+  const { saveExam, canSave } = useExamSave();
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
   const [lmpDate, setLmpDate] = useState<Date | undefined>();
   const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
