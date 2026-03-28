@@ -37,7 +37,17 @@ const CRLCalculator = () => {
     if (!ok) return;
     setError("");
     const ga = gestationalAgeFromCRL(value);
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+    const res = { ...ga, dueDate: dueDateFromGA(ga.totalDays) };
+    setResults(res);
+    if (canSave) {
+      saveExam({
+        calcType: "crl",
+        inputData: { crl: value },
+        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+        gestationalAgeWeeks: ga.weeks,
+        gestationalAgeDays: ga.days,
+      });
+    }
   };
 
   return (
