@@ -28,16 +28,38 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    // First try to get stripe_customer_id from DB
+    const { data: sub } = await supabaseClient
+      .from("user_subscriptions")
+      .select("stripe_customer_id")
+      .eq("doctor_id", user.id)
+      .not("stripe_customer_id", "eq", "")
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    if (customers.data.length === 0) throw new Error("No Stripe customer found");
+    let customerId = sub?.stripe_customer_id;
+
+    // Fallback: search Stripe by email
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "no_customer", message: "Você ainda não possui uma assinatura ativa no Stripe. Assine um plano primeiro." }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+        );
+      }
+      customerId = customers.data[0].id;
+    }
 
     const origin = req.headers.get("origin") || "https://idalia.lovable.app";
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customers.data[0].id,
+      customer: customerId,
       return_url: `${origin}/dashboard`,
     });
 

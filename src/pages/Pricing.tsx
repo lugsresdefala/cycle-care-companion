@@ -157,7 +157,7 @@ const Pricing = () => {
         </div>
 
         {/* Subscription management for existing subscribers */}
-        {subscription && (
+        {subscription && subscription.status === "active" && (
           <div className="flex justify-center">
             <Button variant="outline" size="sm" onClick={handleManageSubscription}>
               <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
