@@ -112,6 +112,61 @@ serve(async (req) => {
         break;
       }
 
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        logStep("Checkout session expired/aborted", {
+          sessionId: session.id,
+          customerId: session.customer,
+          userId: session.metadata?.user_id,
+        });
+
+        const userId = session.metadata?.user_id;
+        if (userId) {
+          // Clean up any pending subscription records created during checkout
+          const { error } = await supabase
+            .from("user_subscriptions")
+            .update({ status: "canceled", updated_at: new Date().toISOString() })
+            .eq("doctor_id", userId)
+            .eq("status", "pending");
+
+          if (error) logStep("Error cleaning up pending subscriptions", { error: error.message });
+          else logStep("Cleaned up pending subscriptions for expired checkout", { userId });
+        }
+        break;
+      }
+
+      case "checkout.session.async_payment_failed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        logStep("Async payment failed for checkout", {
+          sessionId: session.id,
+          customerId: session.customer,
+          userId: session.metadata?.user_id,
+        });
+
+        const userId = session.metadata?.user_id;
+        if (userId) {
+          const { error } = await supabase
+            .from("user_subscriptions")
+            .update({ status: "payment_failed", updated_at: new Date().toISOString() })
+            .eq("doctor_id", userId)
+            .in("status", ["pending", "active"]);
+
+          if (error) logStep("Error updating subscription after async payment failure", { error: error.message });
+          else logStep("Subscription marked as payment_failed", { userId });
+        }
+        break;
+      }
+
+      case "payment_intent.canceled": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        logStep("Payment intent canceled", {
+          paymentIntentId: paymentIntent.id,
+          customerId: paymentIntent.customer,
+          cancellationReason: paymentIntent.cancellation_reason,
+        });
+        break;
+      }
+
       default:
         logStep("Unhandled event type", { type: event.type });
     }

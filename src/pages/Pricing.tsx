@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { STRIPE_TIERS } from "@/lib/stripe-config";
+import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
 
 interface Plan {
   id: string;
@@ -84,6 +85,7 @@ const Pricing = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
+  useCheckoutStatus();
 
   useEffect(() => {
     supabase

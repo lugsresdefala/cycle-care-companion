@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,6 +13,7 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { subscription, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
+  useCheckoutStatus();
   const [profile, setProfile] = useState<any>(null);
   const [patientCount, setPatientCount] = useState(0);
   const [examCount, setExamCount] = useState(0);
