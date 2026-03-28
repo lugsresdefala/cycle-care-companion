@@ -120,7 +120,6 @@ const Patients = () => {
               <DialogHeader>
                 <DialogTitle>{editingPatient ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
               </DialogHeader>
-              </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Nome *</Label>
