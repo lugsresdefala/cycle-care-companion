@@ -77,7 +77,7 @@ const GestationalCalculator = () => {
     if (!ok) return;
     const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
 
-    setResults({
+    const calcResult: CalcResults = {
       gestationalAge: `${result.weeks} semanas e ${result.days} dias`,
       weeks: result.weeks,
       days: result.days,
@@ -89,7 +89,17 @@ const GestationalCalculator = () => {
       progressPercent,
       developmentInfo: result.developmentInfo,
       prenatalCare: result.prenatalCare,
-    });
+    };
+    setResults(calcResult);
+    if (canSave) {
+      saveExam({
+        calcType: "gestational",
+        inputData: { method: calculationType },
+        resultData: { gestationalAge: calcResult.gestationalAge, weeks: result.weeks, days: result.days, dueDate: calcResult.dueDate },
+        gestationalAgeWeeks: result.weeks,
+        gestationalAgeDays: result.days,
+      });
+    }
   };
 
   const toggleSection = (s: string) => setExpandedSection(expandedSection === s ? null : s);
