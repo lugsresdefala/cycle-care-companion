@@ -35,6 +35,7 @@ const PERCENTILE_COLORS = {
 
 const GrowthCurveCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [measurements, setMeasurements] = useState<Measurement[]>([
     { id: crypto.randomUUID(), ga: "", value: "" },
