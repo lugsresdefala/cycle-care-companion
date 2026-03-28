@@ -442,6 +442,16 @@ const Index = () => {
           </motion.div>
         )}
       </main>
+
+      <footer className="border-t border-border/40 bg-muted/30 mt-12">
+        <div className="container max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span>© {new Date().getFullYear()} IDALIA Calc — Saúde Reprodutiva & Medicina Fetal</span>
+          <div className="flex items-center gap-4">
+            <Link to="/termos" className="hover:text-foreground transition-colors">Termos de Uso</Link>
+            <Link to="/privacidade" className="hover:text-foreground transition-colors">Política de Privacidade</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
