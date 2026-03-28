@@ -17,6 +17,8 @@ const PatientExams = lazy(() => import("./pages/PatientExams"));
 const Pricing = lazy(() => import("./pages/Pricing"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ProfileEdit = lazy(() => import("./pages/ProfileEdit"));
+const TermsOfUse = lazy(() => import("./pages/TermsOfUse"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const GestationalCalculator = lazy(() => import("./pages/GestationalCalculator"));
 const FertilityCalculator = lazy(() => import("./pages/FertilityCalculator"));
 const BiometryCalculator = lazy(() => import("./pages/BiometryCalculator"));
@@ -41,6 +43,8 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/termos" element={<TermsOfUse />} />
+              <Route path="/privacidade" element={<PrivacyPolicy />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
               <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
