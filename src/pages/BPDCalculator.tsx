@@ -23,6 +23,7 @@ const BPD_REFERENCE = [
 
 const BPDCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
