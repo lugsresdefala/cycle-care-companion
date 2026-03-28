@@ -64,9 +64,14 @@ const Dashboard = () => {
           <h1 className="font-display text-2xl font-semibold text-foreground">
             Ola, {profile?.full_name || "Doutor(a)"}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {profile?.crm_number ? `CRM ${profile.crm_number}` : "Complete seu perfil para exibir o CRM"}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-muted-foreground">
+              {profile?.crm_number ? `CRM ${profile.crm_number}` : "Complete seu perfil para exibir o CRM"}
+            </p>
+            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs gap-1" onClick={() => navigate("/profile")}>
+              <UserCog className="w-3 h-3" /> Editar
+            </Button>
+          </div>
         </motion.div>
 
         {/* Stats */}
