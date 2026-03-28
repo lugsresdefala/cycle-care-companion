@@ -49,6 +49,7 @@ const BPDCalculator = () => {
         resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
         gestationalAgeWeeks: ga.weeks,
         gestationalAgeDays: ga.days,
+        patientId: selectedPatientId,
       });
     }
   };
