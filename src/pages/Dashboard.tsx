@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins } from "lucide-react";
+import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins, UserCog } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Dashboard = () => {
