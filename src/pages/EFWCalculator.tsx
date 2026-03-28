@@ -70,6 +70,7 @@ const EFWCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h2 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h2>

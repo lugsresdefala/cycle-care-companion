@@ -137,6 +137,7 @@ const GrowthCurveCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       {/* ── Parameter selector ── */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-blue">
         <div>
