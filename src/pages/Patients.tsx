@@ -43,23 +43,46 @@ const Patients = () => {
   useEffect(() => { load(); }, [user]);
 
   const handleSave = async () => {
-    if (!user || !form.name.trim()) { toast.error("Nome e obrigatorio"); return; }
+    if (!user || !form.name.trim()) { toast.error("Nome é obrigatório"); return; }
     setSaving(true);
-    const { error } = await supabase.from("patients").insert({
-      doctor_id: user.id,
-      name: form.name.trim(),
-      age: form.age ? parseInt(form.age) : null,
-      medical_record_id: form.medical_record_id.trim(),
-      notes: form.notes.trim(),
-    });
-    if (error) toast.error("Erro ao salvar paciente");
-    else {
-      toast.success("Paciente cadastrado");
-      setForm({ name: "", age: "", medical_record_id: "", notes: "" });
-      setDialogOpen(false);
-      load();
+    if (editingPatient) {
+      const { error } = await supabase.from("patients").update({
+        name: form.name.trim(),
+        age: form.age ? parseInt(form.age) : null,
+        medical_record_id: form.medical_record_id.trim(),
+        notes: form.notes.trim(),
+      }).eq("id", editingPatient.id);
+      if (error) toast.error("Erro ao atualizar");
+      else { toast.success("Paciente atualizado"); closeDialog(); load(); }
+    } else {
+      const { error } = await supabase.from("patients").insert({
+        doctor_id: user.id,
+        name: form.name.trim(),
+        age: form.age ? parseInt(form.age) : null,
+        medical_record_id: form.medical_record_id.trim(),
+        notes: form.notes.trim(),
+      });
+      if (error) toast.error("Erro ao salvar paciente");
+      else { toast.success("Paciente cadastrado"); closeDialog(); load(); }
     }
     setSaving(false);
+  };
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setEditingPatient(null);
+    setForm({ name: "", age: "", medical_record_id: "", notes: "" });
+  };
+
+  const openEdit = (p: Patient) => {
+    setEditingPatient(p);
+    setForm({
+      name: p.name,
+      age: p.age ? String(p.age) : "",
+      medical_record_id: p.medical_record_id || "",
+      notes: p.notes || "",
+    });
+    setDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
