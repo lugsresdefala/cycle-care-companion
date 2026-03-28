@@ -141,7 +141,7 @@ const Patients = () => {
                   <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="input-glass" placeholder="Notas clinicas" />
                 </div>
                 <Button onClick={handleSave} disabled={saving} className="w-full">
-                  {saving ? "Salvando..." : "Cadastrar Paciente"}
+                  {saving ? "Salvando..." : editingPatient ? "Atualizar Paciente" : "Cadastrar Paciente"}
                 </Button>
               </div>
             </DialogContent>
