@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Search, ArrowLeft, Users, FileText, Trash2 } from "lucide-react";
+import { Plus, Search, ArrowLeft, Users, FileText, Trash2, Pencil } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 interface Patient {
@@ -26,6 +26,7 @@ const Patients = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [form, setForm] = useState({ name: "", age: "", medical_record_id: "", notes: "" });
   const [saving, setSaving] = useState(false);
 
@@ -42,23 +43,46 @@ const Patients = () => {
   useEffect(() => { load(); }, [user]);
 
   const handleSave = async () => {
-    if (!user || !form.name.trim()) { toast.error("Nome e obrigatorio"); return; }
+    if (!user || !form.name.trim()) { toast.error("Nome é obrigatório"); return; }
     setSaving(true);
-    const { error } = await supabase.from("patients").insert({
-      doctor_id: user.id,
-      name: form.name.trim(),
-      age: form.age ? parseInt(form.age) : null,
-      medical_record_id: form.medical_record_id.trim(),
-      notes: form.notes.trim(),
-    });
-    if (error) toast.error("Erro ao salvar paciente");
-    else {
-      toast.success("Paciente cadastrado");
-      setForm({ name: "", age: "", medical_record_id: "", notes: "" });
-      setDialogOpen(false);
-      load();
+    if (editingPatient) {
+      const { error } = await supabase.from("patients").update({
+        name: form.name.trim(),
+        age: form.age ? parseInt(form.age) : null,
+        medical_record_id: form.medical_record_id.trim(),
+        notes: form.notes.trim(),
+      }).eq("id", editingPatient.id);
+      if (error) toast.error("Erro ao atualizar");
+      else { toast.success("Paciente atualizado"); closeDialog(); load(); }
+    } else {
+      const { error } = await supabase.from("patients").insert({
+        doctor_id: user.id,
+        name: form.name.trim(),
+        age: form.age ? parseInt(form.age) : null,
+        medical_record_id: form.medical_record_id.trim(),
+        notes: form.notes.trim(),
+      });
+      if (error) toast.error("Erro ao salvar paciente");
+      else { toast.success("Paciente cadastrado"); closeDialog(); load(); }
     }
     setSaving(false);
+  };
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setEditingPatient(null);
+    setForm({ name: "", age: "", medical_record_id: "", notes: "" });
+  };
+
+  const openEdit = (p: Patient) => {
+    setEditingPatient(p);
+    setForm({
+      name: p.name,
+      age: p.age ? String(p.age) : "",
+      medical_record_id: p.medical_record_id || "",
+      notes: p.notes || "",
+    });
+    setDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -86,7 +110,7 @@ const Patients = () => {
               <span className="font-display text-sm font-semibold text-foreground">Pacientes</span>
             </div>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) closeDialog(); else setDialogOpen(true); }}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-1">
                 <Plus className="w-3.5 h-3.5" /> Novo
@@ -94,7 +118,7 @@ const Patients = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Novo Paciente</DialogTitle>
+                <DialogTitle>{editingPatient ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
               </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
@@ -116,7 +140,7 @@ const Patients = () => {
                   <Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="input-glass" placeholder="Notas clinicas" />
                 </div>
                 <Button onClick={handleSave} disabled={saving} className="w-full">
-                  {saving ? "Salvando..." : "Cadastrar Paciente"}
+                  {saving ? "Salvando..." : editingPatient ? "Atualizar Paciente" : "Cadastrar Paciente"}
                 </Button>
               </div>
             </DialogContent>
@@ -158,6 +182,9 @@ const Patients = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(p)}>
+                    <Pencil className="w-3.5 h-3.5" />
+                  </Button>
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/patient/${p.id}/exams`)}>
                     <FileText className="w-3.5 h-3.5" />
                   </Button>

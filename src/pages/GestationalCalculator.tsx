@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
+import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,7 @@ const GestationalCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("gestational");
   const { saveExam, canSave } = useExamSave();
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [lmpDate, setLmpDate] = useState<Date | undefined>();
   const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
   const [ultrasoundWeeks, setUltrasoundWeeks] = useState(0);
@@ -98,6 +100,7 @@ const GestationalCalculator = () => {
         resultData: { gestationalAge: calcResult.gestationalAge, weeks: result.weeks, days: result.days, dueDate: calcResult.dueDate },
         gestationalAgeWeeks: result.weeks,
         gestationalAgeDays: result.days,
+        patientId: selectedPatientId,
       });
     }
   };
@@ -108,6 +111,7 @@ const GestationalCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       {/* Input */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>

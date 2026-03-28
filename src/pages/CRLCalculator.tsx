@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
+import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ const CRLCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [crl, setCrl] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
@@ -46,6 +48,7 @@ const CRLCalculator = () => {
         resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
         gestationalAgeWeeks: ga.weeks,
         gestationalAgeDays: ga.days,
+        patientId: selectedPatientId,
       });
     }
   };
@@ -53,6 +56,7 @@ const CRLCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Calculadora CRL</h2>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
+import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ const EFWCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
   const [gaWeeks, setGaWeeks] = useState("");
@@ -60,6 +62,7 @@ const EFWCalculator = () => {
         inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW2 },
         resultData: { weightG: efw.weightG, weightKg: efw.weightKg, percentileRange },
         gestationalAgeWeeks: gaW2,
+        patientId: selectedPatientId,
       });
     }
   };
@@ -67,6 +70,7 @@ const EFWCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h2 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h2>

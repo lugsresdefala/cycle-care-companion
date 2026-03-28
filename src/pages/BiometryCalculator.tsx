@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
+import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ const BiometryCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
@@ -57,6 +59,7 @@ const BiometryCalculator = () => {
         resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
         gestationalAgeWeeks: ga.weeks,
         gestationalAgeDays: ga.days,
+        patientId: selectedPatientId,
       });
     }
   };
@@ -71,6 +74,7 @@ const BiometryCalculator = () => {
   return (
     <div className="space-y-6">
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h2 className="font-display text-xl text-foreground">Biometria Fetal Composta</h2>
