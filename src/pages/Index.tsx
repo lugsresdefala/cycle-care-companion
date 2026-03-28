@@ -120,7 +120,7 @@ const SECTIONS = [
   {
     label: "Ciclo e Gestação",
     subtitle: "Datação gestacional",
-    values: ["fertility", "gestational", "crl", "bpd", "biometry"] as ActiveModule[],
+    values: ["fertility", "gestational", "biometry"] as ActiveModule[],
   },
   {
     label: "Crescimento e Hemodinâmica",
