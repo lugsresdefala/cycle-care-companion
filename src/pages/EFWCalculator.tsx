@@ -53,6 +53,15 @@ const EFWCalculator = () => {
     }
 
     setResults({ ...efw, percentileRange, percentiles });
+    if (canSave) {
+      const gaW2 = gaWeeks ? parseInt(gaWeeks) : undefined;
+      saveExam({
+        calcType: "efw",
+        inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW2 },
+        resultData: { weightG: efw.weightG, weightKg: efw.weightKg, percentileRange },
+        gestationalAgeWeeks: gaW2,
+      });
+    }
   };
 
   return (

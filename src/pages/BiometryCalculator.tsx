@@ -50,6 +50,15 @@ const BiometryCalculator = () => {
     if (!ok) return;
     setError("");
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+    if (canSave) {
+      saveExam({
+        calcType: "biometry",
+        inputData: { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl },
+        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+        gestationalAgeWeeks: ga.weeks,
+        gestationalAgeDays: ga.days,
+      });
+    }
   };
 
   const fields = [
