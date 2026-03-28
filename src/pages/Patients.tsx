@@ -26,6 +26,7 @@ const Patients = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [form, setForm] = useState({ name: "", age: "", medical_record_id: "", notes: "" });
   const [saving, setSaving] = useState(false);
 
