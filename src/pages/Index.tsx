@@ -13,7 +13,7 @@ import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
 import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler" | "growth";
+type ActiveModule = null | "fertility" | "gestational" | "biometry" | "efw" | "doppler" | "growth";
 
 /* ── Single source of truth for all calculators ── */
 const CARDS: {
