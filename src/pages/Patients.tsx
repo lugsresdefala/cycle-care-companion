@@ -110,7 +110,7 @@ const Patients = () => {
               <span className="font-display text-sm font-semibold text-foreground">Pacientes</span>
             </div>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) closeDialog(); else setDialogOpen(true); }}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-1">
                 <Plus className="w-3.5 h-3.5" /> Novo
