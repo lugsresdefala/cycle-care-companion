@@ -51,6 +51,7 @@ const GestationalCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("gestational");
   const { saveExam, canSave } = useExamSave();
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [lmpDate, setLmpDate] = useState<Date | undefined>();
   const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
   const [ultrasoundWeeks, setUltrasoundWeeks] = useState(0);
