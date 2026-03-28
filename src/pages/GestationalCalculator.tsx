@@ -100,6 +100,7 @@ const GestationalCalculator = () => {
         resultData: { gestationalAge: calcResult.gestationalAge, weeks: result.weeks, days: result.days, dueDate: calcResult.dueDate },
         gestationalAgeWeeks: result.weeks,
         gestationalAgeDays: result.days,
+        patientId: selectedPatientId,
       });
     }
   };
