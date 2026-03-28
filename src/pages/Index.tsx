@@ -163,8 +163,6 @@ const Index = () => {
     switch (activeModule) {
       case "fertility":   return <FertilityCalculator />;
       case "gestational": return <GestationalCalculator />;
-      case "crl":         return <CRLCalculator />;
-      case "bpd":         return <BPDCalculator />;
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
       case "doppler":     return <DopplerCalculator />;

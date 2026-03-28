@@ -50,8 +50,8 @@ const App = () => (
               <Route path="/gestational" element={<GestationalCalculator />} />
               <Route path="/fertility" element={<FertilityCalculator />} />
               <Route path="/biometry" element={<BiometryCalculator />} />
-              <Route path="/bpd" element={<BPDCalculator />} />
-              <Route path="/crl" element={<CRLCalculator />} />
+              <Route path="/bpd" element={<BiometryCalculator />} />
+              <Route path="/crl" element={<BiometryCalculator />} />
               <Route path="/efw" element={<EFWCalculator />} />
               <Route path="/doppler" element={<DopplerCalculator />} />
               <Route path="/growth-curve" element={<GrowthCurveCalculator />} />
