@@ -22,8 +22,6 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const GestationalCalculator = lazy(() => import("./pages/GestationalCalculator"));
 const FertilityCalculator = lazy(() => import("./pages/FertilityCalculator"));
 const BiometryCalculator = lazy(() => import("./pages/BiometryCalculator"));
-const BPDCalculator = lazy(() => import("./pages/BPDCalculator"));
-const CRLCalculator = lazy(() => import("./pages/CRLCalculator"));
 const EFWCalculator = lazy(() => import("./pages/EFWCalculator"));
 const DopplerCalculator = lazy(() => import("./pages/DopplerCalculator"));
 const GrowthCurveCalculator = lazy(() => import("./pages/GrowthCurveCalculator"));
@@ -52,8 +50,8 @@ const App = () => (
               <Route path="/gestational" element={<GestationalCalculator />} />
               <Route path="/fertility" element={<FertilityCalculator />} />
               <Route path="/biometry" element={<BiometryCalculator />} />
-              <Route path="/bpd" element={<BPDCalculator />} />
-              <Route path="/crl" element={<CRLCalculator />} />
+              <Route path="/bpd" element={<BiometryCalculator />} />
+              <Route path="/crl" element={<BiometryCalculator />} />
               <Route path="/efw" element={<EFWCalculator />} />
               <Route path="/doppler" element={<DopplerCalculator />} />
               <Route path="/growth-curve" element={<GrowthCurveCalculator />} />

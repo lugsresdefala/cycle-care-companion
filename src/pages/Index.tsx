@@ -8,14 +8,12 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import FertilityCalculator from "@/pages/FertilityCalculator";
 import GestationalCalculator from "@/pages/GestationalCalculator";
-import CRLCalculator from "@/pages/CRLCalculator";
-import BPDCalculator from "@/pages/BPDCalculator";
 import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
 import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "crl" | "bpd" | "biometry" | "efw" | "doppler" | "growth";
+type ActiveModule = null | "fertility" | "gestational" | "biometry" | "efw" | "doppler" | "growth";
 
 /* ── Single source of truth for all calculators ── */
 const CARDS: {
@@ -61,37 +59,9 @@ const CARDS: {
     tag: "Gestação",
   },
   {
-    value: "crl",
-    title: "CRL — Comprimento Crânio-Caudal",
-    description: "Datação gestacional no 1º trimestre pela medida do CCN.",
-    icon: <Ruler className="w-5 h-5" />,
-    navIcon: <Ruler className="w-3 h-3" />,
-    navLabel: "CRL",
-    navShort: "CRL",
-    cardClass: "glass-card-blue",
-    iconBg: "bg-primary/12",
-    iconColor: "text-primary",
-    accentColor: "text-primary",
-    tag: "1º Trimestre",
-  },
-  {
-    value: "bpd",
-    title: "DBP — Diâmetro Biparietal",
-    description: "Estimativa de IG no 2º e 3º trimestres pelo diâmetro biparietal.",
-    icon: <Ruler className="w-5 h-5" />,
-    navIcon: <Ruler className="w-3 h-3" />,
-    navLabel: "DBP",
-    navShort: "DBP",
-    cardClass: "glass-card-purple",
-    iconBg: "bg-secondary/12",
-    iconColor: "text-secondary",
-    accentColor: "text-secondary",
-    tag: "2º–3º Trim.",
-  },
-  {
     value: "biometry",
-    title: "Biometria Fetal Composta",
-    description: "IG por múltiplas medidas (DBP, CC, CA, CF) — maior acurácia.",
+    title: "Biometria Fetal",
+    description: "IG por CCN, DBP individual ou biometria composta (DBP, CC, CA, CF).",
     icon: <Activity className="w-5 h-5" />,
     navIcon: <Activity className="w-3 h-3" />,
     navLabel: "Biometria",
@@ -100,7 +70,7 @@ const CARDS: {
     iconBg: "bg-primary/12",
     iconColor: "text-primary",
     accentColor: "text-primary",
-    tag: "Precisão Máxima",
+    tag: "CRL · DBP · Composta",
   },
   {
     value: "efw",
@@ -150,7 +120,7 @@ const SECTIONS = [
   {
     label: "Ciclo e Gestação",
     subtitle: "Datação gestacional",
-    values: ["fertility", "gestational", "crl", "bpd", "biometry"] as ActiveModule[],
+    values: ["fertility", "gestational", "biometry"] as ActiveModule[],
   },
   {
     label: "Crescimento e Hemodinâmica",
@@ -193,8 +163,6 @@ const Index = () => {
     switch (activeModule) {
       case "fertility":   return <FertilityCalculator />;
       case "gestational": return <GestationalCalculator />;
-      case "crl":         return <CRLCalculator />;
-      case "bpd":         return <BPDCalculator />;
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
       case "doppler":     return <DopplerCalculator />;
