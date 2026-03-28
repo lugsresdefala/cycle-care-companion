@@ -77,7 +77,16 @@ const GrowthCurveCalculator = () => {
     const ok = await consumeToken();
     if (!ok) return;
     setError("");
-    setAssessments(valid.map((v) => assessGrowth(selectedParam, v.ga, v.value)));
+    const results = valid.map((v) => assessGrowth(selectedParam, v.ga, v.value));
+    setAssessments(results);
+    if (canSave) {
+      saveExam({
+        calcType: "growth_curve",
+        inputData: { parameter: selectedParam, measurements: valid },
+        resultData: { assessments: results },
+        gestationalAgeWeeks: valid[0]?.ga,
+      });
+    }
   };
 
   // Build chart data merging percentile curves + measurements
