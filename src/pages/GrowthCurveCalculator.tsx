@@ -87,6 +87,7 @@ const GrowthCurveCalculator = () => {
         inputData: { parameter: selectedParam, measurements: valid },
         resultData: { assessments: results },
         gestationalAgeWeeks: valid[0]?.ga,
+        patientId: selectedPatientId,
       });
     }
   };
