@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
@@ -15,9 +15,10 @@ export interface SubscriptionInfo {
 }
 
 export function useSubscription() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const syncedRef = useRef(false);
 
   const fetchSubscription = useCallback(async () => {
     if (!user) { setSubscription(null); setLoading(false); return; }
@@ -50,7 +51,32 @@ export function useSubscription() {
     setLoading(false);
   }, [user]);
 
+  // Sync with Stripe via check-subscription edge function
+  const syncStripe = useCallback(async () => {
+    if (!session?.access_token) return;
+    try {
+      await supabase.functions.invoke("check-subscription", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+    } catch {
+      // silent fail – local DB state is still usable
+    }
+    await fetchSubscription();
+  }, [session, fetchSubscription]);
+
+  // Initial load from DB
   useEffect(() => { fetchSubscription(); }, [fetchSubscription]);
+
+  // Sync with Stripe on login and every 60s
+  useEffect(() => {
+    if (!session) { syncedRef.current = false; return; }
+    if (!syncedRef.current) {
+      syncedRef.current = true;
+      syncStripe();
+    }
+    const interval = setInterval(syncStripe, 60_000);
+    return () => clearInterval(interval);
+  }, [session, syncStripe]);
 
   const canUseCalculator = (calcType: string): boolean => {
     if (!subscription) return false;
