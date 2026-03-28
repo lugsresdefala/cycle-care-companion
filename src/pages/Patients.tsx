@@ -118,7 +118,8 @@ const Patients = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Novo Paciente</DialogTitle>
+                <DialogTitle>{editingPatient ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
+              </DialogHeader>
               </DialogHeader>
               <div className="space-y-3 pt-2">
                 <div className="space-y-1.5">
