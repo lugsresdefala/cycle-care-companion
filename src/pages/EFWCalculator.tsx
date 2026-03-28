@@ -62,6 +62,7 @@ const EFWCalculator = () => {
         inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW2 },
         resultData: { weightG: efw.weightG, weightKg: efw.weightKg, percentileRange },
         gestationalAgeWeeks: gaW2,
+        patientId: selectedPatientId,
       });
     }
   };
