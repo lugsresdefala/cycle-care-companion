@@ -38,9 +38,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+              <Route path="/patient/:id/exams" element={<ProtectedRoute><PatientExams /></ProtectedRoute>} />
               <Route path="/gestational" element={<GestationalCalculator />} />
               <Route path="/fertility" element={<FertilityCalculator />} />
               <Route path="/biometry" element={<BiometryCalculator />} />
