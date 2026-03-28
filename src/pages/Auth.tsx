@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -130,7 +131,29 @@ const Auth = () => {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-          </div>
+           </div>
+
+          {isLogin && (
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!email.trim()) {
+                    toast.error("Digite seu email para recuperar a senha");
+                    return;
+                  }
+                  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                  });
+                  if (error) toast.error(error.message);
+                  else toast.success("Email de recuperação enviado! Verifique sua caixa de entrada.");
+                }}
+                className="text-xs text-primary hover:underline"
+              >
+                Esqueceu a senha?
+              </button>
+            </div>
+          )}
 
           <Button type="submit" disabled={loading} className="w-full gap-2">
             {loading ? "Aguarde..." : isLogin ? "Entrar" : "Criar conta"}

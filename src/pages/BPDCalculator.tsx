@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ const BPD_REFERENCE = [
 
 const BPDCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
@@ -36,7 +38,17 @@ const BPDCalculator = () => {
     if (!ok) return;
     setError("");
     const ga = gestationalAgeFromBPD(value);
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+    const res = { ...ga, dueDate: dueDateFromGA(ga.totalDays) };
+    setResults(res);
+    if (canSave) {
+      saveExam({
+        calcType: "bpd",
+        inputData: { bpd: value },
+        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+        gestationalAgeWeeks: ga.weeks,
+        gestationalAgeDays: ga.days,
+      });
+    }
   };
 
   return (

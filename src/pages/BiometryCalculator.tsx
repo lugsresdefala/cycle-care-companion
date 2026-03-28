@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 
 const BiometryCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
@@ -48,6 +50,15 @@ const BiometryCalculator = () => {
     if (!ok) return;
     setError("");
     setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+    if (canSave) {
+      saveExam({
+        calcType: "biometry",
+        inputData: { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl },
+        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+        gestationalAgeWeeks: ga.weeks,
+        gestationalAgeDays: ga.days,
+      });
+    }
   };
 
   const fields = [

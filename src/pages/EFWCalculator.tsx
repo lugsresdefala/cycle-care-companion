@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
@@ -51,6 +53,15 @@ const EFWCalculator = () => {
     }
 
     setResults({ ...efw, percentileRange, percentiles });
+    if (canSave) {
+      const gaW2 = gaWeeks ? parseInt(gaWeeks) : undefined;
+      saveExam({
+        calcType: "efw",
+        inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW2 },
+        resultData: { weightG: efw.weightG, weightKg: efw.weightKg, percentileRange },
+        gestationalAgeWeeks: gaW2,
+      });
+    }
   };
 
   return (

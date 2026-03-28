@@ -13,7 +13,9 @@ import NotFound from "./pages/NotFound.tsx";
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Patients = lazy(() => import("./pages/Patients"));
+const PatientExams = lazy(() => import("./pages/PatientExams"));
 const Pricing = lazy(() => import("./pages/Pricing"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const GestationalCalculator = lazy(() => import("./pages/GestationalCalculator"));
 const FertilityCalculator = lazy(() => import("./pages/FertilityCalculator"));
 const BiometryCalculator = lazy(() => import("./pages/BiometryCalculator"));
@@ -36,9 +38,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+              <Route path="/patient/:id/exams" element={<ProtectedRoute><PatientExams /></ProtectedRoute>} />
               <Route path="/gestational" element={<GestationalCalculator />} />
               <Route path="/fertility" element={<FertilityCalculator />} />
               <Route path="/biometry" element={<BiometryCalculator />} />

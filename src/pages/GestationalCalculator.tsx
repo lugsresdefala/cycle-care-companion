@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ interface CalcResults {
 
 const GestationalCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("gestational");
+  const { saveExam, canSave } = useExamSave();
   const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
   const [lmpDate, setLmpDate] = useState<Date | undefined>();
   const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
@@ -75,7 +77,7 @@ const GestationalCalculator = () => {
     if (!ok) return;
     const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
 
-    setResults({
+    const calcResult: CalcResults = {
       gestationalAge: `${result.weeks} semanas e ${result.days} dias`,
       weeks: result.weeks,
       days: result.days,
@@ -87,7 +89,17 @@ const GestationalCalculator = () => {
       progressPercent,
       developmentInfo: result.developmentInfo,
       prenatalCare: result.prenatalCare,
-    });
+    };
+    setResults(calcResult);
+    if (canSave) {
+      saveExam({
+        calcType: "gestational",
+        inputData: { method: calculationType },
+        resultData: { gestationalAge: calcResult.gestationalAge, weeks: result.weeks, days: result.days, dueDate: calcResult.dueDate },
+        gestationalAgeWeeks: result.weeks,
+        gestationalAgeDays: result.days,
+      });
+    }
   };
 
   const toggleSection = (s: string) => setExpandedSection(expandedSection === s ? null : s);

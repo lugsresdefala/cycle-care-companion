@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ const PERCENTILE_COLORS = {
 
 const GrowthCurveCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [measurements, setMeasurements] = useState<Measurement[]>([
     { id: crypto.randomUUID(), ga: "", value: "" },
@@ -75,7 +77,16 @@ const GrowthCurveCalculator = () => {
     const ok = await consumeToken();
     if (!ok) return;
     setError("");
-    setAssessments(valid.map((v) => assessGrowth(selectedParam, v.ga, v.value)));
+    const results = valid.map((v) => assessGrowth(selectedParam, v.ga, v.value));
+    setAssessments(results);
+    if (canSave) {
+      saveExam({
+        calcType: "growth_curve",
+        inputData: { parameter: selectedParam, measurements: valid },
+        resultData: { assessments: results },
+        gestationalAgeWeeks: valid[0]?.ga,
+      });
+    }
   };
 
   // Build chart data merging percentile curves + measurements

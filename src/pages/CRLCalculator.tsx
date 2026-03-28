@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ const CRL_REFERENCE = [
 
 const CRLCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [crl, setCrl] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
@@ -35,7 +37,17 @@ const CRLCalculator = () => {
     if (!ok) return;
     setError("");
     const ga = gestationalAgeFromCRL(value);
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+    const res = { ...ga, dueDate: dueDateFromGA(ga.totalDays) };
+    setResults(res);
+    if (canSave) {
+      saveExam({
+        calcType: "crl",
+        inputData: { crl: value },
+        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+        gestationalAgeWeeks: ga.weeks,
+        gestationalAgeDays: ga.days,
+      });
+    }
   };
 
   return (
