@@ -22,6 +22,7 @@ const CRL_REFERENCE = [
 
 const CRLCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { saveExam, canSave } = useExamSave();
   const [crl, setCrl] = useState("");
   const [results, setResults] = useState<{
     weeks: number; days: number; dueDate: Date; totalDays: number;
