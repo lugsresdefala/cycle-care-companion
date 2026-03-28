@@ -20,16 +20,16 @@ export function useExamSave() {
 
   const saveExam = async (params: SaveExamParams) => {
     if (!user) return;
-    const { error } = await supabase.from("exam_history").insert({
+    const { error } = await supabase.from("exam_history").insert([{
       doctor_id: user.id,
       calc_type: params.calcType,
-      input_data: params.inputData,
-      result_data: params.resultData,
+      input_data: params.inputData as unknown as Record<string, unknown>,
+      result_data: params.resultData as unknown as Record<string, unknown>,
       gestational_age_weeks: params.gestationalAgeWeeks ?? null,
       gestational_age_days: params.gestationalAgeDays ?? null,
       patient_id: params.patientId ?? null,
       notes: params.notes ?? "",
-    });
+    }] as any);
     if (error) {
       console.error("Error saving exam:", error);
       toast.error("Erro ao salvar exame no histórico");
