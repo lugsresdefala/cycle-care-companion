@@ -22,8 +22,6 @@ const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const GestationalCalculator = lazy(() => import("./pages/GestationalCalculator"));
 const FertilityCalculator = lazy(() => import("./pages/FertilityCalculator"));
 const BiometryCalculator = lazy(() => import("./pages/BiometryCalculator"));
-const BPDCalculator = lazy(() => import("./pages/BPDCalculator"));
-const CRLCalculator = lazy(() => import("./pages/CRLCalculator"));
 const EFWCalculator = lazy(() => import("./pages/EFWCalculator"));
 const DopplerCalculator = lazy(() => import("./pages/DopplerCalculator"));
 const GrowthCurveCalculator = lazy(() => import("./pages/GrowthCurveCalculator"));
