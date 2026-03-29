@@ -25,6 +25,8 @@ const BiometryCalculator = lazy(() => import("./pages/BiometryCalculator"));
 const EFWCalculator = lazy(() => import("./pages/EFWCalculator"));
 const DopplerCalculator = lazy(() => import("./pages/DopplerCalculator"));
 const GrowthCurveCalculator = lazy(() => import("./pages/GrowthCurveCalculator"));
+const TrisomyRiskCalculator = lazy(() => import("./pages/TrisomyRiskCalculator"));
+const PreeclampsiaRiskCalculator = lazy(() => import("./pages/PreeclampsiaRiskCalculator"));
 
 const queryClient = new QueryClient();
 
@@ -55,6 +57,8 @@ const App = () => (
               <Route path="/efw" element={<EFWCalculator />} />
               <Route path="/doppler" element={<DopplerCalculator />} />
               <Route path="/growth-curve" element={<GrowthCurveCalculator />} />
+              <Route path="/trisomy-risk" element={<TrisomyRiskCalculator />} />
+              <Route path="/preeclampsia-risk" element={<PreeclampsiaRiskCalculator />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

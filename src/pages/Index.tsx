@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp, User, LogIn } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp, User, LogIn, ShieldAlert, HeartPulse } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,10 @@ import BiometryCalculator from "@/pages/BiometryCalculator";
 import EFWCalculator from "@/pages/EFWCalculator";
 import DopplerCalculator from "@/pages/DopplerCalculator";
 import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
+import TrisomyRiskCalculator from "@/pages/TrisomyRiskCalculator";
+import PreeclampsiaRiskCalculator from "@/pages/PreeclampsiaRiskCalculator";
 
-type ActiveModule = null | "fertility" | "gestational" | "biometry" | "efw" | "doppler" | "growth";
+type ActiveModule = null | "fertility" | "gestational" | "biometry" | "efw" | "doppler" | "growth" | "trisomy" | "preeclampsia";
 
 /* ── Single source of truth for all calculators ── */
 const CARDS: {
@@ -114,6 +116,34 @@ const CARDS: {
     accentColor: "text-secondary",
     tag: "INTERGROWTH-21st",
   },
+  {
+    value: "trisomy",
+    title: "Risco de Trissomias",
+    description: "Rastreamento combinado do 1º trimestre: TN, bioquímica sérica e marcadores adicionais.",
+    icon: <ShieldAlert className="w-5 h-5" />,
+    navIcon: <ShieldAlert className="w-3 h-3" />,
+    navLabel: "Trissomias",
+    navShort: "T21",
+    cardClass: "glass-card-warm",
+    iconBg: "bg-accent/12",
+    iconColor: "text-accent",
+    accentColor: "text-accent",
+    tag: "T21 · T18 · T13",
+  },
+  {
+    value: "preeclampsia",
+    title: "Risco de Pré-Eclâmpsia",
+    description: "Modelo FMF com fatores maternos, PAM, Doppler uterino, PAPP-A e PlGF.",
+    icon: <HeartPulse className="w-5 h-5" />,
+    navIcon: <HeartPulse className="w-3 h-3" />,
+    navLabel: "Pré-Eclâmpsia",
+    navShort: "PE",
+    cardClass: "glass-card-blue",
+    iconBg: "bg-primary/12",
+    iconColor: "text-primary",
+    accentColor: "text-primary",
+    tag: "FMF / ASPRE",
+  },
 ];
 
 const SECTIONS = [
@@ -126,6 +156,11 @@ const SECTIONS = [
     label: "Crescimento e Hemodinâmica",
     subtitle: "Peso fetal, Doppler e curvas",
     values: ["efw", "doppler", "growth"] as ActiveModule[],
+  },
+  {
+    label: "Rastreamento de Risco",
+    subtitle: "Trissomias e pré-eclâmpsia",
+    values: ["trisomy", "preeclampsia"] as ActiveModule[],
   },
 ];
 
@@ -145,6 +180,8 @@ const REFERENCES = [
   { text: "Hadlock FP et al. — Am J Obstet Gynecol, 1985", id: "3881966", tag: "PFE" },
   { text: "Shepard MJ et al. — Am J Obstet Gynecol, 1982", id: "7058805", tag: "PFE" },
   { text: "INTERGROWTH-21st — Lancet, 2014", id: "25209488", tag: "Crescimento" },
+  { text: "Kagan KO et al. — Ultrasound Obstet Gynecol, 2008", id: "18634131", tag: "Trissomias" },
+  { text: "Rolnik DL et al. (ASPRE) — N Engl J Med, 2017", id: "28657417", tag: "Pré-Eclâmpsia" },
 ];
 
 const Index = () => {
@@ -166,8 +203,10 @@ const Index = () => {
       case "biometry":    return <BiometryCalculator />;
       case "efw":         return <EFWCalculator />;
       case "doppler":     return <DopplerCalculator />;
-      case "growth":      return <GrowthCurveCalculator />;
-      default:            return null;
+      case "growth":        return <GrowthCurveCalculator />;
+      case "trisomy":       return <TrisomyRiskCalculator />;
+      case "preeclampsia":  return <PreeclampsiaRiskCalculator />;
+      default:              return null;
     }
   };
 
