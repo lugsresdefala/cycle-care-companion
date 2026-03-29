@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const PreeclampsiaRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate("preeclampsia_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
