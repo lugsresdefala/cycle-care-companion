@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const TrisomyRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate("trisomy_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
