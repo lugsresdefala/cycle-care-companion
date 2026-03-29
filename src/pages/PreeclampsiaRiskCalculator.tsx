@@ -96,9 +96,9 @@ const PreeclampsiaRiskCalculator = () => {
 
     if (canSave) {
       saveExam({
-        calcType: "preeclampsia-risk",
-        inputData: input,
-        resultData: result,
+        calcType: "preeclampsia_risk",
+        inputData: input as unknown as Record<string, unknown>,
+        resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
     }

@@ -28,14 +28,14 @@ interface Plan {
 }
 
 const featureLabels: Record<string, string> = {
-  biometry: "Biometria Fetal",
+  biometry: "Biometria Fetal (CCN, DBP, Composta)",
   gestational: "Idade Gestacional",
   fertility: "Ciclo / Fertilidade",
-  bpd: "DBP",
-  crl: "CRL",
-  efw: "PFE",
-  doppler: "Doppler",
+  efw: "Peso Fetal Estimado (PFE)",
+  doppler: "Doppler Obstétrico",
   growth_curve: "Curvas de Crescimento",
+  trisomy_risk: "Risco de Trissomias",
+  preeclampsia_risk: "Risco de Pré-Eclâmpsia",
 };
 
 const modeConfig = [

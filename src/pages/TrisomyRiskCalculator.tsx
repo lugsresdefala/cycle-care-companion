@@ -89,9 +89,9 @@ const TrisomyRiskCalculator = () => {
 
     if (canSave) {
       saveExam({
-        calcType: "trisomy-risk",
-        inputData: input,
-        resultData: result,
+        calcType: "trisomy_risk",
+        inputData: input as unknown as Record<string, unknown>,
+        resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
     }
