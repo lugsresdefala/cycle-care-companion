@@ -242,6 +242,8 @@ export type Database = {
         | "growth_curve"
         | "gestational"
         | "fertility"
+        | "preeclampsia_risk"
+        | "trisomy_risk"
       plan_tier: "free_trial" | "basic" | "professional" | "premium"
     }
     CompositeTypes: {
@@ -379,6 +381,8 @@ export const Constants = {
         "growth_curve",
         "gestational",
         "fertility",
+        "preeclampsia_risk",
+        "trisomy_risk",
       ],
       plan_tier: ["free_trial", "basic", "professional", "premium"],
     },
