@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock Supabase client
-const mockUpdate = vi.fn().mockReturnThis();
+const mockUpdate = vi.fn((_data?: any) => mockUpdate).mockReturnThis();
 const mockEq = vi.fn().mockReturnThis();
 const mockIn = vi.fn().mockReturnThis();
 const mockFrom = vi.fn(() => ({
