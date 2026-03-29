@@ -1,19 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock Supabase client
-const mockUpdate = vi.fn().mockReturnThis();
-const mockEq = vi.fn().mockReturnThis();
-const mockIn = vi.fn().mockReturnThis();
-const mockFrom = vi.fn(() => ({
+const mockEq: any = vi.fn().mockReturnThis();
+const mockIn: any = vi.fn().mockReturnValue({ error: null });
+const mockUpdate: any = vi.fn().mockReturnValue({ eq: mockEq, in: mockIn });
+const mockFrom: any = vi.fn(() => ({
   update: mockUpdate,
   eq: mockEq,
   in: mockIn,
 }));
 
 // Chain mocks properly
-mockUpdate.mockReturnValue({ eq: mockEq, in: mockIn });
 mockEq.mockReturnValue({ eq: mockEq, in: mockIn, error: null });
-mockIn.mockReturnValue({ error: null });
 
 const mockSupabase = { from: mockFrom };
 
