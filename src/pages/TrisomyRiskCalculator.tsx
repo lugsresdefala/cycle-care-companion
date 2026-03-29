@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const TrisomyRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate("trisomy_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
@@ -89,9 +89,9 @@ const TrisomyRiskCalculator = () => {
 
     if (canSave) {
       saveExam({
-        calcType: "trisomy-risk",
-        inputData: input,
-        resultData: result,
+        calcType: "trisomy_risk",
+        inputData: input as unknown as Record<string, unknown>,
+        resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
     }
