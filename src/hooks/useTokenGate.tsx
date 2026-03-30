@@ -8,7 +8,7 @@ const FREE_CALCULATORS = ["gestational", "fertility"];
 
 export function useTokenGate(calculatorType?: string) {
   const { user } = useAuth();
-  const { subscription, loading, useToken, refetch } = useSubscription();
+  const { subscription, loading, consumeServerToken, refetch } = useSubscription();
   const [consuming, setConsuming] = useState(false);
 
   const isFreeCalculator = calculatorType ? FREE_CALCULATORS.includes(calculatorType) : false;
@@ -17,8 +17,8 @@ export function useTokenGate(calculatorType?: string) {
   const needsLogin = !user && !isFreeCalculator;
 
   const consumeToken = useCallback(async (): Promise<boolean> => {
-    // Free calculators don't consume tokens when user is not logged in
-    if (isFreeCalculator && !user) {
+    // Free calculators never consume tokens
+    if (isFreeCalculator) {
       return true;
     }
 
@@ -33,13 +33,13 @@ export function useTokenGate(calculatorType?: string) {
     }
 
     setConsuming(true);
-    const ok = await useToken();
+    const ok = await consumeServerToken();
     setConsuming(false);
     if (!ok) {
       toast({ title: "Erro ao consumir token", description: "Tente novamente.", variant: "destructive" });
     }
     return ok;
-  }, [user, blocked, useToken, isFreeCalculator]);
+  }, [user, blocked, consumeServerToken, isFreeCalculator]);
 
   return { blocked, needsLogin, consuming, loading, subscription, consumeToken, refetch, isFreeCalculator };
 }

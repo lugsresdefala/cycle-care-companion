@@ -87,8 +87,8 @@ const PreeclampsiaRiskCalculator = () => {
       familyHistoryPE,
       meanArterialPressure: showMeasurements && map ? parseFloat(map) : null,
       uterineArteryMeanPI: showMeasurements && uterinePI ? parseFloat(uterinePI) : null,
-      pappaMoM: showBiochem && pappaMoM ? parseFloat(pappaMoM) : null,
-      plgfMoM: showBiochem && plgfMoM ? parseFloat(plgfMoM) : null,
+      pappaMoM: showBiochem && pappaMoM !== "" ? parseFloat(pappaMoM) : null,
+      plgfMoM: showBiochem && plgfMoM !== "" ? parseFloat(plgfMoM) : null,
     };
 
     const result = calculatePreeclampsiaRisk(input);
@@ -334,7 +334,7 @@ const PreeclampsiaRiskCalculator = () => {
               ))}
 
               <p className="text-xs text-muted-foreground">
-                Equivalente: PE pré-termo ≈ 1 : {Math.round(100 / results.riskPreterm).toLocaleString("pt-BR")}
+                Equivalente: PE pré-termo ≈ 1 : {results.riskPreterm > 0 ? Math.round(100 / results.riskPreterm).toLocaleString("pt-BR") : "N/A"}
               </p>
             </div>
 

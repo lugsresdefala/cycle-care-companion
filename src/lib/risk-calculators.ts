@@ -294,6 +294,9 @@ export interface PreeclampsiaResult {
  * published Gaussian survival model for educational purposes.
  */
 export function calculatePreeclampsiaRisk(input: PreeclampsiaInput): PreeclampsiaResult {
+  if (input.height <= 0) {
+    throw new Error("Altura deve ser maior que zero.");
+  }
   const bmi = input.weight / ((input.height / 100) ** 2);
 
   // Base log-odds for preterm PE (< 37 weeks) — intercept

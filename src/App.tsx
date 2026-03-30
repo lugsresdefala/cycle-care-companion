@@ -1,10 +1,10 @@
-// @ts-ignore - QueryClient export may not be found by TS but works at runtime
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, Component } from "react";
+import type { ReactNode } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
@@ -28,6 +28,33 @@ const GrowthCurveCalculator = lazy(() => import("./pages/GrowthCurveCalculator")
 const TrisomyRiskCalculator = lazy(() => import("./pages/TrisomyRiskCalculator"));
 const PreeclampsiaRiskCalculator = lazy(() => import("./pages/PreeclampsiaRiskCalculator"));
 
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-4 text-center">
+          <h1 className="text-xl font-semibold text-foreground">Algo deu errado</h1>
+          <p className="text-sm text-muted-foreground">Ocorreu um erro inesperado. Tente recarregar a página.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Recarregar
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +64,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ErrorBoundary>
           <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-sm text-muted-foreground">Carregando...</div>}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -62,6 +90,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+          </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

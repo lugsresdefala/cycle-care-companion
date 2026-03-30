@@ -92,7 +92,7 @@ const CPR_REFS: Record<number, { p5: number; p50: number; p95: number }> = {
 };
 
 // ---- Helper: get closest GA key ----
-function getClosestGA(table: Record<number, any>, ga: number): number {
+function getClosestGA(table: Record<number, Record<string, number>>, ga: number): number {
   const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
   let closest = keys[0];
   for (const k of keys) {
@@ -215,6 +215,9 @@ export function evaluateUterineArteryPI(pi: number, gaWeeks: number, bilateralNo
 }
 
 export function calculateCPR(mcaPI: number, uaPI: number, gaWeeks: number): CPRResult {
+  if (uaPI <= 0) {
+    return { cpr: 0, mcaPI, uaPI, percentile: "N/A", interpretation: "IP da artéria umbilical deve ser maior que zero.", severity: "critical" };
+  }
   const cpr = parseFloat((mcaPI / uaPI).toFixed(2));
   const ga = getClosestGA(CPR_REFS, gaWeeks);
   const refs = CPR_REFS[ga];
@@ -260,7 +263,7 @@ export function evaluateDuctusVenosusPIV(piv: number, gaWeeks: number): DopplerR
 
 export function evaluateDuctusVenosusWaveA(waveAReversed: boolean, gaWeeks: number): DopplerResult {
   if (waveAReversed) {
-    const severity: "critical" = "critical";
+    const severity = "critical" as const;
     const interpretation = gaWeeks < 14
       ? "Onda 'a' reversa no 1º trimestre — associada a aneuploidias e cardiopatias congênitas. Correlacionar com translucência nucal e cariótipo."
       : "Onda 'a' reversa — indica aumento significativo da pressão atrial direita e possível insuficiência cardíaca fetal. Risco de óbito perinatal aumentado.";
