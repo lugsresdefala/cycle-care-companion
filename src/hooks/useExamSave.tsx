@@ -29,9 +29,8 @@ export function useExamSave() {
       gestational_age_days: params.gestationalAgeDays ?? null,
       patient_id: params.patientId ?? null,
       notes: params.notes ?? "",
-    }] as any);
+    }]);
     if (error) {
-      console.error("Error saving exam:", error);
       toast.error("Erro ao salvar exame no histórico");
     } else {
       toast.success("Exame salvo no histórico");

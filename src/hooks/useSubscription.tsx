@@ -33,7 +33,7 @@ export function useSubscription() {
       .maybeSingle();
 
     if (data) {
-      const plan = data.subscription_plans as any;
+      const plan = data.subscription_plans as { name?: string; tier?: string; features?: string[] } | null;
       setSubscription({
         id: data.id,
         status: data.status,
@@ -85,12 +85,12 @@ export function useSubscription() {
     return subscription.features.includes(calcType);
   };
 
-  const useToken = async (): Promise<boolean> => {
+  const consumeServerToken = async (): Promise<boolean> => {
     if (!user) return false;
     const { data } = await supabase.rpc("use_token", { _user_id: user.id });
     if (data) await fetchSubscription();
     return !!data;
   };
 
-  return { subscription, loading, canUseCalculator, useToken, refetch: fetchSubscription };
+  return { subscription, loading, canUseCalculator, consumeServerToken, refetch: fetchSubscription };
 }

@@ -14,28 +14,31 @@ const Dashboard = () => {
   const { subscription, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
   useCheckoutStatus();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<{ full_name?: string; crm_number?: string; specialty?: string; phone?: string } | null>(null);
   const [patientCount, setPatientCount] = useState(0);
   const [examCount, setExamCount] = useState(0);
+  const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const load = async () => {
+      setLoadingData(true);
       const [{ data: p }, { count: pc }, { count: ec }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, crm_number, specialty, phone").eq("id", user.id).maybeSingle(),
         supabase.from("patients").select("*", { count: "exact", head: true }).eq("doctor_id", user.id),
         supabase.from("exam_history").select("*", { count: "exact", head: true }).eq("doctor_id", user.id),
       ]);
       setProfile(p);
       setPatientCount(pc ?? 0);
       setExamCount(ec ?? 0);
+      setLoadingData(false);
     };
     load();
   }, [user]);
 
   const tierLabel: Record<string, string> = {
     free_trial: "Teste Gratuito",
-    basic: "Basico",
+    basic: "Básico",
     professional: "Profissional",
     premium: "Premium",
   };
@@ -64,7 +67,7 @@ const Dashboard = () => {
       <main className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-1">
           <h1 className="font-display text-2xl font-semibold text-foreground">
-            Ola, {profile?.full_name || "Doutor(a)"}
+            Olá, {profile?.full_name || "Doutor(a)"}
           </h1>
           <div className="flex items-center gap-2">
             <p className="text-sm text-muted-foreground">
@@ -77,6 +80,16 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stats */}
+        {loadingData ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="glass-card-static p-4 space-y-2 animate-pulse">
+                <div className="h-4 bg-muted rounded w-16" />
+                <div className="h-6 bg-muted rounded w-10" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Pacientes", value: patientCount, icon: Users, color: "text-primary" },
@@ -99,14 +112,15 @@ const Dashboard = () => {
             </motion.div>
           ))}
         </div>
+        )}
 
         {/* Subscription alert */}
         {subscription?.status === "trial" && (
           <div className="glass-card-warm p-4 flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-medium text-foreground">Periodo de teste</p>
+              <p className="text-sm font-medium text-foreground">Período de teste</p>
               <p className="text-xs text-muted-foreground">
-                {subscription.tokens_remaining} calculos restantes
+                {subscription.tokens_remaining} cálculos restantes
               </p>
             </div>
             <Button size="sm" onClick={() => navigate("/pricing")} className="gap-1">

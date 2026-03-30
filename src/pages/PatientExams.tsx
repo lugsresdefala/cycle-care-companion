@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,7 @@ import { ArrowLeft, FileText, Calendar, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import logo from "@/assets/logo.png";
 
 const CALC_LABELS: Record<string, string> = {
@@ -40,8 +41,9 @@ const PatientExams = () => {
   const [patientName, setPatientName] = useState("");
   const [exams, setExams] = useState<ExamRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!user || !id) return;
     const [{ data: patient }, { data: examData }] = await Promise.all([
       supabase.from("patients").select("name").eq("id", id).eq("doctor_id", user.id).maybeSingle(),
@@ -50,14 +52,16 @@ const PatientExams = () => {
     setPatientName(patient?.name ?? "Paciente");
     setExams((examData as ExamRow[]) ?? []);
     setLoading(false);
-  };
+  }, [user, id]);
 
-  useEffect(() => { load(); }, [user, id]);
+  useEffect(() => { load(); }, [load]);
 
-  const handleDelete = async (examId: string) => {
-    const { error } = await supabase.from("exam_history").delete().eq("id", examId);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from("exam_history").delete().eq("id", deleteTarget);
     if (error) toast.error("Erro ao excluir exame");
     else { toast.success("Exame removido"); load(); }
+    setDeleteTarget(null);
   };
 
   const formatGA = (w: number | null, d: number | null) => {
@@ -128,7 +132,7 @@ const PatientExams = () => {
                     <Calendar className="w-3 h-3" />
                     {format(new Date(exam.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
                   </div>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleDelete(exam.id)}>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteTarget(exam.id)}>
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
@@ -139,6 +143,23 @@ const PatientExams = () => {
           ))
         )}
       </main>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este exame? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Plus, Search, ArrowLeft, Users, FileText, Trash2, Pencil } from "lucide-react";
 import logo from "@/assets/logo.png";
@@ -29,18 +30,21 @@ const Patients = () => {
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [form, setForm] = useState({ name: "", age: "", medical_record_id: "", notes: "" });
   const [saving, setSaving] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(true);
 
-  const load = async () => {
-    if (!user) return;
+  const load = useCallback(async () => {
+    if (!user) { setLoadingPatients(false); return; }
+    setLoadingPatients(true);
     const { data } = await supabase
       .from("patients")
       .select("*")
       .eq("doctor_id", user.id)
       .order("created_at", { ascending: false });
     setPatients((data as Patient[]) ?? []);
-  };
+    setLoadingPatients(false);
+  }, [user]);
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => { load(); }, [load]);
 
   const handleSave = async () => {
     if (!user || !form.name.trim()) { toast.error("Nome é obrigatório"); return; }
@@ -85,10 +89,14 @@ const Patients = () => {
     setDialogOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("patients").delete().eq("id", id);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from("patients").delete().eq("id", deleteTarget);
     if (error) toast.error("Erro ao excluir");
     else { toast.success("Paciente removido"); load(); }
+    setDeleteTarget(null);
   };
 
   const filtered = patients.filter(
@@ -159,7 +167,9 @@ const Patients = () => {
           />
         </div>
 
-        {filtered.length === 0 ? (
+        {loadingPatients ? (
+          <div className="text-center py-16 text-sm text-muted-foreground">Carregando...</div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-16 space-y-3">
             <Users className="w-10 h-10 mx-auto text-muted-foreground/40" />
             <p className="text-sm text-muted-foreground">Nenhum paciente cadastrado</p>
@@ -188,7 +198,7 @@ const Patients = () => {
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/patient/${p.id}/exams`)}>
                     <FileText className="w-3.5 h-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(p.id)}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(p.id)}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -197,6 +207,23 @@ const Patients = () => {
           </div>
         )}
       </main>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este paciente? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

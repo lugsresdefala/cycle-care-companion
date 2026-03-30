@@ -204,7 +204,7 @@ const Pricing = () => {
                         </div>
                       ))}
                     </div>
-                    <Button variant="outline" onClick={() => navigate("/calculadora-gestacional")} className="w-full" size="sm">
+                    <Button variant="outline" onClick={() => navigate("/gestational")} className="w-full" size="sm">
                       Usar agora
                     </Button>
                   </div>
