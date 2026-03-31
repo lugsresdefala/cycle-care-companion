@@ -43,15 +43,24 @@ serve(async (req) => {
     const signature = req.headers.get("stripe-signature");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
-    let event: Stripe.Event;
-
-    if (webhookSecret && signature) {
-      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      logStep("Event verified via signature", { type: event.type });
-    } else {
-      event = JSON.parse(body) as Stripe.Event;
-      logStep("Event parsed without signature verification", { type: event.type });
+    if (!webhookSecret) {
+      logStep("ERROR", { message: "STRIPE_WEBHOOK_SECRET is not configured" });
+      return new Response(JSON.stringify({ error: "Webhook not configured" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
+
+    if (!signature) {
+      logStep("ERROR", { message: "Missing stripe-signature header" });
+      return new Response(JSON.stringify({ error: "Missing signature" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    const event: Stripe.Event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    logStep("Event verified via signature", { type: event.type });
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -210,9 +219,26 @@ async function upsertSubscription(
   // Find user by email or metadata
   let userId = userIdFromMetadata;
   if (!userId && email) {
-    const { data: users } = await supabase.auth.admin.listUsers();
-    const matchedUser = users?.users?.find((u: any) => u.email === email);
-    if (matchedUser) userId = matchedUser.id;
+    // First check if we already have a subscription record with this customer
+    const { data: existingSub } = await supabase
+      .from("user_subscriptions")
+      .select("doctor_id")
+      .eq("stripe_customer_id", customerId)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingSub) {
+      userId = existingSub.doctor_id;
+    } else {
+      // Fallback: search auth users by email with filter (avoids full table scan)
+      const { data: users } = await supabase.auth.admin.listUsers({
+        page: 1,
+        perPage: 1,
+        filter: email,
+      });
+      const matchedUser = users?.users?.find((u: any) => u.email === email);
+      if (matchedUser) userId = matchedUser.id;
+    }
   }
 
   if (!userId) {
@@ -241,14 +267,16 @@ async function upsertSubscription(
   // Check for existing subscription record
   const { data: existing } = await supabase
     .from("user_subscriptions")
-    .select("id, tokens_used")
+    .select("id, tokens_used, start_date")
     .eq("doctor_id", userId)
     .eq("stripe_subscription_id", subscription.id)
     .limit(1);
 
   if (existing && existing.length > 0) {
-    // Update existing
-    const tokensUsed = existing[0].tokens_used || 0;
+    // Detect period change: if the start_date from Stripe is newer, it's a new billing period
+    const isNewPeriod = existing[0].start_date !== periodStart;
+    const tokensUsed = isNewPeriod ? 0 : (existing[0].tokens_used || 0);
+
     const { error } = await supabase
       .from("user_subscriptions")
       .update({
@@ -256,14 +284,15 @@ async function upsertSubscription(
         end_date: periodEnd,
         start_date: periodStart,
         plan_id: plan.id,
-        tokens_remaining: Math.max(0, plan.tokens_per_period - tokensUsed),
+        tokens_remaining: isNewPeriod ? plan.tokens_per_period : Math.max(0, plan.tokens_per_period - tokensUsed),
+        tokens_used: tokensUsed,
         stripe_customer_id: customerId,
         updated_at: new Date().toISOString(),
       })
       .eq("id", existing[0].id);
 
     if (error) logStep("Error updating subscription", { error: error.message });
-    else logStep("Subscription updated in DB", { userId, tier });
+    else logStep("Subscription updated in DB", { userId, tier, isNewPeriod });
   } else {
     // Deactivate old subscriptions
     await supabase

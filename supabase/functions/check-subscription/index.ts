@@ -59,23 +59,57 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found customer", { customerId });
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customerId,
-      status: "active",
-      limit: 1,
-    });
+    // Fetch both active and trialing subscriptions from Stripe
+    const [activeSubs, trialingSubs] = await Promise.all([
+      stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 }),
+      stripe.subscriptions.list({ customer: customerId, status: "trialing", limit: 1 }),
+    ]);
 
-    const hasActiveSub = subscriptions.data.length > 0;
+    const sub = activeSubs.data[0] || trialingSubs.data[0] || null;
+    const hasActiveSub = sub !== null;
     let productId = null;
     let tier = null;
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
-      const sub = subscriptions.data[0];
       subscriptionEnd = new Date(sub.current_period_end * 1000).toISOString();
+      const periodStart = new Date(sub.current_period_start * 1000).toISOString();
       productId = sub.items.data[0].price.product as string;
       tier = PRODUCT_TIER_MAP[productId] || null;
       logStep("Active subscription", { productId, tier, end: subscriptionEnd });
+
+      // Sync subscription status to local DB
+      if (tier) {
+        const { data: plans } = await supabaseClient
+          .from("subscription_plans")
+          .select("id, tokens_per_period")
+          .eq("tier", tier)
+          .eq("is_active", true)
+          .limit(1);
+
+        const plan = plans?.[0];
+        if (plan) {
+          const isActive = sub.status === "active" || sub.status === "trialing";
+          const { error: upsertError } = await supabaseClient
+            .from("user_subscriptions")
+            .upsert(
+              {
+                doctor_id: user.id,
+                plan_id: plan.id,
+                status: isActive ? "active" : sub.status,
+                start_date: periodStart,
+                end_date: subscriptionEnd,
+                stripe_subscription_id: sub.id,
+                stripe_customer_id: customerId,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: "doctor_id,stripe_subscription_id" }
+            );
+
+          if (upsertError) logStep("Error syncing subscription to DB", { error: upsertError.message });
+          else logStep("Subscription synced to DB", { userId: user.id, tier });
+        }
+      }
     } else {
       logStep("No active subscription");
     }
@@ -92,9 +126,10 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
-    return new Response(JSON.stringify({ error: msg }), {
+    const isAuthError = msg.includes("Auth error") || msg.includes("not authenticated") || msg.includes("authorization");
+    return new Response(JSON.stringify({ error: isAuthError ? msg : "Erro ao verificar assinatura." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: isAuthError ? 401 : 500,
     });
   }
 });

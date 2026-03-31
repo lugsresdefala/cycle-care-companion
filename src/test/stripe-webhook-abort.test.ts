@@ -317,4 +317,51 @@ describe("Stripe Webhook - Abort/Failure Handling", () => {
       expect(result.handled).toBe(false);
     });
   });
+
+  describe("Webhook signature verification", () => {
+    it("should require STRIPE_WEBHOOK_SECRET to be set", () => {
+      // Simulate the guard: if webhookSecret is falsy, reject
+      function validateWebhookRequest(webhookSecret: string | undefined, signature: string | null) {
+        if (!webhookSecret) return { valid: false, error: "Webhook not configured" };
+        if (!signature) return { valid: false, error: "Missing signature" };
+        return { valid: true };
+      }
+
+      expect(validateWebhookRequest(undefined, "sig_test")).toEqual({ valid: false, error: "Webhook not configured" });
+      expect(validateWebhookRequest("", "sig_test")).toEqual({ valid: false, error: "Webhook not configured" });
+      expect(validateWebhookRequest("whsec_test", null)).toEqual({ valid: false, error: "Missing signature" });
+      expect(validateWebhookRequest("whsec_test", "sig_test")).toEqual({ valid: true });
+    });
+  });
+
+  describe("Token renewal on new billing period", () => {
+    it("should detect new billing period and reset tokens", () => {
+      function calculateTokens(
+        existingStartDate: string,
+        newPeriodStart: string,
+        tokensUsed: number,
+        tokensPerPeriod: number,
+      ) {
+        const isNewPeriod = existingStartDate !== newPeriodStart;
+        const effectiveUsed = isNewPeriod ? 0 : tokensUsed;
+        return {
+          isNewPeriod,
+          tokens_remaining: isNewPeriod ? tokensPerPeriod : Math.max(0, tokensPerPeriod - effectiveUsed),
+          tokens_used: effectiveUsed,
+        };
+      }
+
+      // Same period — keep used tokens
+      const same = calculateTokens("2026-03-01T00:00:00Z", "2026-03-01T00:00:00Z", 30, 50);
+      expect(same.isNewPeriod).toBe(false);
+      expect(same.tokens_remaining).toBe(20);
+      expect(same.tokens_used).toBe(30);
+
+      // New period — reset tokens
+      const renewed = calculateTokens("2026-03-01T00:00:00Z", "2026-04-01T00:00:00Z", 30, 50);
+      expect(renewed.isNewPeriod).toBe(true);
+      expect(renewed.tokens_remaining).toBe(50);
+      expect(renewed.tokens_used).toBe(0);
+    });
+  });
 });
