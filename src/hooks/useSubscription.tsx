@@ -78,19 +78,12 @@ export function useSubscription() {
     return () => clearInterval(interval);
   }, [session, syncStripe]);
 
-  const canUseCalculator = (calcType: string): boolean => {
-    if (!subscription) return false;
-    if (subscription.tokens_remaining <= 0) return false;
-    if (new Date(subscription.end_date) < new Date()) return false;
-    return subscription.features.includes(calcType);
-  };
-
   const consumeServerToken = async (): Promise<boolean> => {
     if (!user) return false;
-    const { data } = await supabase.rpc("use_token", { _user_id: user.id });
+    const { data } = await supabase.rpc("use_token");
     if (data) await fetchSubscription();
     return !!data;
   };
 
-  return { subscription, loading, canUseCalculator, consumeServerToken, refetch: fetchSubscription };
+  return { subscription, loading, consumeServerToken, refetch: fetchSubscription };
 }

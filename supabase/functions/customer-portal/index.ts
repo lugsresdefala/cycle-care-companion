@@ -69,9 +69,11 @@ serve(async (req) => {
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: msg }), {
+    console.error(`[CUSTOMER-PORTAL] ERROR - ${msg}`);
+    const isAuthError = msg.includes("Auth error") || msg.includes("not authenticated") || msg.includes("authorization");
+    return new Response(JSON.stringify({ error: isAuthError ? msg : "Erro ao abrir portal de gerenciamento." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: isAuthError ? 401 : 500,
     });
   }
 });

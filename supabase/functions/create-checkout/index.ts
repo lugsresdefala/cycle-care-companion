@@ -72,9 +72,11 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
-    return new Response(JSON.stringify({ error: msg }), {
+    // Return generic message to client; details are logged server-side
+    const isAuthError = msg.includes("not authenticated") || msg.includes("priceId");
+    return new Response(JSON.stringify({ error: isAuthError ? msg : "Erro ao criar sessão de pagamento." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: isAuthError ? 400 : 500,
     });
   }
 });
