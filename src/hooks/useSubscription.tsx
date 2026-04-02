@@ -80,7 +80,7 @@ export function useSubscription() {
 
   const consumeServerToken = async (): Promise<boolean> => {
     if (!user) return false;
-    const { data } = await supabase.rpc("use_token");
+    const { data } = await supabase.rpc("use_token", { _user_id: user.id });
     if (data) await fetchSubscription();
     return !!data;
   };
