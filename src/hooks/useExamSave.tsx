@@ -23,8 +23,8 @@ export function useExamSave() {
     const { error } = await supabase.from("exam_history").insert([{
       doctor_id: user.id,
       calc_type: params.calcType,
-      input_data: params.inputData as unknown as Record<string, unknown>,
-      result_data: params.resultData as unknown as Record<string, unknown>,
+      input_data: params.inputData as any,
+      result_data: params.resultData as any,
       gestational_age_weeks: params.gestationalAgeWeeks ?? null,
       gestational_age_days: params.gestationalAgeDays ?? null,
       patient_id: params.patientId ?? null,
