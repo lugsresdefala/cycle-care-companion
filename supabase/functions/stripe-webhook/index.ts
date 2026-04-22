@@ -273,8 +273,11 @@ async function upsertSubscription(
     .limit(1);
 
   if (existing && existing.length > 0) {
-    // Detect period change: if the start_date from Stripe is newer, it's a new billing period
-    const isNewPeriod = existing[0].start_date !== periodStart;
+    // Detect period change by comparing normalized timestamps — Postgres TIMESTAMPTZ
+    // and Stripe's ISO strings can differ in precision/format even for the same instant
+    const existingStart = existing[0].start_date ? new Date(existing[0].start_date).getTime() : 0;
+    const newStart = new Date(periodStart).getTime();
+    const isNewPeriod = Number.isFinite(existingStart) && Number.isFinite(newStart) && existingStart !== newStart;
     const tokensUsed = isNewPeriod ? 0 : (existing[0].tokens_used || 0);
 
     const { error } = await supabase

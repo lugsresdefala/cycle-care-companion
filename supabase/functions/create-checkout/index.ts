@@ -11,6 +11,18 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
 };
 
+const ALLOWED_ORIGINS = [
+  "https://idalia.lovable.app",
+  "http://localhost:5173",
+  "http://localhost:8080",
+];
+const DEFAULT_ORIGIN = "https://idalia.lovable.app";
+
+function resolveOrigin(req: Request): string {
+  const origin = req.headers.get("origin");
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : DEFAULT_ORIGIN;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -24,9 +36,12 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
+    const token = authHeader.replace("Bearer ", "").trim();
+    if (!token) throw new Error("Invalid authorization header");
+    const { data, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw new Error(`Auth error: ${userError.message}`);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
     logStep("User authenticated", { email: user.email });
@@ -47,7 +62,7 @@ serve(async (req) => {
     }
     logStep("Customer lookup", { customerId: customerId || "new" });
 
-    const origin = req.headers.get("origin") || "https://idalia.lovable.app";
+    const origin = resolveOrigin(req);
 
     // Session expires in 30 minutes to avoid stale checkouts
     const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
@@ -73,7 +88,7 @@ serve(async (req) => {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
     // Return generic message to client; details are logged server-side
-    const isAuthError = msg.includes("not authenticated") || msg.includes("priceId");
+    const isAuthError = msg.includes("not authenticated") || msg.includes("priceId") || msg.includes("authorization") || msg.includes("Auth error");
     return new Response(JSON.stringify({ error: isAuthError ? msg : "Erro ao criar sessão de pagamento." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: isAuthError ? 400 : 500,

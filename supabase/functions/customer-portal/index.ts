@@ -7,6 +7,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const ALLOWED_ORIGINS = [
+  "https://idalia.lovable.app",
+  "http://localhost:5173",
+  "http://localhost:8080",
+];
+const DEFAULT_ORIGIN = "https://idalia.lovable.app";
+
+function resolveOrigin(req: Request): string {
+  const origin = req.headers.get("origin");
+  return origin && ALLOWED_ORIGINS.includes(origin) ? origin : DEFAULT_ORIGIN;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -22,7 +34,8 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
-    const token = authHeader.replace("Bearer ", "");
+    const token = authHeader.replace("Bearer ", "").trim();
+    if (!token) throw new Error("Invalid authorization header");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Auth error: ${userError.message}`);
     const user = userData.user;
@@ -57,7 +70,7 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    const origin = req.headers.get("origin") || "https://idalia.lovable.app";
+    const origin = resolveOrigin(req);
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/dashboard`,
