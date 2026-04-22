@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, ChevronRight, Waves, TrendingUp, User, LogIn, ShieldAlert, HeartPulse } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
-import FertilityCalculator from "@/pages/FertilityCalculator";
-import GestationalCalculator from "@/pages/GestationalCalculator";
-import BiometryCalculator from "@/pages/BiometryCalculator";
-import EFWCalculator from "@/pages/EFWCalculator";
-import DopplerCalculator from "@/pages/DopplerCalculator";
-import GrowthCurveCalculator from "@/pages/GrowthCurveCalculator";
-import TrisomyRiskCalculator from "@/pages/TrisomyRiskCalculator";
-import PreeclampsiaRiskCalculator from "@/pages/PreeclampsiaRiskCalculator";
+
+const FertilityCalculator = lazy(() => import("@/pages/FertilityCalculator"));
+const GestationalCalculator = lazy(() => import("@/pages/GestationalCalculator"));
+const BiometryCalculator = lazy(() => import("@/pages/BiometryCalculator"));
+const EFWCalculator = lazy(() => import("@/pages/EFWCalculator"));
+const DopplerCalculator = lazy(() => import("@/pages/DopplerCalculator"));
+const GrowthCurveCalculator = lazy(() => import("@/pages/GrowthCurveCalculator"));
+const TrisomyRiskCalculator = lazy(() => import("@/pages/TrisomyRiskCalculator"));
+const PreeclampsiaRiskCalculator = lazy(() => import("@/pages/PreeclampsiaRiskCalculator"));
 
 type ActiveModule = null | "fertility" | "gestational" | "biometry" | "efw" | "doppler" | "growth" | "trisomy" | "preeclampsia";
 
@@ -445,7 +445,15 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            {renderModule()}
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-24 text-sm text-muted-foreground">
+                  Carregando calculadora...
+                </div>
+              }
+            >
+              {renderModule()}
+            </Suspense>
           </motion.div>
         )}
       </main>
