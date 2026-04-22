@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { SUBSCRIPTION_REFRESH_EVENT } from "./useCheckoutStatus";
 
 export interface SubscriptionInfo {
   id: string;
@@ -78,16 +79,40 @@ export function useSubscription() {
     return () => clearInterval(interval);
   }, [session, syncStripe]);
 
-  const consumeServerToken = async (): Promise<boolean> => {
+  // Force-refresh when a checkout redirect lands so the UI updates without
+  // waiting for the 60-second Stripe sync poll.
+  useEffect(() => {
+    const handler = () => { void syncStripe(); };
+    window.addEventListener(SUBSCRIPTION_REFRESH_EVENT, handler);
+    return () => window.removeEventListener(SUBSCRIPTION_REFRESH_EVENT, handler);
+  }, [syncStripe]);
+
+  // Guards against overlapping RPC calls from different callers racing the
+  // same subscription row. The DB function takes FOR UPDATE so it's safe
+  // either way, but this avoids wasted round-trips and double-counting when
+  // a component re-renders mid-flight.
+  const inFlightRef = useRef<Promise<boolean> | null>(null);
+
+  const consumeServerToken = useCallback(async (): Promise<boolean> => {
     if (!user) return false;
-    const { data, error } = await supabase.rpc("use_token");
-    if (error) {
-      console.error("[useSubscription] use_token failed", error);
-      return false;
+    if (inFlightRef.current) return inFlightRef.current;
+
+    const promise = (async () => {
+      const { data, error } = await supabase.rpc("use_token");
+      if (error) {
+        console.error("[useSubscription] use_token failed", error);
+        return false;
+      }
+      if (data) await fetchSubscription();
+      return !!data;
+    })();
+    inFlightRef.current = promise;
+    try {
+      return await promise;
+    } finally {
+      inFlightRef.current = null;
     }
-    if (data) await fetchSubscription();
-    return !!data;
-  };
+  }, [user, fetchSubscription]);
 
   return { subscription, loading, consumeServerToken, refetch: fetchSubscription };
 }

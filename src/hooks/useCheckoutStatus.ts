@@ -1,12 +1,19 @@
 import { useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export type CheckoutStatus = "success" | "canceled" | null;
 
+// Broadcast channel name used to tell useSubscription to force-refresh
+// immediately after a successful checkout, so the UI reflects the new plan
+// without waiting for the 60-second Stripe sync poll.
+export const SUBSCRIPTION_REFRESH_EVENT = "idalia:subscription-refresh";
+
 /**
  * Detects checkout status from URL query params after Stripe redirect.
- * Shows appropriate toast and cleans up the URL.
+ * On success, triggers a Stripe->DB sync and dispatches an event so any
+ * mounted useSubscription instance refetches immediately.
  */
 export function useCheckoutStatus() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,14 +36,32 @@ export function useCheckoutStatus() {
         description: "Você cancelou o processo de pagamento. Nenhuma cobrança foi realizada.",
         duration: 6000,
       });
-    } else if (status === "success") {
+      clearParams();
+      return;
+    }
+
+    if (status === "success") {
       toast.success("Assinatura realizada!", {
         description: "Seu pagamento foi processado com sucesso. Aproveite sua assinatura!",
         duration: 6000,
       });
-    }
 
-    clearParams();
+      // Force-sync with Stripe in case the webhook is briefly delayed. The
+      // event then tells useSubscription to refetch from the DB. Best-effort:
+      // the normal 60-second poll will recover from any failure here.
+      void (async () => {
+        try {
+          await supabase.functions.invoke("check-subscription");
+        } catch (err) {
+          console.warn("[useCheckoutStatus] post-checkout sync failed", err);
+        }
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent(SUBSCRIPTION_REFRESH_EVENT));
+        }
+      })();
+
+      clearParams();
+    }
   }, [status, clearParams]);
 
   return { status, sessionId };

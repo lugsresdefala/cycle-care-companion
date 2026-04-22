@@ -11,12 +11,27 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
 };
 
-// Map Stripe product IDs to internal tiers
-const PRODUCT_TIER_MAP: Record<string, string> = {
+// Map Stripe product IDs to internal tiers. Override per-environment with
+// STRIPE_PRODUCT_TIER_MAP='{"prod_xxx":"basic",...}'.
+const FALLBACK_PRODUCT_TIER_MAP: Record<string, string> = {
   "prod_UBSjDxy12ggcNr": "basic",       // Pessoal
   "prod_UBXuhebJkzJkWX": "professional", // Clínico
   "prod_UBXvP745IUaxd3": "premium",      // Clínico Premium
 };
+
+function loadProductTierMap(): Record<string, string> {
+  const raw = Deno.env.get("STRIPE_PRODUCT_TIER_MAP");
+  if (!raw) return FALLBACK_PRODUCT_TIER_MAP;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed as Record<string, string>;
+  } catch (err) {
+    console.error(`[CHECK-SUBSCRIPTION] Invalid STRIPE_PRODUCT_TIER_MAP, using fallback - ${String(err)}`);
+  }
+  return FALLBACK_PRODUCT_TIER_MAP;
+}
+
+const PRODUCT_TIER_MAP = loadProductTierMap();
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -44,7 +59,7 @@ serve(async (req) => {
     if (userError) throw new Error(`Auth error: ${userError.message}`);
     const user = userData?.user;
     if (!user?.email) throw new Error("User not authenticated");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });

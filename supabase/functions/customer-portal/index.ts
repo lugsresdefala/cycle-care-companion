@@ -7,12 +7,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const ALLOWED_ORIGINS = [
-  "https://idalia.lovable.app",
-  "http://localhost:5173",
-  "http://localhost:8080",
-];
-const DEFAULT_ORIGIN = "https://idalia.lovable.app";
+const DEFAULT_ORIGIN = Deno.env.get("STRIPE_DEFAULT_ORIGIN") ?? "https://idalia.lovable.app";
+
+function resolveAllowedOrigins(): string[] {
+  const raw = Deno.env.get("STRIPE_ALLOWED_ORIGINS");
+  if (raw && raw.trim()) {
+    return raw
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
+  }
+  // Dev-only fallback. Production MUST set STRIPE_ALLOWED_ORIGINS.
+  return [
+    DEFAULT_ORIGIN,
+    "http://localhost:5173",
+    "http://localhost:8080",
+  ];
+}
+
+const ALLOWED_ORIGINS = resolveAllowedOrigins();
 
 function resolveOrigin(req: Request): string {
   const origin = req.headers.get("origin");
