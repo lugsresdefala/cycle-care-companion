@@ -13,7 +13,16 @@ export function useTokenGate(calculatorType?: string) {
 
   const isFreeCalculator = calculatorType ? FREE_CALCULATORS.includes(calculatorType) : false;
 
-  const blocked = !loading && !isFreeCalculator && (!subscription || subscription.tokens_remaining <= 0 || new Date(subscription.end_date) < new Date());
+  const isExpired = (() => {
+    if (!subscription?.end_date) return true;
+    const end = new Date(subscription.end_date).getTime();
+    return !Number.isFinite(end) || end < Date.now();
+  })();
+
+  const blocked =
+    !loading &&
+    !isFreeCalculator &&
+    (!subscription || subscription.tokens_remaining <= 0 || isExpired);
   const needsLogin = !user && !isFreeCalculator;
 
   const consumeToken = useCallback(async (): Promise<boolean> => {

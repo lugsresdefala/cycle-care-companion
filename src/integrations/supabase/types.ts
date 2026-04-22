@@ -227,10 +227,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_remaining_tokens: { Args: { _user_id: string }; Returns: number }
+      get_remaining_tokens: { Args: Record<string, never>; Returns: number }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
       is_in_trial: { Args: { _user_id: string }; Returns: boolean }
-      use_token: { Args: { _user_id: string }; Returns: boolean }
+      use_token: { Args: Record<string, never>; Returns: boolean }
     }
     Enums: {
       calculation_type:

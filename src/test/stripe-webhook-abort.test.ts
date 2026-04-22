@@ -342,7 +342,10 @@ describe("Stripe Webhook - Abort/Failure Handling", () => {
         tokensUsed: number,
         tokensPerPeriod: number,
       ) {
-        const isNewPeriod = existingStartDate !== newPeriodStart;
+        const existingMs = existingStartDate ? new Date(existingStartDate).getTime() : 0;
+        const newMs = new Date(newPeriodStart).getTime();
+        const isNewPeriod =
+          Number.isFinite(existingMs) && Number.isFinite(newMs) && existingMs !== newMs;
         const effectiveUsed = isNewPeriod ? 0 : tokensUsed;
         return {
           isNewPeriod,
@@ -356,6 +359,16 @@ describe("Stripe Webhook - Abort/Failure Handling", () => {
       expect(same.isNewPeriod).toBe(false);
       expect(same.tokens_remaining).toBe(20);
       expect(same.tokens_used).toBe(30);
+
+      // Same instant expressed with different precision — must still be treated as same period
+      const sameInstant = calculateTokens(
+        "2026-03-01T00:00:00+00:00",
+        "2026-03-01T00:00:00.000Z",
+        30,
+        50,
+      );
+      expect(sameInstant.isNewPeriod).toBe(false);
+      expect(sameInstant.tokens_remaining).toBe(20);
 
       // New period — reset tokens
       const renewed = calculateTokens("2026-03-01T00:00:00Z", "2026-04-01T00:00:00Z", 30, 50);
