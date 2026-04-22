@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
-import { STRIPE_TIERS } from "@/lib/stripe-config";
 import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
 
 interface Plan {

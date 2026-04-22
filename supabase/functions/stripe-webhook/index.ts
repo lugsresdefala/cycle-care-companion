@@ -7,21 +7,36 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: unknown) => {
   console.log(`[STRIPE-WEBHOOK] ${step}${details ? ` - ${JSON.stringify(details)}` : ""}`);
 };
 
-const PRODUCT_TIER_MAP: Record<string, string> = {
+// Events older than this are rejected to mitigate replay attacks.
+// Stripe retries for up to ~72h, but a well-behaved endpoint processes
+// events within minutes. Set generously via env if operational needs differ.
+const MAX_EVENT_AGE_SECONDS = Number(Deno.env.get("STRIPE_MAX_EVENT_AGE_SECONDS") ?? "86400");
+
+// Product-id -> internal tier mapping is configurable so dev/prod can differ
+// without a code change. Falls back to the historical hardcoded map.
+const FALLBACK_PRODUCT_TIER_MAP: Record<string, string> = {
   "prod_UBSjDxy12ggcNr": "basic",
   "prod_UBXuhebJkzJkWX": "professional",
   "prod_UBXvP745IUaxd3": "premium",
 };
 
-const TIER_TOKENS: Record<string, number> = {
-  basic: 50,
-  professional: 200,
-  premium: 500,
-};
+function loadProductTierMap(): Record<string, string> {
+  const raw = Deno.env.get("STRIPE_PRODUCT_TIER_MAP");
+  if (!raw) return FALLBACK_PRODUCT_TIER_MAP;
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object") return parsed as Record<string, string>;
+  } catch (err) {
+    logStep("Invalid STRIPE_PRODUCT_TIER_MAP, using fallback", { error: String(err) });
+  }
+  return FALLBACK_PRODUCT_TIER_MAP;
+}
+
+const PRODUCT_TIER_MAP = loadProductTierMap();
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,8 +74,51 @@ serve(async (req) => {
       });
     }
 
-    const event: Stripe.Event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    logStep("Event verified via signature", { type: event.type });
+    // constructEventAsync is required under Deno (crypto.subtle is async).
+    const event: Stripe.Event = await stripe.webhooks.constructEventAsync(
+      body,
+      signature,
+      webhookSecret
+    );
+    logStep("Event verified via signature", { type: event.type, id: event.id });
+
+    // Reject events that are too old — mitigates replay if the webhook secret
+    // is ever briefly exposed in logs or a proxy.
+    const ageSeconds = Math.floor(Date.now() / 1000) - event.created;
+    if (ageSeconds > MAX_EVENT_AGE_SECONDS) {
+      logStep("Rejecting stale event", { id: event.id, ageSeconds });
+      return new Response(JSON.stringify({ received: true, stale: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // Idempotency gate: insert the event id up-front. If it already exists
+    // Stripe is retrying a previously-handled event and we ACK without work.
+    const { error: dedupError } = await supabase
+      .from("stripe_webhook_events")
+      .insert({
+        event_id: event.id,
+        event_type: event.type,
+        payload_created_at: new Date(event.created * 1000).toISOString(),
+      });
+
+    if (dedupError) {
+      // Postgres unique_violation -> already processed. Any other error is
+      // logged and surfaced so Stripe retries with a fresh attempt.
+      if ((dedupError as { code?: string }).code === "23505") {
+        logStep("Duplicate event, skipping", { id: event.id });
+        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      logStep("Dedup table error, aborting to allow retry", { error: dedupError.message });
+      return new Response(JSON.stringify({ error: "dedup_failure" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
+    }
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -131,7 +189,6 @@ serve(async (req) => {
 
         const userId = session.metadata?.user_id;
         if (userId) {
-          // Clean up any pending subscription records created during checkout
           const { error } = await supabase
             .from("user_subscriptions")
             .update({ status: "canceled", updated_at: new Date().toISOString() })
@@ -242,7 +299,9 @@ async function upsertSubscription(
   }
 
   if (!userId) {
-    logStep("User not found", { email });
+    // Customer paid but we cannot resolve them to a local account. This is
+    // actionable: surface it via a distinct log line for alerting on.
+    logStep("ALERT user_unmatched", { subscriptionId: subscription.id, customerId });
     return;
   }
 
