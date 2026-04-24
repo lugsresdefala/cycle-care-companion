@@ -85,6 +85,34 @@ serve(async (req) => {
     if (!priceId || typeof priceId !== "string") throw new Error("priceId is required");
     logStep("Price ID received", { priceId });
 
+    // Allowlist the priceId against our own subscription_plans table so a
+    // client cannot start a checkout for an arbitrary Stripe price (e.g. a
+    // one-cent test price or a competitor's product). Service role bypasses
+    // RLS, which is needed here because the plans table has public SELECT
+    // gated on is_active and we want the same gate.
+    const { data: plan, error: planErr } = await supabaseAdmin
+      .from("subscription_plans")
+      .select("id, tier, is_active")
+      .eq("stripe_price_id", priceId)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (planErr) {
+      logStep("Plan lookup failed", { error: planErr.message });
+      return new Response(
+        JSON.stringify({ error: "Erro ao validar plano." }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
+    }
+
+    if (!plan || plan.tier === "free_trial") {
+      logStep("Unknown or non-purchasable priceId rejected", { priceId });
+      return new Response(
+        JSON.stringify({ error: "Plano inválido." }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
     // Rate limit: count recent attempts and reject if over cap. We still
     // record the rejected attempt so the window enforces a true lock-out.
     const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_SECONDS * 1000).toISOString();
