@@ -14,12 +14,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
-
-const CRL_REFERENCE = [
-  { crl: 3, ga: "6+0" }, { crl: 8, ga: "7+0" }, { crl: 16, ga: "8+0" },
-  { crl: 23, ga: "9+0" }, { crl: 31, ga: "10+0" }, { crl: 41, ga: "11+0" },
-  { crl: 53, ga: "12+0" }, { crl: 67, ga: "13+0" }, { crl: 80, ga: "14+0" },
-];
+import { CRL_REFERENCE } from "@/lib/biometry-references";
 
 const CRLCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
