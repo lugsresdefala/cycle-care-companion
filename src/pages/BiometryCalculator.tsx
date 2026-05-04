@@ -16,8 +16,7 @@ import {
   gestationalAgeFromMultipleBiometry,
   dueDateFromGA,
 } from "@/lib/biometry";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatDateLongBR, formatGAShort } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 import { CRL_REFERENCE, BPD_REFERENCE } from "@/lib/biometry-references";
@@ -242,9 +241,10 @@ const BiometryCalculator = () => {
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
-                <span className="text-sm text-muted-foreground">semanas</span>
+                <span className="text-sm text-muted-foreground">sem</span>
                 <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
                 <span className="text-sm text-muted-foreground">dias</span>
+                <span className="ml-3 text-xs text-muted-foreground tabular-nums">({formatGAShort(results.weeks, results.days)})</span>
               </div>
               {results.estimates && (
                 <p className="text-xs text-muted-foreground mt-2">
@@ -263,7 +263,7 @@ const BiometryCalculator = () => {
                       <span className="text-xs font-medium text-muted-foreground">{est.label}</span>
                     </div>
                     <p className="tabular-nums text-lg font-display text-foreground">
-                      {est.weeks}<span className="text-sm text-muted-foreground">s</span> {est.days}<span className="text-sm text-muted-foreground">d</span>
+                      {formatGAShort(est.weeks, est.days)}
                     </p>
                   </div>
                 ))}
@@ -277,7 +277,7 @@ const BiometryCalculator = () => {
                 <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
               </div>
               <p className="tabular-nums text-lg font-display text-foreground">
-                {format(results.dueDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                {formatDateLongBR(results.dueDate)}
               </p>
               <p className="text-xs text-muted-foreground">
                 {mode === "crl" ? "DPP estimada (±5 dias no 1º trimestre)" : "DPP estimada (±7–14 dias no 2º/3º trimestre)"}

@@ -26,6 +26,7 @@ import {
   type DopplerResult,
   type CPRResult,
 } from "@/lib/doppler";
+import { formatIndex } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
@@ -61,7 +62,7 @@ function ResultCard({ label, result }: { label: string; result: DopplerResult })
       </div>
       <div className="flex items-baseline gap-2">
         <span className="tabular-nums text-2xl font-display text-foreground">
-          {result.value.toFixed(2)}
+          {formatIndex(result.value)}
         </span>
         <span className="text-xs text-muted-foreground">{result.percentile}</span>
       </div>
@@ -88,7 +89,7 @@ function RefBar({
     <div className="space-y-1">
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{label}</span>
-        <span className="tabular-nums">{value.toFixed(2)}</span>
+        <span className="tabular-nums">{formatIndex(value)}</span>
       </div>
       <div className="h-3 bg-muted rounded-full relative overflow-hidden">
         {/* Normal range band */}
