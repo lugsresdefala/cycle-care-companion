@@ -79,13 +79,13 @@ const GestationalCalculator = () => {
     const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
 
     const calcResult: CalcResults = {
-      gestationalAge: `${result.weeks} semanas e ${result.days} dias`,
+      gestationalAge: formatGALong(result.weeks, result.days),
       weeks: result.weeks,
       days: result.days,
-      dueDate: format(result.dueDate, "dd/MM/yyyy", { locale: ptBR }),
+      dueDate: formatDateBR(result.dueDate),
       dueDateRaw: result.dueDate,
-      firstTrimester: format(result.firstTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
-      secondTrimester: format(result.secondTrimesterEnd, "dd/MM/yyyy", { locale: ptBR }),
+      firstTrimester: formatDateBR(result.firstTrimesterEnd),
+      secondTrimester: formatDateBR(result.secondTrimesterEnd),
       currentTrimester: result.currentTrimester,
       progressPercent,
       developmentInfo: result.developmentInfo,
