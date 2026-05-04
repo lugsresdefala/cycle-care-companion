@@ -14,13 +14,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
-
-const BPD_REFERENCE = [
-  { bpd: 20, ga: "12+4" }, { bpd: 26, ga: "14+0" }, { bpd: 35, ga: "16+5" },
-  { bpd: 43, ga: "19+0" }, { bpd: 50, ga: "21+0" }, { bpd: 58, ga: "23+3" },
-  { bpd: 65, ga: "25+5" }, { bpd: 73, ga: "28+2" }, { bpd: 80, ga: "31+0" },
-  { bpd: 86, ga: "33+4" }, { bpd: 91, ga: "36+0" }, { bpd: 95, ga: "38+2" },
-];
+import { BPD_REFERENCE } from "@/lib/biometry-references";
 
 const BPDCalculator = () => {
   const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
