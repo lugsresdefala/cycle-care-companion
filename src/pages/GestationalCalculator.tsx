@@ -19,8 +19,7 @@ import {
   calculateGestationalAgeFromUltrasound,
   calculateGestationalAgeFromTransfer,
 } from "@/lib/calculators";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { formatDateBR, formatGALong } from "@/lib/units";
 import GestationalVisualization from "@/components/GestationalVisualization";
 import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "@/components/DatePicker";
