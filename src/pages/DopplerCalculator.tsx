@@ -26,6 +26,7 @@ import {
   type DopplerResult,
   type CPRResult,
 } from "@/lib/doppler";
+import { formatIndex } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
