@@ -136,6 +136,8 @@ export default {
         "shimmer": "shimmer 2s infinite linear",
         "pulse-glow": "pulse-glow 2s infinite ease-in-out",
         "spin-ring": "spin-ring 12s linear infinite",
+        "spin-slow": "spin-ring 8s linear infinite",
+        "spin-reverse": "spin-ring 6s linear infinite reverse",
         "float": "float 6s ease-in-out infinite",
         "fade-up": "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) forwards",
         "scale-in": "scale-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards",
