@@ -111,12 +111,21 @@ const Pricing = () => {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
         body: { priceId: plan.stripe_price_id },
       });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
+      if (error) {
+        // FunctionsHttpError carries the actual response body in .context.
+        // Extract the server-side message (e.g. rate limit, invalid plan)
+        // so we show it instead of the generic SDK wrapper text.
+        let message = "Erro ao criar sessão de pagamento.";
+        try {
+          const body = await (error as unknown as { context: Response }).context.json();
+          if (body?.error) message = body.error;
+        } catch { /* fall through to generic message */ }
+        toast.error(message);
+        return;
       }
-    } catch (err: any) {
-      toast.error(err.message || "Erro ao criar sessão de pagamento.");
+      if (data?.url) window.location.href = data.url;
+    } catch {
+      toast.error("Erro ao criar sessão de pagamento.");
     } finally {
       setLoading(null);
     }
@@ -125,7 +134,16 @@ const Pricing = () => {
   const handleManageSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("customer-portal");
-      if (error) throw error;
+      if (error) {
+        let message = "Erro ao abrir portal de gerenciamento.";
+        try {
+          const body = await (error as unknown as { context: Response }).context.json();
+          if (body?.message) message = body.message;
+          else if (body?.error) message = body.error;
+        } catch { /* fall through to generic message */ }
+        toast.error(message);
+        return;
+      }
       if (data?.url) window.location.href = data.url;
     } catch {
       toast.error("Erro ao abrir portal de gerenciamento.");

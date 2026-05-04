@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -244,15 +244,23 @@ serve(async (req) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: msg });
+    // Signature failures are permanent — return 400 so Stripe stops retrying.
+    // All other errors are potentially transient (DB unavailable, timeout, etc.)
+    // so return 500 to let Stripe retry the delivery.
+    const isSignatureError =
+      msg.includes("No signatures found") ||
+      msg.includes("signature") ||
+      msg.includes("Webhook signature") ||
+      msg.includes("timestamp");
     return new Response(JSON.stringify({ error: msg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
+      status: isSignatureError ? 400 : 500,
     });
   }
 });
 
 async function upsertSubscription(
-  supabase: any,
+  supabase: SupabaseClient,
   stripe: Stripe,
   subscription: Stripe.Subscription,
   userIdFromMetadata?: string
