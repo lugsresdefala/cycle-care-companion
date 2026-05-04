@@ -306,11 +306,31 @@ const Index = () => {
           >
             {/* ── Hero (compact — logo already in header) ── */}
             <motion.div variants={item} className="text-center space-y-4 pt-6 pb-2">
-              <img
-                src={logo}
-                alt="IDALIA Calc"
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover mx-auto shadow-lg ring-4 ring-primary/10"
-              />
+              <div className="relative mx-auto w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
+                <div
+                  aria-hidden
+                  className="absolute inset-0 rounded-full animate-spin-slow"
+                  style={{
+                    background:
+                      "conic-gradient(from 0deg, transparent 0deg, hsl(var(--primary) / 0.55) 60deg, hsl(var(--accent) / 0.6) 140deg, transparent 220deg, hsl(var(--secondary) / 0.5) 300deg, transparent 360deg)",
+                    filter: "blur(14px)",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-1 rounded-full animate-spin-reverse opacity-70"
+                  style={{
+                    background:
+                      "conic-gradient(from 180deg, transparent 0deg, hsl(var(--accent) / 0.45) 90deg, transparent 180deg, hsl(var(--primary) / 0.45) 270deg, transparent 360deg)",
+                    filter: "blur(10px)",
+                  }}
+                />
+                <img
+                  src={logo}
+                  alt="IDALIA Calc"
+                  className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-lg ring-4 ring-primary/10"
+                />
+              </div>
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl leading-tight text-balance">
                 <span className="gradient-text-brand">Saúde Reprodutiva</span>
                 <br />
