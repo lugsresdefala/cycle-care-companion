@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Baby, Activity, Ruler, Scale, Calendar, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Stethoscope } from "lucide-react";
 import {
   AreaChart,
