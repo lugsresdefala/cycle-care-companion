@@ -259,36 +259,12 @@ const GestationalCalculator = () => {
                 </div>
               </div>
 
-              {/* Progress bar */}
-              <div className="mt-6 space-y-2">
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${results.progressPercent}%` }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full bg-gradient-to-r from-folicular via-accent to-primary rounded-full glow-accent"
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>1º Trim</span><span>2º Trim</span><span>3º Trim</span><span>40sem</span>
-                </div>
+              {/* Progress + DPP inline */}
+              <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
+                <span>DPP: <span className="text-foreground font-medium">{results.dueDate}</span></span>
+                <span>{40 - results.weeks} semanas restantes</span>
               </div>
             </div>
-
-            {/* Fetal Development */}
-            <CollapsibleSection
-              title={`Desenvolvimento Fetal — Semana ${results.weeks}`}
-              icon={<Baby className="w-4 h-4 text-accent" />}
-              isOpen={expandedSection === "development"}
-              onToggle={() => toggleSection("development")}
-            >
-              <div className="p-4 space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium text-foreground">{results.developmentInfo.title}</h4>
-                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{results.developmentInfo.development}</p>
-                </div>
-              </div>
-            </CollapsibleSection>
 
             {/* Prenatal Care */}
             <CollapsibleSection

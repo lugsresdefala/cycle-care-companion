@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Baby, Activity, Ruler, Scale, Calendar, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Stethoscope } from "lucide-react";
 import {
   AreaChart,
@@ -47,11 +47,12 @@ const getTrimester = (week: number) => {
   return { number: 3, color: "hsl(var(--secondary))", bg: "bg-secondary/15", border: "border-secondary/30", label: "3º Trimestre" };
 };
 
-const getWeekData = (week: number) => {
+const getClosestWeek = (week: number): number => {
   const keys = Object.keys(fetalDevelopment).map(Number).sort((a, b) => a - b);
-  const closest = keys.reduce((p, c) => Math.abs(c - week) < Math.abs(p - week) ? c : p);
-  return fetalDevelopment[closest];
+  return keys.reduce((p, c) => Math.abs(c - week) < Math.abs(p - week) ? c : p);
 };
+
+const getWeekData = (week: number) => fetalDevelopment[getClosestWeek(week)];
 
 const getExams = (week: number) => {
   const exams = [];
@@ -79,11 +80,15 @@ const GestationalVisualization = ({
   dueDate = new Date(Date.now() + 20 * 7 * 24 * 60 * 60 * 1000)
 }: GestationalVisualizationProps) => {
   const [selectedWeek, setSelectedWeek] = useState(currentWeek);
+  useEffect(() => { setSelectedWeek(currentWeek); }, [currentWeek]);
+
+  const refWeek = getClosestWeek(selectedWeek);
   const currentData = getWeekData(selectedWeek);
   const trimester = getTrimester(selectedWeek);
   const currentExams = getExams(selectedWeek);
   const weeks = Array.from({ length: 40 }, (_, i) => i + 1);
   const progressPercent = Math.round((currentWeek / 40) * 100);
+  const isReference = refWeek !== selectedWeek;
 
   return (
     <div className="space-y-5">
@@ -91,7 +96,7 @@ const GestationalVisualization = ({
       <div className={`glass-card-static rounded-2xl p-5 border ${trimester.border}`}>
         <h3 className="text-base font-semibold mb-4 flex items-center gap-2" style={{ color: trimester.color }}>
           <Baby className="h-5 w-5" />
-          Desenvolvimento Gestacional
+          Linha do Tempo Gestacional
         </h3>
 
         {/* Info Cards */}
@@ -104,7 +109,9 @@ const GestationalVisualization = ({
           <div className="p-4 rounded-xl bg-accent/10 border border-accent/25">
             <div className="flex items-center gap-2 mb-2">
               <Ruler className="h-4 w-4 text-accent" />
-              <span className="text-xs font-semibold text-accent">Tamanho</span>
+              <span className="text-xs font-semibold text-accent">
+                Tamanho {isReference && <span className="opacity-60">(ref. sem {refWeek})</span>}
+              </span>
             </div>
             <div className="text-lg font-bold text-foreground">{currentData.length}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{currentData.size}</div>
@@ -112,7 +119,9 @@ const GestationalVisualization = ({
           <div className="p-4 rounded-xl bg-primary/10 border border-primary/25">
             <div className="flex items-center gap-2 mb-2">
               <Scale className="h-4 w-4 text-primary" />
-              <span className="text-xs font-semibold text-primary">Peso</span>
+              <span className="text-xs font-semibold text-primary">
+                Peso {isReference && <span className="opacity-60">(ref. sem {refWeek})</span>}
+              </span>
             </div>
             <div className="text-lg font-bold text-foreground">{currentData.weight}</div>
             <div className="text-xs text-muted-foreground mt-0.5">Aproximado</div>
@@ -123,7 +132,9 @@ const GestationalVisualization = ({
         <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 mb-5">
           <div className="flex items-center gap-2 mb-1.5">
             <Activity className="h-4 w-4 text-accent" />
-            <span className="text-xs font-semibold text-accent uppercase tracking-wider">Marco da Semana {selectedWeek}</span>
+            <span className="text-xs font-semibold text-accent uppercase tracking-wider">
+              Marco de referência — Semana {refWeek}
+            </span>
           </div>
           <p className="text-sm text-foreground font-medium">{currentData.milestone}</p>
         </div>
