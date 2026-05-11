@@ -244,7 +244,6 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">sem</span>
                 <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
                 <span className="text-sm text-muted-foreground">dias</span>
-                <span className="ml-3 text-xs text-muted-foreground tabular-nums">({formatGAShort(results.weeks, results.days)})</span>
               </div>
               {results.estimates && (
                 <p className="text-xs text-muted-foreground mt-2">

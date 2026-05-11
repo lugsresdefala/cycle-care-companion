@@ -275,54 +275,6 @@ const GestationalCalculator = () => {
               </div>
             </div>
 
-            {/* Key Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="glass-card-static p-5 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
-                </div>
-                <p className="tabular-nums text-lg font-display text-foreground">{results.dueDate}</p>
-                <p className="text-xs text-muted-foreground">DPP estimada (margem de ±2 semanas)</p>
-              </div>
-              <div className="glass-card-static p-5 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">Biometria Comparativa</span>
-                </div>
-                <p className="text-sm text-foreground">{results.developmentInfo.size}</p>
-                <p className="text-xs text-muted-foreground">Referência aproximada para a idade gestacional</p>
-              </div>
-              <div className="glass-card-static p-5 space-y-2">
-                <div className="flex items-center gap-2">
-                  <Baby className="w-4 h-4 text-ovulatory" />
-                  <span className="text-sm font-medium text-foreground">Marco do Desenvolvimento</span>
-                </div>
-                <p className="text-sm text-foreground">{results.developmentInfo.milestone}</p>
-              </div>
-            </div>
-
-            {/* Trimester Dates */}
-            <div className="glass-card-static p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Limites dos Trimestres</span>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                {[
-                  { label: "1º Trimestre", date: results.firstTrimester, sub: "até semana 13" },
-                  { label: "2º Trimestre", date: results.secondTrimester, sub: "até semana 27" },
-                  { label: "3º Trimestre", date: results.dueDate, sub: "até semana 40" },
-                ].map((t, i) => (
-                  <div key={t.label} className={`flex-1 p-3 rounded-xl ${results.currentTrimester === i + 1 ? "bg-accent/10 border border-accent/30" : "bg-muted/20"}`}>
-                    <p className="text-xs text-muted-foreground">{t.label}</p>
-                    <p className="text-sm font-medium text-foreground tabular-nums">{t.date}</p>
-                    <p className="text-xs text-muted-foreground">{t.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Fetal Development */}
             <CollapsibleSection
               title={`Desenvolvimento Fetal — Semana ${results.weeks}`}
