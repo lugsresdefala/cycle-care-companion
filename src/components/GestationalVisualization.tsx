@@ -47,11 +47,12 @@ const getTrimester = (week: number) => {
   return { number: 3, color: "hsl(var(--secondary))", bg: "bg-secondary/15", border: "border-secondary/30", label: "3º Trimestre" };
 };
 
-const getWeekData = (week: number) => {
+const getClosestWeek = (week: number): number => {
   const keys = Object.keys(fetalDevelopment).map(Number).sort((a, b) => a - b);
-  const closest = keys.reduce((p, c) => Math.abs(c - week) < Math.abs(p - week) ? c : p);
-  return fetalDevelopment[closest];
+  return keys.reduce((p, c) => Math.abs(c - week) < Math.abs(p - week) ? c : p);
 };
+
+const getWeekData = (week: number) => fetalDevelopment[getClosestWeek(week)];
 
 const getExams = (week: number) => {
   const exams = [];
