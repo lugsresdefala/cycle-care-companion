@@ -188,11 +188,29 @@ const GestationalCalculator = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs text-muted-foreground">Semanas</Label>
-                  <Input type="number" min={0} max={42} value={ultrasoundWeeks} onChange={(e) => setUltrasoundWeeks(parseInt(e.target.value) || 0)} className="input-glass tabular-nums" />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={42}
+                    placeholder="0"
+                    value={ultrasoundWeeks === 0 ? "" : ultrasoundWeeks}
+                    onChange={(e) => setUltrasoundWeeks(e.target.value === "" ? 0 : parseInt(e.target.value) || 0)}
+                    onFocus={(e) => e.target.select()}
+                    className="input-glass tabular-nums"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">Dias</Label>
-                  <Input type="number" min={0} max={6} value={ultrasoundDays} onChange={(e) => setUltrasoundDays(parseInt(e.target.value) || 0)} className="input-glass tabular-nums" />
+                  <Input
+                    type="number"
+                    min={0}
+                    max={6}
+                    placeholder="0"
+                    value={ultrasoundDays === 0 ? "" : ultrasoundDays}
+                    onChange={(e) => setUltrasoundDays(e.target.value === "" ? 0 : parseInt(e.target.value) || 0)}
+                    onFocus={(e) => e.target.select()}
+                    className="input-glass tabular-nums"
+                  />
                 </div>
               </div>
             </div>
