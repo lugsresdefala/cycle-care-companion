@@ -7,6 +7,7 @@ import { lazy, Suspense, Component } from "react";
 import type { ReactNode } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -29,6 +30,7 @@ const DopplerCalculator = lazy(() => import("./pages/DopplerCalculator"));
 const GrowthCurveCalculator = lazy(() => import("./pages/GrowthCurveCalculator"));
 const TrisomyRiskCalculator = lazy(() => import("./pages/TrisomyRiskCalculator"));
 const PreeclampsiaRiskCalculator = lazy(() => import("./pages/PreeclampsiaRiskCalculator"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
   constructor(props: { children: ReactNode }) {
@@ -89,6 +91,7 @@ const App = () => (
               <Route path="/growth-curve" element={<GrowthCurveCalculator />} />
               <Route path="/trisomy-risk" element={<TrisomyRiskCalculator />} />
               <Route path="/preeclampsia-risk" element={<PreeclampsiaRiskCalculator />} />
+              <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
