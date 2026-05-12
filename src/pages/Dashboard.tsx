@@ -6,13 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins, UserCog } from "lucide-react";
+import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins, UserCog, ShieldCheck } from "lucide-react";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import logo from "@/assets/logo.png";
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
   const { subscription, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
+  const { isAdmin } = useIsAdmin();
   useCheckoutStatus();
   const [profile, setProfile] = useState<{ full_name?: string; crm_number?: string; specialty?: string; phone?: string } | null>(null);
   const [patientCount, setPatientCount] = useState(0);
@@ -57,6 +59,11 @@ const Dashboard = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
               Calculadoras
             </Button>
+            {isAdmin && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="gap-1">
+                <ShieldCheck className="w-4 h-4" /> Admin
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={signOut} title="Sair">
               <LogOut className="w-4 h-4" />
             </Button>
