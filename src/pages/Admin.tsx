@@ -23,6 +23,21 @@ interface Row {
   exam_count: number;
 }
 
+interface ProfileRow {
+  id: string;
+  full_name: string | null;
+  crm_number: string | null;
+}
+
+interface SubscriptionRow {
+  doctor_id: string;
+  status: string | null;
+  tokens_remaining: number | null;
+  tokens_used: number | null;
+  end_date: string | null;
+  subscription_plans?: { tier: string | null } | { tier: string | null }[] | null;
+}
+
 const calcLabels: Record<Calc, string> = {
   biometry: "Biometria",
   bpd: "DBP",
@@ -54,12 +69,12 @@ export default function Admin() {
       supabase.from("exam_history").select("doctor_id, calc_type"),
     ]);
 
-    const profiles = profilesRes.data ?? [];
-    const subs = subsRes.data ?? [];
+    const profiles = (profilesRes.data ?? []) as ProfileRow[];
+    const subs = (subsRes.data ?? []) as SubscriptionRow[];
     const exams = examsRes.data ?? [];
 
     // pick latest subscription per doctor
-    const subByDoctor: Record<string, any> = {};
+    const subByDoctor: Record<string, SubscriptionRow> = {};
     for (const s of subs) {
       if (!subByDoctor[s.doctor_id]) subByDoctor[s.doctor_id] = s;
     }
@@ -70,14 +85,17 @@ export default function Admin() {
       calcAgg[e.calc_type] = (calcAgg[e.calc_type] ?? 0) + 1;
     }
 
-    const built: Row[] = profiles.map((p: any) => {
+    const built: Row[] = profiles.map((p) => {
       const s = subByDoctor[p.id];
+      const planTier = Array.isArray(s?.subscription_plans)
+        ? s.subscription_plans[0]?.tier
+        : s?.subscription_plans?.tier;
       return {
         user_id: p.id,
         full_name: p.full_name || "(sem nome)",
         crm_number: p.crm_number,
         status: s?.status ?? null,
-        tier: s?.subscription_plans?.tier ?? null,
+        tier: planTier ?? null,
         tokens_remaining: s?.tokens_remaining ?? 0,
         tokens_used: s?.tokens_used ?? 0,
         end_date: s?.end_date ?? null,

@@ -301,7 +301,7 @@ async function upsertSubscription(
         perPage: 1,
         filter: email,
       });
-      const matchedUser = users?.users?.find((u: any) => u.email === email);
+      const matchedUser = users?.users?.find((u: { email?: string | null }) => u.email === email);
       if (matchedUser) userId = matchedUser.id;
     }
   }

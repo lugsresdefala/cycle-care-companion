@@ -257,6 +257,8 @@ const Index = () => {
                 <button
                   key={card.value}
                   onClick={() => setActiveModule(card.value)}
+                  aria-label={`Abrir ${card.navLabel}`}
+                  aria-current={activeModule === card.value ? "page" : undefined}
                   className={`nav-pill whitespace-nowrap ${
                     activeModule === card.value ? "nav-pill-active" : "nav-pill-inactive"
                   }`}
@@ -273,9 +275,10 @@ const Index = () => {
             <button
               onClick={() => setActiveModule(null)}
               className="shrink-0 text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+              aria-label="Voltar para início"
             >
               <ChevronRight className="w-3 h-3 rotate-180" />
-              <span className="hidden xs:inline">Inicio</span>
+              <span className="hidden xs:inline">Início</span>
             </button>
           )}
 
@@ -372,9 +375,10 @@ const Index = () => {
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                          onClick={() => setActiveModule(card.value)}
-                          className={`${card.cardClass} p-5 text-left group cursor-pointer w-full`}
-                        >
+                           onClick={() => setActiveModule(card.value)}
+                           aria-label={`Acessar calculadora: ${card.title}`}
+                           className={`${card.cardClass} p-5 text-left group cursor-pointer w-full`}
+                         >
                           <div className="flex items-start gap-4">
                             <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0 ${card.iconColor} mt-0.5 transition-transform duration-300 group-hover:scale-110`}>
                               {card.icon}

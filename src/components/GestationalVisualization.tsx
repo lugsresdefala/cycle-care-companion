@@ -16,6 +16,12 @@ interface GestationalVisualizationProps {
   dueDate?: Date;
 }
 
+interface ChartTooltipPayload {
+  name: string;
+  value: string | number;
+  color: string;
+}
+
 const fetalDevelopment: Record<number, { size: string; weight: string; length: string; milestone: string }> = {
   4:  { size: "Semente de papoula", weight: "< 1g",  length: "2mm",    milestone: "Formação do tubo neural" },
   8:  { size: "Framboesa",          weight: "1g",    length: "1.6cm",  milestone: "Batimentos cardíacos detectáveis" },
@@ -63,12 +69,20 @@ const getExams = (week: number) => {
   return exams;
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: ChartTooltipPayload[];
+  label?: string | number;
+}) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="glass-card-static border border-primary/20 rounded-lg p-3 text-xs">
       <p className="font-semibold text-primary mb-1">Semana {label}</p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <p key={p.name} style={{ color: p.color }}>{p.name}: {p.value}{p.name === "Peso" ? "g" : "cm"}</p>
       ))}
     </div>
@@ -161,10 +175,13 @@ const GestationalVisualization = ({
               const isCurrent = week === currentWeek;
               const isPast = week < currentWeek;
               return (
-                <div
+                <button
                   key={week}
                   onClick={() => setSelectedWeek(week)}
                   title={`Semana ${week}`}
+                  type="button"
+                  aria-label={`Selecionar semana ${week}`}
+                  aria-pressed={isSelected}
                   className={`flex-shrink-0 w-6 rounded cursor-pointer transition-all duration-150 relative
                     ${isSelected ? "scale-y-125 ring-2 ring-accent z-10" : "hover:scale-y-110"}
                     ${isCurrent ? "ring-1 ring-primary" : ""}
@@ -178,7 +195,7 @@ const GestationalVisualization = ({
                   {week % 8 === 0 && (
                     <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-xs text-muted-foreground whitespace-nowrap">{week}</span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>

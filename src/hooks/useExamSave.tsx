@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 
 type CalcType = Database["public"]["Enums"]["calculation_type"];
+type ExamHistoryInsert = Database["public"]["Tables"]["exam_history"]["Insert"];
 
 interface SaveExamParams {
   calcType: CalcType;
@@ -23,8 +24,8 @@ export function useExamSave() {
     const { error } = await supabase.from("exam_history").insert([{
       doctor_id: user.id,
       calc_type: params.calcType,
-      input_data: params.inputData as any,
-      result_data: params.resultData as any,
+      input_data: params.inputData as ExamHistoryInsert["input_data"],
+      result_data: params.resultData as ExamHistoryInsert["result_data"],
       gestational_age_weeks: params.gestationalAgeWeeks ?? null,
       gestational_age_days: params.gestationalAgeDays ?? null,
       patient_id: params.patientId ?? null,
