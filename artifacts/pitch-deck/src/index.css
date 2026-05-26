@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: var(--slide-primary);
+  --color-accent: var(--slide-accent);
+  --color-secondary: var(--slide-secondary);
+  --color-bg: var(--slide-bg);
+  --color-ink: var(--slide-ink);
+  --color-muted: var(--slide-muted);
+  --color-line: var(--slide-line);
+  --font-display: var(--font-display-family);
+  --font-body: var(--font-body-family);
+  --font-serif: var(--font-serif-family);
+}
+
+:root {
+  /* IDALIA brand palette */
+  --slide-primary: #133069;     /* deep navy */
+  --slide-accent: #ED7A2A;      /* warm amber-orange */
+  --slide-secondary: #6336AB;   /* purple connector */
+  --slide-bg: #F5F6F9;          /* off-white */
+  --slide-ink: #0D1626;         /* near-black ink */
+  --slide-muted: #5E6A82;
+  --slide-line: #E2E5EC;
+
+  --font-display-family: "Instrument Sans", system-ui, sans-serif;
+  --font-body-family: "Instrument Sans", system-ui, sans-serif;
+  --font-serif-family: "Instrument Serif", Georgia, serif;
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--slide-bg);
+  color: var(--slide-ink);
+  font-family: var(--font-body-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+.slide {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide-viewer {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
