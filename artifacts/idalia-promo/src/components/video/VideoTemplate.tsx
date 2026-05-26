@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useVideoPlayer } from '@/lib/video';
 import { Scene1 } from './video_scenes/Scene1';
@@ -7,6 +7,7 @@ import { Scene3 } from './video_scenes/Scene3';
 import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
 import { Scene6 } from './video_scenes/Scene6';
+import { SCENE_CAPTIONS } from './captions';
 
 export const SCENE_DURATIONS = {
   hook: 8000,
@@ -70,6 +71,7 @@ export default function VideoTemplate({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const voiceRef = useRef<HTMLAudioElement | null>(null);
+  const [captionText, setCaptionText] = useState<string>('');
 
   const MUSIC_VOLUME_NORMAL = 0.45;
   const MUSIC_VOLUME_DUCKED = 0.15;
@@ -99,16 +101,28 @@ export default function VideoTemplate({
     const unduck = () => {
       if (music) music.volume = MUSIC_VOLUME_NORMAL;
     };
+    const cues = SCENE_CAPTIONS[baseSceneKey] ?? [];
+    setCaptionText('');
+    const updateCaption = () => {
+      const t = voice.currentTime;
+      const active = cues.find(c => t >= c.start && t < c.end);
+      setCaptionText(active ? active.text : '');
+    };
     voice.addEventListener('playing', duck);
     voice.addEventListener('ended', unduck);
     voice.addEventListener('pause', unduck);
+    voice.addEventListener('timeupdate', updateCaption);
+    voice.addEventListener('ended', updateCaption);
     voice.play().catch(() => {});
     return () => {
       voice.removeEventListener('playing', duck);
       voice.removeEventListener('ended', unduck);
       voice.removeEventListener('pause', unduck);
+      voice.removeEventListener('timeupdate', updateCaption);
+      voice.removeEventListener('ended', updateCaption);
       voice.pause();
       unduck();
+      setCaptionText('');
     };
   }, [currentSceneKey, baseSceneKey]);
 
@@ -148,6 +162,38 @@ export default function VideoTemplate({
       <AnimatePresence mode="popLayout">
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>
+
+      <div className="absolute inset-x-0 bottom-0 z-30 pointer-events-none flex justify-center pb-[5vh] px-[8vw]">
+        <AnimatePresence mode="wait">
+          {captionText && (
+            <motion.div
+              key={captionText}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-[80%] rounded-xl px-6 py-3 text-center"
+              style={{
+                background: 'rgba(15, 23, 42, 0.72)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                borderTop: '2px solid var(--color-primary)',
+              }}
+            >
+              <p
+                className="text-white text-[1.6vw] leading-snug font-medium"
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  textShadow: '0 1px 2px rgba(0,0,0,0.4)',
+                }}
+              >
+                {captionText}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <audio
         ref={audioRef}
