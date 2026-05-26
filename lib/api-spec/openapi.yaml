@@ -1,36 +1,453 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: IDALIA API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: me
+  - name: patients
+  - name: exams
+  - name: subscriptions
+  - name: plans
+  - name: admin
+  - name: tokens
+  - name: stripe
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
-          description: Healthy
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /me:
+    get:
+      operationId: getMyProfile
+      tags: [me]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+    patch:
+      operationId: updateMyProfile
+      tags: [me]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Profile" }
+  /me/is-admin:
+    get:
+      operationId: isAdmin
+      tags: [me]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminFlag" }
+  /patients:
+    get:
+      operationId: listPatients
+      tags: [patients]
+      responses:
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/HealthStatus"
+                type: array
+                items: { $ref: "#/components/schemas/Patient" }
+    post:
+      operationId: createPatient
+      tags: [patients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatientCreate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Patient" }
+  /patients/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPatient
+      tags: [patients]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Patient" }
+    patch:
+      operationId: updatePatient
+      tags: [patients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PatientUpdate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Patient" }
+    delete:
+      operationId: deletePatient
+      tags: [patients]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+  /exams:
+    get:
+      operationId: listExams
+      tags: [exams]
+      parameters:
+        - in: query
+          name: patientId
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Exam" }
+    post:
+      operationId: createExam
+      tags: [exams]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ExamCreate" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Exam" }
+  /exams/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string }
+    delete:
+      operationId: deleteExam
+      tags: [exams]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+  /plans:
+    get:
+      operationId: listPlans
+      tags: [plans]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Plan" }
+  /subscription:
+    get:
+      operationId: getSubscription
+      tags: [subscriptions]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubscriptionState" }
+  /subscription/refresh:
+    post:
+      operationId: refreshSubscription
+      tags: [subscriptions]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SubscriptionState" }
+  /tokens/use:
+    post:
+      operationId: useToken
+      tags: [tokens]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UseTokenResult" }
+  /tokens/remaining:
+    get:
+      operationId: getTokensRemaining
+      tags: [tokens]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokensRemaining" }
+  /stripe/checkout:
+    post:
+      operationId: createCheckout
+      tags: [stripe]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UrlResponse" }
+  /stripe/portal:
+    post:
+      operationId: createPortal
+      tags: [stripe]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UrlResponse" }
+  /stripe/checkout-status:
+    get:
+      operationId: checkoutStatus
+      tags: [stripe]
+      parameters:
+        - in: query
+          name: session_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutStatusInfo" }
+  /admin/users:
+    get:
+      operationId: adminListUsers
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AdminUserRow" }
+  /admin/grant-tokens:
+    post:
+      operationId: adminGrantTokens
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GrantTokensRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
 components:
   schemas:
     HealthStatus:
       type: object
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+      required: [status]
+    Ok:
+      type: object
+      properties:
+        ok: { type: boolean }
+      required: [ok]
+    Profile:
+      type: object
+      properties:
+        id: { type: string }
+        fullName: { type: string }
+        specialty: { type: string, nullable: true }
+        crmNumber: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+      required: [id, fullName]
+    ProfileUpdate:
+      type: object
+      properties:
+        fullName: { type: string }
+        specialty: { type: string }
+        crmNumber: { type: string }
+        phone: { type: string }
+    AdminFlag:
+      type: object
+      properties:
+        isAdmin: { type: boolean }
+      required: [isAdmin]
+    Patient:
+      type: object
+      properties:
+        id: { type: string }
+        doctorId: { type: string }
+        name: { type: string }
+        age: { type: integer, nullable: true }
+        medicalRecordId: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, doctorId, name, createdAt, updatedAt]
+    PatientCreate:
+      type: object
+      properties:
+        name: { type: string }
+        age: { type: integer, nullable: true }
+        medicalRecordId: { type: string }
+        notes: { type: string }
+      required: [name]
+    PatientUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        age: { type: integer, nullable: true }
+        medicalRecordId: { type: string }
+        notes: { type: string }
+    Exam:
+      type: object
+      properties:
+        id: { type: string }
+        doctorId: { type: string }
+        patientId: { type: string, nullable: true }
+        calcType: { type: string }
+        inputData: {}
+        resultData: {}
+        gestationalAgeWeeks: { type: integer, nullable: true }
+        gestationalAgeDays: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+        createdAt: { type: string }
+      required: [id, doctorId, calcType, createdAt]
+    ExamCreate:
+      type: object
+      properties:
+        patientId: { type: string, nullable: true }
+        calcType: { type: string }
+        inputData: {}
+        resultData: {}
+        gestationalAgeWeeks: { type: integer, nullable: true }
+        gestationalAgeDays: { type: integer, nullable: true }
+        notes: { type: string }
+      required: [calcType]
+    Plan:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        tier: { type: string }
+        description: { type: string, nullable: true }
+        priceCents: { type: integer }
+        durationMonths: { type: integer }
+        tokensPerPeriod: { type: integer }
+        features: {}
+        isActive: { type: boolean }
+        stripePriceId: { type: string, nullable: true }
+      required: [id, name, tier, priceCents, durationMonths, tokensPerPeriod, features, isActive]
+    SubscriptionState:
+      type: object
+      properties:
+        subscribed: { type: boolean }
+        subscriptionTier: { type: string, nullable: true }
+        subscriptionEnd: { type: string, nullable: true }
+        tokensRemaining: { type: integer }
+        isTrial: { type: boolean }
+        trialEndsAt: { type: string, nullable: true }
+        status: { type: string, nullable: true }
+      required: [subscribed, tokensRemaining, isTrial]
+    UseTokenResult:
+      type: object
+      properties:
+        success: { type: boolean }
+        tokensRemaining: { type: integer }
+      required: [success, tokensRemaining]
+    TokensRemaining:
+      type: object
+      properties:
+        tokensRemaining: { type: integer }
+      required: [tokensRemaining]
+    CheckoutRequest:
+      type: object
+      properties:
+        priceId: { type: string }
+      required: [priceId]
+    UrlResponse:
+      type: object
+      properties:
+        url: { type: string }
+      required: [url]
+    CheckoutStatusInfo:
+      type: object
+      properties:
+        status: { type: string }
+        paymentStatus: { type: string, nullable: true }
+        subscriptionId: { type: string, nullable: true }
+      required: [status]
+    AdminUserRow:
+      type: object
+      properties:
+        id: { type: string }
+        fullName: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        crmNumber: { type: string, nullable: true }
+        isAdmin: { type: boolean }
+        subscription:
+          type: object
+          nullable: true
+          properties:
+            tier: { type: string, nullable: true }
+            status: { type: string, nullable: true }
+            tokensRemaining: { type: integer }
+            endDate: { type: string, nullable: true }
+      required: [id, isAdmin]
+    GrantTokensRequest:
+      type: object
+      properties:
+        userId: { type: string }
+        amount: { type: integer }
+      required: [userId, amount]

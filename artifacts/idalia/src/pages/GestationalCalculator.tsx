@@ -1,0 +1,381 @@
+import { useState } from "react";
+import { useTokenGate } from "@/hooks/useTokenGate";
+import { useExamSave } from "@/hooks/useExamSave";
+import { PatientSelector } from "@/components/PatientSelector";
+import { TokenGateAlert } from "@/components/TokenGateAlert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import {
+  Info, Calendar, Baby, Stethoscope, Syringe, HeartPulse,
+  Salad, Ruler, ChevronDown, ChevronUp, AlertCircle
+} from "lucide-react";
+import {
+  calculateGestationalAgeFromLMP,
+  calculateGestationalAgeFromUltrasound,
+  calculateGestationalAgeFromTransfer,
+} from "@/lib/calculators";
+import { formatDateBR, formatGALong } from "@/lib/units";
+import GestationalVisualization from "@/components/GestationalVisualization";
+import { motion, AnimatePresence } from "framer-motion";
+import { DatePicker } from "@/components/DatePicker";
+
+type CalculationType = "lmp" | "ultrasound" | "transfer";
+
+const TRIMESTER_CONFIG = [
+  { label: "1º Trimestre", range: "Semanas 1–13", description: "Organogênese" },
+  { label: "2º Trimestre", range: "Semanas 14–27", description: "Crescimento e diferenciação" },
+  { label: "3º Trimestre", range: "Semanas 28–40", description: "Maturação funcional" },
+];
+
+interface CalcResults {
+  gestationalAge: string;
+  weeks: number;
+  days: number;
+  dueDate: string;
+  dueDateRaw: Date;
+  firstTrimester: string;
+  secondTrimester: string;
+  currentTrimester: number;
+  progressPercent: number;
+  developmentInfo: { title: string; development: string; size: string; milestone: string };
+  prenatalCare: { nutrition: string; lifestyle: string; warning_signs: string; examinations: string; vaccines: string; special_care: string };
+}
+
+const GestationalCalculator = () => {
+  const { blocked, needsLogin, consuming, subscription, consumeToken, isFreeCalculator } = useTokenGate("gestational");
+  const { saveExam, canSave } = useExamSave();
+  const [calculationType, setCalculationType] = useState<CalculationType>("lmp");
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
+  const [lmpDate, setLmpDate] = useState<Date | undefined>();
+  const [ultrasoundDate, setUltrasoundDate] = useState<Date | undefined>();
+  const [ultrasoundWeeks, setUltrasoundWeeks] = useState(0);
+  const [ultrasoundDays, setUltrasoundDays] = useState(0);
+  const [transferDate, setTransferDate] = useState<Date | undefined>();
+  const [embryoDays, setEmbryoDays] = useState("5");
+  const [expandedSection, setExpandedSection] = useState<string | null>("development");
+  const [results, setResults] = useState<CalcResults | null>(null);
+
+  const handleCalculate = async () => {
+    let result;
+    if (calculationType === "lmp") {
+      if (!lmpDate) return;
+      result = calculateGestationalAgeFromLMP(lmpDate);
+    } else if (calculationType === "ultrasound") {
+      if (!ultrasoundDate) return;
+      result = calculateGestationalAgeFromUltrasound(ultrasoundDate, ultrasoundWeeks, ultrasoundDays);
+    } else {
+      if (!transferDate) return;
+      result = calculateGestationalAgeFromTransfer(transferDate, parseInt(embryoDays));
+    }
+
+    if (!result) return;
+    const ok = await consumeToken();
+    if (!ok) return;
+    const progressPercent = Math.min(100, Math.round((result.weeks / 40) * 100));
+
+    const calcResult: CalcResults = {
+      gestationalAge: formatGALong(result.weeks, result.days),
+      weeks: result.weeks,
+      days: result.days,
+      dueDate: formatDateBR(result.dueDate),
+      dueDateRaw: result.dueDate,
+      firstTrimester: formatDateBR(result.firstTrimesterEnd),
+      secondTrimester: formatDateBR(result.secondTrimesterEnd),
+      currentTrimester: result.currentTrimester,
+      progressPercent,
+      developmentInfo: result.developmentInfo,
+      prenatalCare: result.prenatalCare,
+    };
+    setResults(calcResult);
+    if (canSave) {
+      saveExam({
+        calcType: "gestational",
+        inputData: { method: calculationType },
+        resultData: { gestationalAge: calcResult.gestationalAge, weeks: result.weeks, days: result.days, dueDate: calcResult.dueDate },
+        gestationalAgeWeeks: result.weeks,
+        gestationalAgeDays: result.days,
+        patientId: selectedPatientId,
+      });
+    }
+  };
+
+  const toggleSection = (s: string) => setExpandedSection(expandedSection === s ? null : s);
+  const trimCfg = results ? TRIMESTER_CONFIG[results.currentTrimester - 1] : null;
+
+  return (
+    <div className="space-y-6">
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
+      {/* Input */}
+      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
+        <div>
+          <h2 className="font-display text-xl text-foreground">Calculadora de Idade Gestacional</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Cálculo de idade gestacional, data provável do parto e referências de desenvolvimento fetal por semana gestacional.
+          </p>
+        </div>
+
+        {/* Method Selection */}
+        <div className="space-y-3">
+          <Label className="text-sm text-foreground">Método de Cálculo</Label>
+          <RadioGroup
+            value={calculationType}
+            onValueChange={(v) => setCalculationType(v as CalculationType)}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+          >
+            {[
+              { value: "lmp", label: "Última Menstruação", desc: "Método padrão" },
+              { value: "ultrasound", label: "Ultrassom", desc: "Via imagem" },
+              { value: "transfer", label: "Transferência (FIV)", desc: "Embrionária" },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={`flex items-start gap-3 p-3 rounded-xl cursor-pointer transition-all border ${
+                  calculationType === opt.value
+                    ? "border-accent/50 bg-accent/10"
+                    : "border-border bg-muted/20 hover:bg-muted/30"
+                }`}
+              >
+                <RadioGroupItem value={opt.value} className="mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">{opt.label}</p>
+                  <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                </div>
+              </label>
+            ))}
+          </RadioGroup>
+        </div>
+
+        {/* Dynamic Inputs */}
+        {calculationType === "lmp" && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5">
+                <Label className="text-sm text-foreground">Data da Última Menstruação</Label>
+                <Tooltip>
+                  <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                  <TooltipContent>Primeiro dia do último ciclo menstrual</TooltipContent>
+                </Tooltip>
+              </div>
+              <DatePicker
+                date={lmpDate}
+                onSelect={setLmpDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
+            </div>
+          </div>
+        )}
+
+        {calculationType === "ultrasound" && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Data do Ultrassom</Label>
+              <DatePicker
+                date={ultrasoundDate}
+                onSelect={setUltrasoundDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Idade Gestacional no Ultrassom</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Semanas</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={42}
+                    placeholder="0"
+                    value={ultrasoundWeeks === 0 ? "" : ultrasoundWeeks}
+                    onChange={(e) => setUltrasoundWeeks(e.target.value === "" ? 0 : parseInt(e.target.value) || 0)}
+                    onFocus={(e) => e.target.select()}
+                    className="input-glass tabular-nums"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Dias</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={6}
+                    placeholder="0"
+                    value={ultrasoundDays === 0 ? "" : ultrasoundDays}
+                    onChange={(e) => setUltrasoundDays(e.target.value === "" ? 0 : parseInt(e.target.value) || 0)}
+                    onFocus={(e) => e.target.select()}
+                    className="input-glass tabular-nums"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {calculationType === "transfer" && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Data da Transferência</Label>
+              <DatePicker
+                date={transferDate}
+                onSelect={setTransferDate}
+                placeholder="Selecionar data"
+                disabled={(date) => date > new Date()}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm text-foreground">Dias do Embrião</Label>
+              <Select value={embryoDays} onValueChange={setEmbryoDays}>
+                <SelectTrigger className="input-glass"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">3 dias</SelectItem>
+                  <SelectItem value="5">5 dias (blastocisto)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+          Calcular
+        </Button>
+      </div>
+
+      {/* Results */}
+      <AnimatePresence>
+        {results && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-6"
+          >
+            {/* Hero Banner */}
+            <div className="glass-card-static p-6 md:p-8 mesh-navy min-h-[200px] flex flex-col justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Baby className="w-4 h-4 text-accent" />
+                    <span className="text-xs uppercase tracking-wider text-muted-foreground">{trimCfg?.label}</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
+                    <span className="text-sm text-muted-foreground">sem</span>
+                    <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
+                    <span className="text-sm text-muted-foreground">dias</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">{trimCfg?.description} · {trimCfg?.range}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">Progresso</p>
+                  <p className="tabular-nums text-3xl font-display text-accent">{results.progressPercent}%</p>
+                </div>
+              </div>
+
+              {/* Progress + DPP inline */}
+              <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
+                <span>DPP: <span className="text-foreground font-medium">{results.dueDate}</span></span>
+                <span>{40 - results.weeks} semanas restantes</span>
+              </div>
+            </div>
+
+            {/* Prenatal Care */}
+            <CollapsibleSection
+              title="Cuidados Pré-Natais"
+              icon={<HeartPulse className="w-4 h-4 text-accent" />}
+              isOpen={expandedSection === "prenatal"}
+              onToggle={() => toggleSection("prenatal")}
+            >
+              <div className="p-4 space-y-3">
+                {[
+                  { icon: <Stethoscope className="w-4 h-4 text-folicular" />, title: "Exames", text: results.prenatalCare.examinations },
+                  { icon: <Syringe className="w-4 h-4 text-accent" />, title: "Vacinas", text: results.prenatalCare.vaccines },
+                  { icon: <Salad className="w-4 h-4 text-luteal" />, title: "Alimentação", text: results.prenatalCare.nutrition },
+                  { icon: <HeartPulse className="w-4 h-4 text-primary" />, title: "Cuidados Especiais", text: results.prenatalCare.special_care },
+                ].map((item, i) => (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    className="glass-card-static p-4 space-y-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      {item.icon}
+                      <span className="font-medium text-sm text-foreground">{item.title}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{item.text}</p>
+                  </motion.div>
+                ))}
+
+                {/* Warning Signs */}
+                <div className="glass-card-static p-4 border-destructive/30 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-destructive" />
+                    <span className="font-medium text-sm text-foreground">Sinais de Alerta</span>
+                    <Badge variant="destructive" className="text-xs">Urgente</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{results.prenatalCare.warning_signs}</p>
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Visualization */}
+            <GestationalVisualization
+              currentWeek={results.weeks}
+              dueDate={results.dueDateRaw}
+            />
+
+            {/* Disclaimer */}
+            <div className="glass-card-static p-4 border-accent/20">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <strong>Nota técnica:</strong> Os valores apresentados são estimativas baseadas em métodos de cálculo padronizados.
+                As referências seguem diretrizes do Ministério da Saúde, FEBRASGO e ACOG.
+                Estes resultados não substituem avaliação, diagnóstico ou conduta de profissional de saúde habilitado.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Collapsible helper
+const CollapsibleSection = ({
+  title, icon, isOpen, onToggle, children,
+}: {
+  title: string; icon: React.ReactNode; isOpen: boolean; onToggle: () => void; children: React.ReactNode;
+}) => (
+  <div className="glass-card-static overflow-hidden">
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between p-4 tech-gradient hover:bg-muted/20 transition-colors"
+    >
+      <div className="flex items-center gap-2">
+        {icon}
+        <span className="text-sm font-medium text-foreground">{title}</span>
+      </div>
+      {isOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+    </button>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
+
+export default GestationalCalculator;
