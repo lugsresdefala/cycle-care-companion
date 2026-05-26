@@ -3,7 +3,7 @@ export default function Roadmap() {
     <div className="relative w-screen h-screen overflow-hidden bg-bg font-body text-ink">
       <div className="absolute top-[6vh] left-[6vw] right-[6vw] flex items-center justify-between">
         <span className="text-[1.3vw] tracking-[0.3em] uppercase text-muted font-semibold">
-          08 · Traction and roadmap
+          08 · Roadmap
         </span>
         <span className="text-[1.3vw] tracking-[0.2em] uppercase text-muted">IDALIA</span>
       </div>
@@ -13,9 +13,6 @@ export default function Roadmap() {
           Where we are,
           <span className="italic text-accent"> where we are going.</span>
         </h2>
-        <p className="mt-[2.5vh] text-[1.6vw] leading-snug text-muted max-w-[50vw] text-pretty">
-          Current numbers to be confirmed by the team before each presentation.
-        </p>
       </div>
 
       {/* Timeline */}
@@ -32,8 +29,8 @@ export default function Roadmap() {
             <div className="text-[1.3vw] uppercase tracking-[0.25em] text-primary font-semibold">Today</div>
             <div className="font-serif text-[2.6vw] leading-tight text-ink mt-[0.5vh]">Product live</div>
             <p className="text-[1.4vw] leading-snug text-muted mt-[1vh] text-pretty">
-              8 calculators, mobile PWA, Stripe live, first paying clinicians
-              <span className="text-muted/60"> [to be filled in]</span>.
+              8 calculators, mobile PWA and Stripe checkout live for individual
+              clinicians.
             </p>
           </div>
           <div>
@@ -48,8 +45,8 @@ export default function Roadmap() {
             <div className="text-[1.3vw] uppercase tracking-[0.25em] text-secondary font-semibold">Q2–Q3 2026</div>
             <div className="font-serif text-[2.6vw] leading-tight text-ink mt-[0.5vh]">Clinic pilots</div>
             <p className="text-[1.4vw] leading-snug text-muted mt-[1vh] text-pretty">
-              5 anchor clinics in Portugal and 3 across the EU, with assisted
-              onboarding.
+              First multi-clinician pilots with assisted onboarding and clinic
+              branding.
             </p>
           </div>
           <div>

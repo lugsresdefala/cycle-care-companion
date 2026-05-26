@@ -20,7 +20,7 @@
     "position": 3,
     "filepath": "src/pages/slides/Market.tsx",
     "title": "Market",
-    "description": "OB-GYN clinics across Portugal, the EU and beyond",
+    "description": "OB-GYN clinicians, everywhere they practise",
     "speakerNotes": ""
   },
   {
@@ -76,7 +76,7 @@
     "position": 10,
     "filepath": "src/pages/slides/Team.tsx",
     "title": "Team",
-    "description": "Fetal medicine and engineering",
+    "description": "Built by a clinician who uses it every day",
     "speakerNotes": ""
   },
   {
