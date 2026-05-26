@@ -420,6 +420,7 @@ components:
       type: object
       properties:
         url: { type: string }
+        sessionId: { type: string, nullable: true }
       required: [url]
     CheckoutStatusInfo:
       type: object

@@ -230,12 +230,14 @@ export const CreateCheckoutBody = zod.object({
 })
 
 export const CreateCheckoutResponse = zod.object({
-  "url": zod.string()
+  "url": zod.string(),
+  "sessionId": zod.string().nullish()
 })
 
 
 export const CreatePortalResponse = zod.object({
-  "url": zod.string()
+  "url": zod.string(),
+  "sessionId": zod.string().nullish()
 })
 
 

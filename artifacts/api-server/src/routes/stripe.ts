@@ -69,7 +69,7 @@ router.post("/stripe/checkout", requireAuth, async (req, res): Promise<any> => {
       sessionId: session.id,
     });
 
-    res.json({ url: session.url });
+    res.json({ url: session.url, sessionId: session.id });
   } catch (e: any) {
     req.log?.error({ err: e }, "checkout error");
     res.status(500).json({ error: e?.message || "Checkout failed" });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   useListPlans,
   useGetSubscription,
+  checkoutStatus,
   type Plan,
   type SubscriptionState,
 } from "@workspace/api-client-react";
@@ -39,33 +40,147 @@ const FEATURE_LABELS: Record<string, string> = {
   preeclampsia_risk: "Risco de Pré-Eclâmpsia",
 };
 
+type StatusKind = "info" | "success" | "error";
+type StatusBanner = { kind: StatusKind; message: string } | null;
+
+const POLL_INTERVAL_MS = 2000;
+const POLL_MAX_ATTEMPTS = 8;
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
 export default function PlansScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const plansQ = useListPlans<Plan[]>();
   const subQ = useGetSubscription<SubscriptionState>();
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [status, setStatus] = useState<StatusBanner>(null);
+  const pollingRef = useRef(false);
 
   const plans = (plansQ.data ?? [])
     .filter((p) => p.tier !== "free_trial" && p.stripePriceId)
     .sort((a, b) => (TIER_ORDER[a.tier] ?? 99) - (TIER_ORDER[b.tier] ?? 99));
 
+  const pollForActivation = async (
+    sessionId: string | null,
+    previousTier: string | null,
+    targetTier: string,
+  ) => {
+    if (pollingRef.current) return;
+    pollingRef.current = true;
+    setStatus({
+      kind: "info",
+      message: "Processando pagamento, aguarde alguns segundos…",
+    });
+
+    let lastCheckoutStatus: Awaited<ReturnType<typeof checkoutStatus>> | null = null;
+
+    try {
+      for (let attempt = 0; attempt < POLL_MAX_ATTEMPTS; attempt++) {
+        await sleep(POLL_INTERVAL_MS);
+
+        const { data: sub } = await subQ.refetch();
+        if (
+          sub?.subscribed &&
+          (sub.subscriptionTier === targetTier ||
+            sub.subscriptionTier !== previousTier)
+        ) {
+          setStatus({ kind: "success", message: "Assinatura ativada com sucesso." });
+          return;
+        }
+
+        if (sessionId) {
+          try {
+            lastCheckoutStatus = await checkoutStatus({ session_id: sessionId });
+          } catch {
+            // ignore transient errors; keep polling
+          }
+          if (lastCheckoutStatus) {
+            if (
+              lastCheckoutStatus.status === "expired" ||
+              lastCheckoutStatus.paymentStatus === "unpaid" &&
+                lastCheckoutStatus.status !== "complete"
+            ) {
+              setStatus({
+                kind: "error",
+                message: "Pagamento cancelado ou expirado. Tente novamente quando quiser.",
+              });
+              return;
+            }
+            if (
+              lastCheckoutStatus.status === "complete" &&
+              lastCheckoutStatus.paymentStatus &&
+              lastCheckoutStatus.paymentStatus !== "paid"
+            ) {
+              setStatus({
+                kind: "error",
+                message: "Falha no pagamento. Tente novamente ou use outro cartão.",
+              });
+              return;
+            }
+          }
+        }
+      }
+
+      if (
+        lastCheckoutStatus?.status === "complete" &&
+        (!lastCheckoutStatus.paymentStatus ||
+          lastCheckoutStatus.paymentStatus === "paid")
+      ) {
+        setStatus({
+          kind: "info",
+          message:
+            "Pagamento confirmado. A ativação pode levar alguns instantes — puxe para atualizar.",
+        });
+      } else {
+        setStatus({
+          kind: "info",
+          message:
+            "Ainda não recebemos a confirmação. Aguarde alguns minutos e puxe para atualizar.",
+        });
+      }
+    } finally {
+      pollingRef.current = false;
+    }
+  };
+
   const handleSubscribe = async (plan: Plan) => {
     if (!plan.stripePriceId) return;
-    setErrorMsg(null);
+    setStatus(null);
     setLoadingId(plan.id);
+    const previousTier = subQ.data?.subscribed
+      ? subQ.data.subscriptionTier ?? null
+      : null;
     try {
-      const { url } = await createCheckout({ priceId: plan.stripePriceId });
+      const { url, sessionId } = await createCheckout({ priceId: plan.stripePriceId });
       if (!url) throw new Error("URL de checkout indisponível");
-      await WebBrowser.openBrowserAsync(url);
-      subQ.refetch();
+      const result = await WebBrowser.openBrowserAsync(url);
+      setLoadingId(null);
+      if (
+        Platform.OS === "ios" &&
+        (result as any)?.type === "cancel"
+      ) {
+        // iOS reports `cancel` when the user explicitly closes the browser tab
+        // before the success page; still poll because Stripe may have completed
+        // in the background.
+      }
+      await pollForActivation(sessionId ?? null, previousTier, plan.tier);
     } catch (e: any) {
-      setErrorMsg(e?.message || "Erro ao abrir checkout");
+      setStatus({
+        kind: "error",
+        message: e?.message || "Erro ao abrir checkout.",
+      });
     } finally {
       setLoadingId(null);
     }
   };
+
+  const bannerColor =
+    status?.kind === "success"
+      ? colors.accent
+      : status?.kind === "error"
+        ? colors.destructive
+        : colors.secondary;
 
   return (
     <>
@@ -82,6 +197,33 @@ export default function PlansScreen() {
           Escolha o plano ideal para sua prática. A assinatura é processada com
           segurança pelo Stripe e abre no navegador.
         </Text>
+
+        {status ? (
+          <View
+            style={[
+              styles.banner,
+              {
+                borderColor: bannerColor,
+                backgroundColor: colors.card,
+                borderRadius: colors.radius,
+              },
+            ]}
+          >
+            {pollingRef.current && status.kind === "info" ? (
+              <ActivityIndicator color={bannerColor} />
+            ) : null}
+            <Text
+              style={{
+                color: bannerColor,
+                fontFamily: "Inter_600SemiBold",
+                flex: 1,
+                fontSize: 13,
+              }}
+            >
+              {status.message}
+            </Text>
+          </View>
+        ) : null}
 
         {plansQ.isLoading ? (
           <ActivityIndicator color={colors.primary} style={{ marginTop: 24 }} />
@@ -173,12 +315,6 @@ export default function PlansScreen() {
           })
         )}
 
-        {errorMsg ? (
-          <Text style={{ color: colors.destructive, textAlign: "center" }}>
-            {errorMsg}
-          </Text>
-        ) : null}
-
         {Platform.OS === "ios" ? (
           <Text
             style={{
@@ -212,5 +348,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     fontSize: 11,
     letterSpacing: 0.5,
+  },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+    borderWidth: 1,
   },
 });

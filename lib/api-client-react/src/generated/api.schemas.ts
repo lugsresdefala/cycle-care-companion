@@ -119,6 +119,7 @@ export interface CheckoutRequest {
 
 export interface UrlResponse {
   url: string;
+  sessionId?: string | null;
 }
 
 export interface CheckoutStatusInfo {

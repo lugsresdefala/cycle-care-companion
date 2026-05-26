@@ -8,4 +8,5 @@
 
 export interface UrlResponse {
   url: string;
+  sessionId?: string | null;
 }
