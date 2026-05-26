@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/idalia-promo/"
+title = "IDALIA Promo"
+version = "1.0.0"
+id = "artifacts/idalia-promo"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/idalia-promo/" ]
+localPort = 21108
+
+[services.development]
+run = "pnpm --filter @workspace/idalia-promo run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/idalia-promo", "run", "build" ]
+publicDir = "artifacts/idalia-promo/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21108"
+BASE_PATH = "/idalia-promo/"

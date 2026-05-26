@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "n46QuysiOgq5AdJ9lgqzv"
+uri = "file://artifacts/idalia-promo/public/audio/bg_music.mp3"
+type = "audio"
+title = "background music"
