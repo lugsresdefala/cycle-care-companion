@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/pitch-deck-en/"
+title = "IDALIA — Pitch Deck (EN)"
+version = "1.0.0"
+id = "artifacts/pitch-deck-en"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/pitch-deck-en/" ]
+localPort = 22196
+
+[services.development]
+run = "pnpm --filter @workspace/pitch-deck-en run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pitch-deck-en", "run", "build" ]
+publicDir = "artifacts/pitch-deck-en/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22196"
+BASE_PATH = "/pitch-deck-en/"

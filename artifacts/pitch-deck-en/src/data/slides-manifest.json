@@ -1,0 +1,90 @@
+[
+  {
+    "id": "11111111-1111-4111-8111-1111111111e1",
+    "position": 1,
+    "filepath": "src/pages/slides/Cover.tsx",
+    "title": "Cover",
+    "description": "IDALIA — pitch deck for international investors and clinical partners",
+    "speakerNotes": ""
+  },
+  {
+    "id": "22222222-2222-4222-8222-2222222222e2",
+    "position": 2,
+    "filepath": "src/pages/slides/Problem.tsx",
+    "title": "Problem",
+    "description": "Fetal biometry is still manual",
+    "speakerNotes": ""
+  },
+  {
+    "id": "33333333-3333-4333-8333-3333333333e3",
+    "position": 3,
+    "filepath": "src/pages/slides/Market.tsx",
+    "title": "Market",
+    "description": "OB-GYN clinics across Portugal, the EU and beyond",
+    "speakerNotes": ""
+  },
+  {
+    "id": "44444444-4444-4444-8444-4444444444e4",
+    "position": 4,
+    "filepath": "src/pages/slides/Solution.tsx",
+    "title": "Solution",
+    "description": "IDALIA Calc — one platform for every obstetric calculation",
+    "speakerNotes": ""
+  },
+  {
+    "id": "55555555-5555-4555-8555-5555555555e5",
+    "position": 5,
+    "filepath": "src/pages/slides/Product.tsx",
+    "title": "Product",
+    "description": "Eight clinical modules",
+    "speakerNotes": ""
+  },
+  {
+    "id": "66666666-6666-4666-8666-6666666666e6",
+    "position": 6,
+    "filepath": "src/pages/slides/Demo.tsx",
+    "title": "Demo",
+    "description": "Designed for the pace of the clinic",
+    "speakerNotes": ""
+  },
+  {
+    "id": "77777777-7777-4777-8777-7777777777e7",
+    "position": 7,
+    "filepath": "src/pages/slides/Evidence.tsx",
+    "title": "Evidence",
+    "description": "Every calculation, a published reference",
+    "speakerNotes": ""
+  },
+  {
+    "id": "88888888-8888-4888-8888-8888888888e8",
+    "position": 8,
+    "filepath": "src/pages/slides/Pricing.tsx",
+    "title": "Revenue model",
+    "description": "Three subscription tiers in EUR, USD and BRL",
+    "speakerNotes": ""
+  },
+  {
+    "id": "99999999-9999-4999-8999-9999999999e9",
+    "position": 9,
+    "filepath": "src/pages/slides/Roadmap.tsx",
+    "title": "Traction and roadmap",
+    "description": "Where we are, where we are going",
+    "speakerNotes": ""
+  },
+  {
+    "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaea",
+    "position": 10,
+    "filepath": "src/pages/slides/Team.tsx",
+    "title": "Team",
+    "description": "Fetal medicine and engineering",
+    "speakerNotes": ""
+  },
+  {
+    "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbeb",
+    "position": 11,
+    "filepath": "src/pages/slides/Ask.tsx",
+    "title": "The ask",
+    "description": "What we are looking for",
+    "speakerNotes": ""
+  }
+]
