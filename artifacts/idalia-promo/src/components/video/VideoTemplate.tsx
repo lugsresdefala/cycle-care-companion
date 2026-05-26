@@ -69,17 +69,48 @@ export default function VideoTemplate({
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceRef = useRef<HTMLAudioElement | null>(null);
+
+  const MUSIC_VOLUME_NORMAL = 0.45;
+  const MUSIC_VOLUME_DUCKED = 0.15;
+  const VOICE_VOLUME = 1.0;
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = 0.45;
+    audio.volume = MUSIC_VOLUME_NORMAL;
     const targetTime = SCENE_START_SEC[baseSceneKey] ?? 0;
     if (Math.abs(audio.currentTime - targetTime) > AUDIO_SEEK_EPSILON_SEC) {
       audio.currentTime = targetTime;
     }
     audio.play().catch(() => {});
   }, [currentSceneKey, baseSceneKey, muted]);
+
+  useEffect(() => {
+    const voice = voiceRef.current;
+    const music = audioRef.current;
+    if (!voice) return;
+    voice.volume = VOICE_VOLUME;
+    voice.src = `${import.meta.env.BASE_URL}audio/vo/${baseSceneKey}.mp3`;
+    voice.currentTime = 0;
+    const duck = () => {
+      if (music) music.volume = MUSIC_VOLUME_DUCKED;
+    };
+    const unduck = () => {
+      if (music) music.volume = MUSIC_VOLUME_NORMAL;
+    };
+    voice.addEventListener('playing', duck);
+    voice.addEventListener('ended', unduck);
+    voice.addEventListener('pause', unduck);
+    voice.play().catch(() => {});
+    return () => {
+      voice.removeEventListener('playing', duck);
+      voice.removeEventListener('ended', unduck);
+      voice.removeEventListener('pause', unduck);
+      voice.pause();
+      unduck();
+    };
+  }, [currentSceneKey, baseSceneKey]);
 
   const bgPos = backgroundPositions[sceneIndex] ?? backgroundPositions[0];
 
@@ -123,6 +154,12 @@ export default function VideoTemplate({
         src={`${import.meta.env.BASE_URL}audio/bg_music.mp3`}
         preload="auto"
         autoPlay
+        muted={muted}
+      />
+
+      <audio
+        ref={voiceRef}
+        preload="auto"
         muted={muted}
       />
     </div>
