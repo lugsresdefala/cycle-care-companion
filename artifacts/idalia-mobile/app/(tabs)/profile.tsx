@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  AppState,
+  type AppStateStatus,
   Platform,
   Pressable,
   RefreshControl,
@@ -11,6 +13,8 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@clerk/expo";
 import {
   useGetMyProfile,
@@ -24,11 +28,12 @@ import { GlassCard } from "@/components/GlassCard";
 import { Field } from "@/components/Field";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useColors } from "@/hooks/useColors";
-import { updateMyProfile } from "@/lib/api";
+import { createPortal, updateMyProfile } from "@/lib/api";
 
 export default function ProfileTab() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { signOut } = useAuth();
 
   const profileQ = useGetMyProfile<Profile>();
@@ -40,6 +45,35 @@ export default function ProfileTab() {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
+
+  const appState = useRef(AppState.currentState);
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next: AppStateStatus) => {
+      if (appState.current.match(/inactive|background/) && next === "active") {
+        subQ.refetch();
+        profileQ.refetch();
+      }
+      appState.current = next;
+    });
+    return () => sub.remove();
+  }, [subQ, profileQ]);
+
+  const openPortal = async () => {
+    setBillingError(null);
+    setPortalLoading(true);
+    try {
+      const { url } = await createPortal();
+      if (!url) throw new Error("URL do portal indisponível");
+      await WebBrowser.openBrowserAsync(url);
+      subQ.refetch();
+    } catch (e: any) {
+      setBillingError(e?.message || "Erro ao abrir portal");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (profileQ.data) {
@@ -136,11 +170,37 @@ export default function ProfileTab() {
                   Renovação: {new Date(subQ.data.subscriptionEnd).toLocaleDateString("pt-BR")}
                 </Text>
               ) : null}
+              <View style={{ gap: 8, marginTop: 4 }}>
+                <PrimaryButton
+                  label={subQ.data.subscribed ? "Mudar de plano" : "Ver planos"}
+                  onPress={() => router.push("/plans")}
+                  variant={subQ.data.subscribed ? "outline" : "primary"}
+                />
+                {subQ.data.subscribed ? (
+                  <PrimaryButton
+                    label="Gerenciar assinatura"
+                    variant="ghost"
+                    onPress={openPortal}
+                    loading={portalLoading}
+                  />
+                ) : null}
+                {billingError ? (
+                  <Text style={{ color: colors.destructive, fontSize: 13 }}>
+                    {billingError}
+                  </Text>
+                ) : null}
+              </View>
             </View>
           ) : (
-            <Text style={{ color: colors.mutedForeground, marginTop: 10 }}>
-              Informações de assinatura indisponíveis.
-            </Text>
+            <View style={{ marginTop: 10, gap: 10 }}>
+              <Text style={{ color: colors.mutedForeground }}>
+                Informações de assinatura indisponíveis.
+              </Text>
+              <PrimaryButton
+                label="Ver planos"
+                onPress={() => router.push("/plans")}
+              />
+            </View>
           )}
         </GlassCard>
 

@@ -74,6 +74,7 @@ function AuthGate() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="patient/[id]" options={{ headerShown: true, title: "Paciente" }} />
       <Stack.Screen name="patient/new" options={{ headerShown: true, title: "Novo paciente", presentation: "modal" }} />
+      <Stack.Screen name="plans" options={{ headerShown: true, title: "Planos" }} />
     </Stack>
   );
 }
