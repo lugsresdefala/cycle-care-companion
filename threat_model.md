@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-IDALIA is a public-facing obstetrics application with a React web client (`artifacts/idalia`), an Express API (`artifacts/api-server`), shared PostgreSQL/Drizzle data models (`lib/db`), and an Expo mobile client (`artifacts/idalia-mobile`). Users are clinicians who authenticate with Clerk, store patient and exam-history data, and purchase subscriptions through Stripe to unlock premium calculators and token-based usage.
+IDALIA is a public-facing obstetrics application with a React web client (`artifacts/idalia`), an Express API (`artifacts/api-server`), shared PostgreSQL/Drizzle data models (`lib/db`), and an Expo mobile client (`artifacts/idalia-mobile`). Users are clinicians who authenticate with Clerk, store patient and exam-history data, and purchase subscriptions through Stripe to unlock premium calculators and token-based usage. The web client uses Clerk cookie-backed sessions against same-origin `/api` routes, while the mobile client sends Clerk bearer tokens to the same API.
 
 The current production deployment is public (`https://idcalc.com`). Per deployment assumptions, transport security is handled by the platform. The scan should focus on production-reachable code paths and ignore mockup-only or presentation-only artifacts unless they can influence production behavior.
 
@@ -30,6 +30,7 @@ The current production deployment is public (`https://idcalc.com`). Per deployme
 - **Highest-risk backend areas:** `artifacts/api-server/src/lib/auth.ts`, `artifacts/api-server/src/routes/patients.ts`, `artifacts/api-server/src/routes/exams.ts`, `artifacts/api-server/src/routes/stripe.ts`, `artifacts/api-server/src/routes/admin.ts`
 - **Highest-risk client areas:** `artifacts/idalia/src/App.tsx`, calculator pages under `artifacts/idalia/src/pages/`, token/subscription hooks under `artifacts/idalia/src/hooks/`
 - **Shared data and authorization model:** `lib/db/src/schema/index.ts`, `lib/api-spec/openapi.yaml`
+- **Auth/bootstrap caveat:** `requireAuth()` in `artifacts/api-server/src/lib/auth.ts` performs profile and free-trial bootstrap side effects before protected routes run, including on authenticated `GET` requests.
 - **Usually ignore unless proven reachable in production:** `artifacts/mockup-sandbox`, `artifacts/pitch-deck*`, `artifacts/idalia-promo`, `.migration-backup`, most build scripts under `scripts/` and `artifacts/*/scripts/`
 
 ## Threat Categories
