@@ -53,3 +53,8 @@ externalPort = 80
 [[ports]]
 localPort = 25760
 externalPort = 3001
+
+[userenv]
+
+[userenv.production]
+APP_ORIGIN = "https://idcalc.com"
