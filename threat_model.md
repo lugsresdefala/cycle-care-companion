@@ -21,6 +21,7 @@ The current production deployment is public (`https://idcalc.com`). Per deployme
 - **API to PostgreSQL** — the API has broad access to patient, billing, and role data. Broken authorization or unsafe queries here expose all tenants.
 - **API to Clerk** — authenticated identity is delegated to Clerk. The API must trust only validated session context and must not infer user identity from client-controlled fields.
 - **API to Stripe** — subscription state crosses from Stripe webhooks and API lookups into local authorization/token state. Webhook events and session/subscription identifiers must be strongly bound to the correct user.
+- **Mobile device storage and in-memory caches** — bearer tokens, React Query caches, and locally rendered PHI on shared phones/tablets can outlive a session boundary unless explicitly cleared on logout or account switch.
 - **Public vs authenticated vs admin surfaces** — `/api/healthz`, `/api/plans`, Clerk proxying, and Stripe webhooks are public; most patient/subscription routes are authenticated; `/api/admin/*` is privileged.
 - **Production vs dev-only artifacts** — `artifacts/mockup-sandbox`, pitch decks, promo artifacts, `.migration-backup`, and most build/export scripts are normally out of scope for production vulnerability reporting unless they leak real secrets or alter deployed behavior.
 
@@ -45,7 +46,7 @@ Client input can modify patient records, exam history, token balances, and subsc
 
 ### Information Disclosure
 
-Patient and exam data are medical records and must be scoped to the authenticated clinician on every read and write. Error handling, logs, and payment status endpoints must not reveal secrets or other users’ billing/session state. Public endpoints should expose only the minimum plan/catalog data required for checkout.
+Patient and exam data are medical records and must be scoped to the authenticated clinician on every read and write. Error handling, logs, payment status endpoints, and mobile-side caches shown after logout or account switch must not reveal secrets or other users’ billing/session state. Public endpoints should expose only the minimum plan/catalog data required for checkout.
 
 ### Denial of Service
 
