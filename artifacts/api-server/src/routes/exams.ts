@@ -37,27 +37,18 @@ router.post("/exams", requireAuth, async (req, res): Promise<any> => {
 
   if ((PREMIUM_CALC_TYPES as readonly string[]).includes(calcType)) {
     const now = new Date();
-    const decremented = await db.execute(sql`
-      UPDATE user_subscriptions
-      SET tokens_remaining = tokens_remaining - 1,
-          tokens_used = tokens_used + 1,
-          updated_at = now()
-      WHERE id = (
-        SELECT id FROM user_subscriptions
-        WHERE doctor_id = ${userId}
-          AND (status = 'active' OR status = 'trial')
-          AND end_date > ${now}
-          AND tokens_remaining > 0
-        ORDER BY created_at DESC
-        LIMIT 1
-        FOR UPDATE
-      )
-      RETURNING tokens_remaining
+    const rows = await db.execute(sql`
+      SELECT id FROM user_subscriptions
+      WHERE doctor_id = ${userId}
+        AND (status = 'active' OR status = 'trial')
+        AND end_date > ${now}
+      ORDER BY created_at DESC
+      LIMIT 1
     `);
     // @ts-ignore
-    const tokenRow = (decremented.rows ?? decremented)[0];
-    if (!tokenRow) {
-      return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+    const subRow = (rows.rows ?? rows)[0];
+    if (!subRow) {
+      return res.status(402).json({ error: "Active subscription required for premium calculators" });
     }
   }
 

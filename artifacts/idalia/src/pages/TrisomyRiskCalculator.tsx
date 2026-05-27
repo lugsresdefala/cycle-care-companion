@@ -22,7 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const TrisomyRiskCalculator = () => {
-  const { blocked, needsLogin, subscription } = useTokenGate("trisomy_risk");
+  const { blocked, needsLogin, consuming, loading, subscription, consumeToken } = useTokenGate("trisomy_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
@@ -69,8 +69,11 @@ const TrisomyRiskCalculator = () => {
       return;
     }
 
-    if (blocked || needsLogin) return;
+    if (loading || blocked || needsLogin) return;
     setError("");
+
+    const granted = await consumeToken();
+    if (!granted) return;
 
     const input: TrisomyInput = {
       maternalAge: ageVal,
@@ -275,7 +278,7 @@ const TrisomyRiskCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+        <Button onClick={handleCalculate} disabled={loading || blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <ShieldAlert className="w-4 h-4 mr-1" /> Calcular Risco
         </Button>
       </div>
