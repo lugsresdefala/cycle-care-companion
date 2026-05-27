@@ -232,13 +232,6 @@ async function lookupUserIdBySub(
       .orderBy(desc(userSubscriptions.createdAt))
       .limit(1);
     if (byCust[0]) return byCust[0].doctorId;
-    const attempt = await db
-      .select()
-      .from(stripeCheckoutAttempts)
-      .orderBy(desc(stripeCheckoutAttempts.createdAt))
-      .limit(50);
-    // fallback: most recent checkout attempt — best-effort
-    if (attempt[0]) return attempt[0].doctorId;
   }
   return "";
 }
