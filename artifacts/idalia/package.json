@@ -76,7 +76,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.61.3",
+    "@clerk/clerk-react": "^5.61.6",
     "@supabase/supabase-js": "^2.106.2",
     "@testing-library/react": "^16.3.2",
     "react-router-dom": "^7.15.1",
