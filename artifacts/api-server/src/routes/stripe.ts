@@ -111,8 +111,24 @@ router.post("/stripe/portal", requireAuth, async (req, res): Promise<any> => {
 
 router.get("/stripe/checkout-status", requireAuth, async (req, res): Promise<any> => {
   try {
+    const userId = (req as AuthedRequest).userId;
     const sessionId = req.query.session_id as string;
     if (!sessionId) return res.status(400).json({ error: "session_id required" });
+
+    const attempt = await db
+      .select()
+      .from(stripeCheckoutAttempts)
+      .where(
+        and(
+          eq(stripeCheckoutAttempts.sessionId, sessionId),
+          eq(stripeCheckoutAttempts.doctorId, userId),
+        ),
+      )
+      .limit(1);
+    if (!attempt[0]) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     res.json({
       status: session.status || "unknown",
@@ -156,18 +172,25 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
         const userId = (session.metadata?.user_id as string) || "";
         const subId = session.subscription as string;
         if (userId && subId) {
-          await syncSubscription(userId, subId);
+          await syncSubscription(userId, subId, undefined, true);
         }
         break;
       }
-      case "customer.subscription.created":
+      case "customer.subscription.created": {
+        const sub = event.data.object as Stripe.Subscription;
+        const userId =
+          (sub.metadata?.user_id as string) ||
+          (await lookupUserIdBySub(sub.id, sub.customer as string));
+        if (userId) await syncSubscription(userId, sub.id, sub, true);
+        break;
+      }
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         const userId =
           (sub.metadata?.user_id as string) ||
           (await lookupUserIdBySub(sub.id, sub.customer as string));
-        if (userId) await syncSubscription(userId, sub.id, sub);
+        if (userId) await syncSubscription(userId, sub.id, sub, false);
         break;
       }
       case "invoice.payment_succeeded": {
@@ -179,7 +202,7 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
           const userId =
             (sub.metadata?.user_id as string) ||
             (await lookupUserIdBySub(subId, sub.customer as string));
-          if (userId) await syncSubscription(userId, subId, sub);
+          if (userId) await syncSubscription(userId, subId, sub, true);
         }
         break;
       }
@@ -224,6 +247,7 @@ async function syncSubscription(
   userId: string,
   stripeSubId: string,
   preloaded?: Stripe.Subscription,
+  resetTokens: boolean = false,
 ) {
   const sub = preloaded || (await stripe.subscriptions.retrieve(stripeSubId));
   const productId = sub.items.data[0]?.price.product as string;
@@ -253,16 +277,19 @@ async function syncSubscription(
     .limit(1);
 
   if (existing[0]) {
+    const updateFields: Record<string, unknown> = {
+      planId: plan[0].id,
+      status,
+      endDate,
+      stripeCustomerId: sub.customer as string,
+      updatedAt: new Date(),
+    };
+    if (resetTokens) {
+      updateFields.tokensRemaining = plan[0].tokensPerPeriod;
+    }
     await db
       .update(userSubscriptions)
-      .set({
-        planId: plan[0].id,
-        status,
-        endDate,
-        tokensRemaining: plan[0].tokensPerPeriod,
-        stripeCustomerId: sub.customer as string,
-        updatedAt: new Date(),
-      })
+      .set(updateFields)
       .where(eq(userSubscriptions.id, existing[0].id));
   } else {
     await db.insert(userSubscriptions).values({
