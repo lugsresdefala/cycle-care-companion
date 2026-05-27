@@ -6,7 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/expo";
+import { ClerkProvider, ClerkLoaded, useAuth, useUser } from "@clerk/expo";
 import { Slot, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
@@ -34,10 +34,11 @@ if (apiDomain) {
 
 function AuthGate() {
   const { isLoaded, isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
+  const queryClient = useQueryClient();
   const segments = useSegments();
   const router = useRouter();
   const colors = useColors();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -46,6 +47,11 @@ function AuthGate() {
     setAuthTokenGetter(isSignedIn ? () => getToken() : null);
     return () => setAuthTokenGetter(null);
   }, [isSignedIn, getToken, queryClient]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    queryClient.clear();
+  }, [isLoaded, user?.id, queryClient]);
 
   useEffect(() => {
     if (!isLoaded) return;

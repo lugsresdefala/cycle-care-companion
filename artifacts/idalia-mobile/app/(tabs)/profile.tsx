@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ActivityIndicator,
   AppState,
@@ -35,6 +36,7 @@ export default function ProfileTab() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { signOut } = useAuth();
+  const queryClient = useQueryClient();
 
   const profileQ = useGetMyProfile<Profile>();
   const subQ = useGetSubscription<SubscriptionState>();
@@ -235,7 +237,7 @@ export default function ProfileTab() {
         </GlassCard>
 
         <Pressable
-          onPress={() => signOut()}
+          onPress={() => { queryClient.clear(); signOut(); }}
           style={({ pressed }) => [
             styles.signOut,
             {
