@@ -1,62 +1,64 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import idaliaLogo from '@assets/idalia_logo.png';
 
 export function Scene6() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 1500),
-      setTimeout(() => setPhase(3), 3000),
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
-    <motion.div 
-      className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--color-primary)]"
-      initial={{ opacity: 0, clipPath: 'circle(0% at 50% 50%)' }}
-      animate={{ opacity: 1, clipPath: 'circle(150% at 50% 50%)' }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+    <motion.div
+      key="scene-outro"
+      className="absolute inset-0 z-10 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.6 }}
     >
-      <motion.div
-        className="absolute inset-0 opacity-20"
-        style={{
-          background: 'radial-gradient(circle at 50% 50%, var(--color-accent) 0%, transparent 50%)'
-        }}
-        animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.3, 0.1] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      <svg className="absolute inset-0 w-full h-full opacity-[0.05]" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="grid-outro" width="80" height="80" patternUnits="userSpaceOnUse">
+            <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#133069" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="1920" height="1080" fill="url(#grid-outro)" />
+      </svg>
 
-      <div className="z-10 flex flex-col items-center">
+      <div className="relative z-10 flex flex-col items-center text-center">
         <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={phase >= 1 ? { scale: 1, opacity: 1 } : { scale: 0.5, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className="bg-white p-8 rounded-3xl shadow-2xl mb-8"
+          className="flex items-center gap-[1.2vw]"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          <img src={idaliaLogo} alt="IDALIA Calc Logo" className="h-24 object-contain" />
+          <motion.svg
+            width="64" height="64" viewBox="0 0 64 64" className="w-[5vw] h-[5vw]"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+          >
+            <circle cx="32" cy="32" r="28" fill="none" stroke="#133069" strokeWidth="2.5" />
+            <circle cx="32" cy="32" r="16" fill="none" stroke="#ED7A2A" strokeWidth="2.5" />
+            <circle cx="32" cy="32" r="4" fill="#133069" />
+          </motion.svg>
+          <span
+            className="text-[6vw] font-bold leading-none"
+            style={{ color: '#0E2350', fontFamily: 'var(--font-display)', letterSpacing: '-0.04em' }}
+          >
+            Idália<span style={{ color: '#ED7A2A' }}> Calc</span>
+          </span>
         </motion.div>
 
-        <motion.h1
-          className="text-4xl font-bold text-white mb-4 tracking-wide"
-          style={{ fontFamily: 'var(--font-display)' }}
-          initial={{ y: 20, opacity: 0 }}
-          animate={phase >= 2 ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
-        >
-          Idalia Calc — Saúde Reprodutiva
-        </motion.h1>
+        <motion.div
+          className="mt-[3vh] h-[2px] w-[8vw]"
+          style={{ background: 'linear-gradient(90deg, transparent, #ED7A2A, transparent)' }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        />
 
         <motion.p
-          className="text-xl text-white/80 font-medium"
-          initial={{ opacity: 0, filter: 'blur(10px)' }}
-          animate={phase >= 3 ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(10px)' }}
-          transition={{ duration: 1 }}
+          className="mt-[3vh] text-[1.8vw]"
+          style={{ color: '#3A4865', fontFamily: 'var(--font-display)', letterSpacing: '0.02em' }}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          Para obstetras e ginecologistas.
+          Saúde reprodutiva e medicina fetal.
         </motion.p>
       </div>
     </motion.div>

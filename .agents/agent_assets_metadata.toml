@@ -5,40 +5,46 @@ generated = []
 id = "n46QuysiOgq5AdJ9lgqzv"
 uri = "file://artifacts/idalia-promo/public/audio/bg_music.mp3"
 type = "audio"
-title = "background music"
+title = "idalia-clinical-bed"
 
 [[outputs]]
 id = "vTc6EzgGucMZ4E3wB8__V"
 uri = "file://artifacts/idalia-promo/public/audio/vo/biometry.mp3"
 type = "audio"
-title = "idalia_pt_biometry"
+title = "idalia-vo-biometry"
 
 [[outputs]]
 id = "t-yuEw-QN2_anvItYLIvq"
 uri = "file://artifacts/idalia-promo/public/audio/vo/hook.mp3"
 type = "audio"
-title = "idalia_pt_hook"
+title = "idalia-vo-hook"
 
 [[outputs]]
 id = "Vst0NZAA4EnR1pkHvKBiS"
 uri = "file://artifacts/idalia-promo/public/audio/vo/dating.mp3"
 type = "audio"
-title = "idalia_pt_dating"
+title = "idalia-vo-dating"
 
 [[outputs]]
 id = "dAhEfU1ZsPjJxM8ijhaPF"
 uri = "file://artifacts/idalia-promo/public/audio/vo/records.mp3"
 type = "audio"
-title = "idalia_pt_records"
+title = "idalia-vo-records"
 
 [[outputs]]
 id = "ug-HKqpst63STKSW90i16"
 uri = "file://artifacts/idalia-promo/public/audio/vo/outro.mp3"
 type = "audio"
-title = "idalia_pt_outro"
+title = "idalia-vo-outro"
 
 [[outputs]]
 id = "Ghe78k9cNS-NTs1I5FNOd"
 uri = "file://artifacts/idalia-promo/public/audio/vo/pricing.mp3"
 type = "audio"
 title = "idalia_pt_pricing"
+
+[[outputs]]
+id = "TAE4W0e8y2jEubLr8sBXb"
+uri = "file://artifacts/idalia-promo/public/audio/vo/growth.mp3"
+type = "audio"
+title = "idalia-vo-growth"

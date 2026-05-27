@@ -10,11 +10,11 @@ import { Scene6 } from './video_scenes/Scene6';
 import { SCENE_CAPTIONS } from './captions';
 
 export const SCENE_DURATIONS = {
-  hook: 8000,
-  dating: 12000,
-  biometry: 12000,
-  records: 12000,
-  pricing: 10000,
+  hook: 7000,
+  dating: 11000,
+  biometry: 13500,
+  growth: 8500,
+  records: 8000,
   outro: 6000,
 };
 
@@ -22,8 +22,8 @@ const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   hook: Scene1,
   dating: Scene2,
   biometry: Scene3,
-  records: Scene4,
-  pricing: Scene5,
+  growth: Scene4,
+  records: Scene5,
   outro: Scene6,
 };
 
@@ -73,8 +73,8 @@ export default function VideoTemplate({
   const voiceRef = useRef<HTMLAudioElement | null>(null);
   const [captionText, setCaptionText] = useState<string>('');
 
-  const MUSIC_VOLUME_NORMAL = 0.45;
-  const MUSIC_VOLUME_DUCKED = 0.15;
+  const MUSIC_VOLUME_NORMAL = 0.28;
+  const MUSIC_VOLUME_DUCKED = 0.09;
   const VOICE_VOLUME = 1.0;
 
   useEffect(() => {

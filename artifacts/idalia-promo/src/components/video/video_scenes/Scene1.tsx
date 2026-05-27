@@ -1,84 +1,102 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import idaliaLogo from '@assets/idalia_logo.png';
 
 export function Scene1() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 1500),
-      setTimeout(() => setPhase(3), 3000),
-      setTimeout(() => setPhase(4), 4500),
-      setTimeout(() => setPhase(5), 7000), // exit
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
-    <motion.div 
-      className="absolute inset-0 flex items-center justify-center"
-      initial={{ opacity: 0, scale: 1.1 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, y: -50, filter: 'blur(10px)' }}
-      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+    <motion.div
+      key="scene-hook"
+      className="absolute inset-0 z-10 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.04 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="flex flex-col items-center z-10">
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={phase >= 1 ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className="mb-8"
-        >
-          <img src={idaliaLogo} alt="IDALIA Calc" className="h-24 w-auto object-contain drop-shadow-xl" />
-        </motion.div>
+      <svg className="absolute inset-0 w-full h-full opacity-[0.07]" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id="grid-hook" width="60" height="60" patternUnits="userSpaceOnUse">
+            <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#133069" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="1920" height="1080" fill="url(#grid-hook)" />
+      </svg>
 
-        <motion.div className="text-center overflow-hidden h-24">
-          <motion.h1 
-            className="text-[4vw] font-bold text-[var(--color-text-primary)]"
-            initial={{ y: '100%' }}
-            animate={phase >= 2 ? { y: 0 } : { y: '100%' }}
-            transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Precisão clínica.
-          </motion.h1>
-        </motion.div>
-
-        <motion.div className="text-center overflow-hidden h-24">
-          <motion.h1 
-            className="text-[4vw] font-bold text-[var(--color-primary)]"
-            initial={{ y: '100%' }}
-            animate={phase >= 3 ? { y: 0 } : { y: '100%' }}
-            transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Decisões seguras.
-          </motion.h1>
-        </motion.div>
-
-        <motion.p
-          className="mt-8 text-[1.5vw] text-[var(--color-text-secondary)] font-medium max-w-2xl text-center"
-          initial={{ opacity: 0, filter: 'blur(8px)' }}
-          animate={phase >= 4 ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(8px)' }}
-          transition={{ duration: 0.8 }}
-        >
-          A ferramenta definitiva para obstetras e ginecologistas.
-        </motion.p>
-      </div>
-
-      {/* Decorative medical crosses */}
-      <motion.div 
-        className="absolute top-20 right-32 text-[var(--color-secondary)] opacity-20"
-        initial={{ rotate: -45, scale: 0 }}
-        animate={phase >= 1 ? { rotate: 0, scale: 1 } : { rotate: -45, scale: 0 }}
-        transition={{ type: 'spring', delay: 0.8 }}
+      <motion.div
+        className="absolute"
+        style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+        initial={{ scale: 0.6, opacity: 0 }}
+        animate={{ scale: 1, opacity: 0.15 }}
+        transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
       >
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 10.5H13.5V5C13.5 4.17 12.83 3.5 12 3.5C11.17 3.5 10.5 4.17 10.5 5V10.5H5C4.17 10.5 3.5 11.17 3.5 12C3.5 12.83 4.17 13.5 5 13.5H10.5V19C10.5 19.83 11.17 20.5 12 20.5C12.83 20.5 13.5 19.83 13.5 19V13.5H19C19.83 13.5 20.5 12.83 20.5 12C20.5 11.17 19.83 10.5 19 10.5Z"/>
+        <svg width="780" height="780" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="92" fill="none" stroke="#133069" strokeWidth="0.4" />
+          <circle cx="100" cy="100" r="74" fill="none" stroke="#133069" strokeWidth="0.4" />
+          <circle cx="100" cy="100" r="56" fill="none" stroke="#ED7A2A" strokeWidth="0.5" strokeDasharray="2 3" />
+          <g stroke="#133069" strokeWidth="0.4">
+            {Array.from({ length: 40 }).map((_, i) => {
+              const a = (i / 40) * Math.PI * 2;
+              return (
+                <line
+                  key={i}
+                  x1={100 + Math.cos(a) * 92}
+                  y1={100 + Math.sin(a) * 92}
+                  x2={100 + Math.cos(a) * (i % 5 === 0 ? 84 : 88)}
+                  y2={100 + Math.sin(a) * (i % 5 === 0 ? 84 : 88)}
+                />
+              );
+            })}
+          </g>
         </svg>
       </motion.div>
+
+      <div className="relative z-10 flex flex-col items-center text-center px-[10vw]">
+        <motion.div
+          className="flex items-center gap-[1.4vw] mb-[2.2vh]"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <svg width="64" height="64" viewBox="0 0 64 64" className="w-[4.2vw] h-[4.2vw]">
+            <circle cx="32" cy="32" r="28" fill="none" stroke="#133069" strokeWidth="2.5" />
+            <circle cx="32" cy="32" r="16" fill="none" stroke="#ED7A2A" strokeWidth="2.5" />
+            <circle cx="32" cy="32" r="4" fill="#133069" />
+          </svg>
+          <span
+            className="text-[1.1vw] uppercase tracking-[0.4em] font-semibold"
+            style={{ color: '#6B7384', fontFamily: 'var(--font-display)' }}
+          >
+            Idália · Medicina Fetal
+          </span>
+        </motion.div>
+
+        <motion.h1
+          className="text-[8.5vw] leading-[0.95] font-bold"
+          style={{
+            color: '#0E2350',
+            fontFamily: 'var(--font-display)',
+            letterSpacing: '-0.04em',
+          }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Precisão clínica<motion.span
+            className="inline-block ml-[0.6vw]"
+            style={{ color: '#ED7A2A' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.6, duration: 0.4 }}
+          >.</motion.span>
+        </motion.h1>
+
+        <motion.p
+          className="mt-[2.6vh] text-[1.7vw] max-w-[58vw]"
+          style={{ color: '#3A4865', fontFamily: 'var(--font-body)', lineHeight: 1.45 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 1.9, ease: [0.16, 1, 0.3, 1] }}
+        >
+          A plataforma de cálculos para medicina fetal e saúde reprodutiva.
+        </motion.p>
+      </div>
     </motion.div>
   );
 }
