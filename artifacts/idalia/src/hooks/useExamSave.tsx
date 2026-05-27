@@ -1,5 +1,5 @@
 import { useAuth } from "./useAuth";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 import { toast } from "sonner";
 
 type CalcType =
@@ -36,8 +36,12 @@ export function useExamSave() {
         }),
       });
       toast.success("Exame salvo no histórico");
-    } catch {
-      toast.error("Erro ao salvar exame no histórico");
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        toast.error("Assinatura necessária", { description: "Assine um plano para usar as calculadoras premium." });
+      } else {
+        toast.error("Erro ao salvar exame no histórico");
+      }
     }
   };
 

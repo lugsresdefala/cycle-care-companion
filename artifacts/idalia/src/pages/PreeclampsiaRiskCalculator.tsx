@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const PreeclampsiaRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate("preeclampsia_risk");
+  const { blocked, needsLogin, subscription } = useTokenGate("preeclampsia_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
@@ -69,8 +69,7 @@ const PreeclampsiaRiskCalculator = () => {
       if (piVal < 0.3 || piVal > 5.0) { setError("IP art. uterinas deve estar entre 0,3 e 5,0."); return; }
     }
 
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin) return;
     setError("");
 
     const input: PreeclampsiaInput = {
@@ -257,7 +256,7 @@ const PreeclampsiaRiskCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <HeartPulse className="w-4 h-4 mr-1" /> Calcular Risco de PE
         </Button>
       </div>

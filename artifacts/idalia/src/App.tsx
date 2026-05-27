@@ -90,8 +90,8 @@ const App = () => (
               <Route path="/efw" element={<EFWCalculator />} />
               <Route path="/doppler" element={<DopplerCalculator />} />
               <Route path="/growth-curve" element={<GrowthCurveCalculator />} />
-              <Route path="/trisomy-risk" element={<TrisomyRiskCalculator />} />
-              <Route path="/preeclampsia-risk" element={<PreeclampsiaRiskCalculator />} />
+              <Route path="/trisomy-risk" element={<ProtectedRoute><TrisomyRiskCalculator /></ProtectedRoute>} />
+              <Route path="/preeclampsia-risk" element={<ProtectedRoute><PreeclampsiaRiskCalculator /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
