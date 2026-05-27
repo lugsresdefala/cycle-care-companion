@@ -81,6 +81,11 @@ export default function ProfileTab() {
       setSpecialty(profileQ.data.specialty ?? "");
       setCrm(profileQ.data.crmNumber ?? "");
       setPhone(profileQ.data.phone ?? "");
+    } else {
+      setFullName("");
+      setSpecialty("");
+      setCrm("");
+      setPhone("");
     }
   }, [profileQ.data]);
 
