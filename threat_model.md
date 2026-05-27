@@ -32,6 +32,8 @@ The current production deployment is public (`https://idcalc.com`). Per deployme
 - **Highest-risk client areas:** `artifacts/idalia/src/App.tsx`, calculator pages under `artifacts/idalia/src/pages/`, token/subscription hooks under `artifacts/idalia/src/hooks/`
 - **Shared data and authorization model:** `lib/db/src/schema/index.ts`, `lib/api-spec/openapi.yaml`
 - **Auth/bootstrap caveat:** `requireAuth()` in `artifacts/api-server/src/lib/auth.ts` performs profile and free-trial bootstrap side effects before protected routes run, including on authenticated `GET` requests.
+- **Billing-binding caveat:** `artifacts/api-server/src/routes/stripe.ts` falls back to recovering Stripe customers by email when a local `stripeCustomerId` is missing, so future scans should verify account binding and webhook reconciliation carefully.
+- **Mobile-session caveat:** `artifacts/idalia-mobile/app/_layout.tsx` uses a process-wide TanStack Query client while generated mobile query keys in `lib/api-client-react/src/generated/api.ts` are route-based rather than user-scoped, so auth-bound cache clearing remains a recurring risk area.
 - **Usually ignore unless proven reachable in production:** `artifacts/mockup-sandbox`, `artifacts/pitch-deck*`, `artifacts/idalia-promo`, `.migration-backup`, most build scripts under `scripts/` and `artifacts/*/scripts/`
 
 ## Threat Categories
