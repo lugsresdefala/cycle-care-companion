@@ -63,7 +63,7 @@ export function Scene1() {
             className="text-[1.1vw] uppercase tracking-[0.4em] font-semibold"
             style={{ color: '#6B7384', fontFamily: 'var(--font-display)' }}
           >
-            Idália · Medicina Fetal
+            IdaliaCalc · Medicina Fetal
           </span>
         </motion.div>
 
@@ -78,8 +78,8 @@ export function Scene1() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          Precisão clínica<motion.span
-            className="inline-block ml-[0.6vw]"
+          IdaliaCalc<motion.span
+            className="inline-block ml-[0.4vw]"
             style={{ color: '#ED7A2A' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -88,13 +88,13 @@ export function Scene1() {
         </motion.h1>
 
         <motion.p
-          className="mt-[2.6vh] text-[1.7vw] max-w-[58vw]"
+          className="mt-[2.6vh] text-[1.7vw] max-w-[60vw]"
           style={{ color: '#3A4865', fontFamily: 'var(--font-body)', lineHeight: 1.45 }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 1.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          A plataforma de cálculos para medicina fetal e saúde reprodutiva.
+          Cálculos clínicos para medicina fetal e saúde reprodutiva.
         </motion.p>
       </div>
     </motion.div>

@@ -7,22 +7,25 @@ import { Scene3 } from './video_scenes/Scene3';
 import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
 import { Scene6 } from './video_scenes/Scene6';
+import { Scene7 } from './video_scenes/Scene7';
 import { SCENE_CAPTIONS } from './captions';
 
 export const SCENE_DURATIONS = {
-  hook: 7000,
-  dating: 11000,
-  biometry: 13500,
-  growth: 8500,
-  records: 8000,
-  outro: 6000,
+  hook: 6500,
+  suite: 13000,
+  dating: 10500,
+  biometry: 12000,
+  result: 7000,
+  records: 7500,
+  outro: 5000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   hook: Scene1,
+  suite: Scene7,
   dating: Scene2,
   biometry: Scene3,
-  growth: Scene4,
+  result: Scene4,
   records: Scene5,
   outro: Scene6,
 };

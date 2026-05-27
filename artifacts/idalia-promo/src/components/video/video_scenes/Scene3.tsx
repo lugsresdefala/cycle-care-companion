@@ -32,7 +32,7 @@ export function Scene3() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
         >
-          02 · Biometria fetal
+          03 · Biometria fetal
         </motion.div>
         <motion.h2
           className="text-[4vw] leading-[1.05] font-bold mb-[2.4vh]"

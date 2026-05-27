@@ -131,7 +131,7 @@ export function Scene2() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
           >
-            01 · Datação
+            02 · Datação
           </motion.div>
           <motion.h2
             className="text-[4.2vw] leading-[1.05] font-bold mb-[3vh]"

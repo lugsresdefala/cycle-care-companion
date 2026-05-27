@@ -39,7 +39,7 @@ export function Scene6() {
             className="text-[6vw] font-bold leading-none"
             style={{ color: '#0E2350', fontFamily: 'var(--font-display)', letterSpacing: '-0.04em' }}
           >
-            Idália<span style={{ color: '#ED7A2A' }}> Calc</span>
+            Idalia<span style={{ color: '#ED7A2A' }}>Calc</span>
           </span>
         </motion.div>
 
@@ -58,7 +58,7 @@ export function Scene6() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-          Saúde reprodutiva e medicina fetal.
+          Sua plataforma de medicina fetal.
         </motion.p>
       </div>
     </motion.div>

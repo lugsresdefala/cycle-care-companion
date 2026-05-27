@@ -32,7 +32,7 @@ export function Scene5() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          04 · Prontuário
+          05 · Prontuário
         </motion.div>
         <motion.h2
           className="text-[3.8vw] leading-[1.05] font-bold mb-[2.4vh]"

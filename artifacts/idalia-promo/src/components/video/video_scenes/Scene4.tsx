@@ -37,7 +37,7 @@ export function Scene4() {
 
   return (
     <motion.div
-      key="scene-growth"
+      key="scene-result"
       className="absolute inset-0 z-10 flex items-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -53,29 +53,20 @@ export function Scene4() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            03 · Crescimento
+            04 · Resultado
           </motion.div>
           <motion.h2
-            className="text-[3.8vw] leading-[1.05] font-bold mb-[2.4vh]"
+            className="text-[3.6vw] leading-[1.05] font-bold mb-[2.4vh]"
             style={{ color: '#0E2350', fontFamily: 'var(--font-display)', letterSpacing: '-0.03em' }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.4 }}
           >
-            Percentil em<br />tempo real.
+            Percentil,<br />classificação<br />e orientação.
           </motion.h2>
-          <motion.p
-            className="text-[1.15vw]"
-            style={{ color: '#3A4865', fontFamily: 'var(--font-body)', lineHeight: 1.5, maxWidth: '22vw' }}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-          >
-            Curvas de crescimento INTERGROWTH-21st aplicadas a cada exame.
-          </motion.p>
 
           <motion.div
-            className="mt-[3vh] inline-flex items-center gap-[0.8vw] rounded-full px-[1.4vw] py-[1vh]"
+            className="mt-[1vh] inline-flex items-center gap-[0.8vw] rounded-full px-[1.4vw] py-[1vh]"
             style={{ background: '#0E2350', color: '#FFFFFF' }}
             initial={{ opacity: 0, scale: 0.92 }}
             animate={point.visible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.92 }}
@@ -83,11 +74,36 @@ export function Scene4() {
           >
             <span className="w-[0.7vw] h-[0.7vw] rounded-full" style={{ background: '#ED7A2A' }} />
             <span className="text-[1.1vw] font-semibold" style={{ fontFamily: 'var(--font-display)' }}>
-              Percentil 52
+              P52 · AIG
             </span>
             <span className="text-[0.9vw] opacity-75" style={{ fontFamily: 'var(--font-body)' }}>
               · adequado para IG
             </span>
+          </motion.div>
+
+          <motion.div
+            className="mt-[2.4vh] rounded-2xl px-[1.4vw] py-[1.6vh]"
+            style={{
+              background: '#F5F6F9',
+              border: '1px solid #E1E6F1',
+              maxWidth: '24vw',
+            }}
+            initial={{ opacity: 0, y: 14 }}
+            animate={point.visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+            transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div
+              className="text-[0.75vw] uppercase tracking-[0.3em] font-bold mb-[0.6vh]"
+              style={{ color: '#ED7A2A', fontFamily: 'var(--font-display)' }}
+            >
+              Orientação clínica
+            </div>
+            <div
+              className="text-[0.95vw] leading-[1.45]"
+              style={{ color: '#0E2350', fontFamily: 'var(--font-body)' }}
+            >
+              Crescimento dentro da faixa esperada. Repetir biometria fetal em 14 dias.
+            </div>
           </motion.div>
         </div>
 
