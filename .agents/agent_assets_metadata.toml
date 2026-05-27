@@ -48,3 +48,9 @@ id = "TAE4W0e8y2jEubLr8sBXb"
 uri = "file://artifacts/idalia-promo/public/audio/vo/growth.mp3"
 type = "audio"
 title = "idalia-vo-growth"
+
+[[outputs]]
+id = "qJd0ZFhoXwmhBfGSfcx4J"
+uri = "file://artifacts/idalia-promo/exports/idalia_promo.mp4"
+type = "video"
+title = "IDALIA Promo Video (60s, with music)"
