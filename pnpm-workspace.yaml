@@ -75,6 +75,11 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  # Dedupe @types/react to a single version (transitive deps like zustand and
+  # react-native peer-depend on 19.1.x; force everything to catalog 19.2.x to
+  # prevent "Two different types with this name exist" build failures).
+  "@types/react": "^19.2.0"
+  "@types/react-dom": "^19.2.0"
   # replit uses linux-x64 only, we can exclude all other platforms
   "esbuild>@esbuild/darwin-arm64": "-"
   "esbuild>@esbuild/darwin-x64": "-"

@@ -3,13 +3,11 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
-if (!rawPort) throw new Error("PORT environment variable is required.");
+const rawPort = process.env.PORT ?? "5000";
 const port = Number(rawPort);
 if (Number.isNaN(port) || port <= 0) throw new Error(`Invalid PORT: "${rawPort}"`);
 
-const basePath = process.env.BASE_PATH;
-if (!basePath) throw new Error("BASE_PATH environment variable is required.");
+const basePath = process.env.BASE_PATH ?? "/";
 
 // API target — the api-server artifact runs on its own port and BASE_PATH.
 const apiTarget = process.env.API_PROXY_TARGET ?? "http://localhost:8080";

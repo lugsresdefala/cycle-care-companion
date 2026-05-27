@@ -4,13 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+// PORT is only required for `vite` (dev) and `vite preview` (serve).
+// `vite build` produces static assets and does not bind a port, so we fall
+// back to a sentinel value to avoid blocking production builds.
+const rawPort = process.env.PORT ?? "5000";
 
 const port = Number(rawPort);
 
@@ -18,13 +15,9 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
-}
+// BASE_PATH is injected by the artifact runtime; during `vite build` we fall
+// back to the artifact's known public path so production builds aren't blocked.
+const basePath = process.env.BASE_PATH ?? "/pitch-deck/";
 
 export default defineConfig({
   base: basePath,
