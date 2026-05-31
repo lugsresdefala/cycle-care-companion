@@ -193,7 +193,11 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
           const userId =
             (sub.metadata?.user_id as string) ||
             (await lookupUserIdBySub(subId, sub.customer as string));
-          if (userId) await syncSubscription(userId, subId, sub, true);
+          // Only replenish tokens on genuine billing-cycle renewals, not on
+          // subscription updates, upgrades, or other invoice triggers.
+          // @ts-ignore
+          const isRenewal = (inv.billing_reason as string) === "subscription_cycle";
+          if (userId) await syncSubscription(userId, subId, sub, isRenewal);
         }
         break;
       }
@@ -261,7 +265,7 @@ async function syncSubscription(
     .limit(1);
 
   if (existing[0]) {
-    const updateFields: Record<string, unknown> = {
+    const fields: Record<string, unknown> = {
       planId: plan[0].id,
       status,
       endDate,
@@ -269,11 +273,11 @@ async function syncSubscription(
       updatedAt: new Date(),
     };
     if (resetTokens) {
-      updateFields.tokensRemaining = plan[0].tokensPerPeriod;
+      fields.tokensRemaining = plan[0].tokensPerPeriod;
     }
     await db
       .update(userSubscriptions)
-      .set(updateFields)
+      .set(fields)
       .where(eq(userSubscriptions.id, existing[0].id));
   } else {
     await db.insert(userSubscriptions).values({
