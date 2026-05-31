@@ -10,6 +10,7 @@ import {
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const planTierEnum = pgEnum("plan_tier", [
   "free_trial",
@@ -113,6 +114,12 @@ export const userSubscriptions = pgTable(
   (t) => [
     index("idx_user_subscriptions_doctor").on(t.doctorId),
     index("idx_user_subscriptions_status").on(t.status, t.endDate),
+    uniqueIndex("idx_user_subscriptions_stripe_customer_unique")
+      .on(t.stripeCustomerId)
+      .where(sql`stripe_customer_id != ''`),
+    uniqueIndex("idx_user_subscriptions_stripe_subscription_unique")
+      .on(t.stripeSubscriptionId)
+      .where(sql`stripe_subscription_id != ''`),
   ],
 );
 

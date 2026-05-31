@@ -38,11 +38,6 @@ router.post("/stripe/checkout", requireAuth, async (req, res): Promise<any> => {
       .limit(1);
     let customerId = existing[0]?.stripeCustomerId || undefined;
 
-    if (!customerId && email) {
-      const customers = await stripe.customers.list({ email, limit: 1 });
-      if (customers.data.length > 0) customerId = customers.data[0].id;
-    }
-
     const origin = resolveOrigin(req);
     const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
     const bucket = Math.floor(Date.now() / 60000);
@@ -87,10 +82,6 @@ router.post("/stripe/portal", requireAuth, async (req, res): Promise<any> => {
       .orderBy(desc(userSubscriptions.createdAt))
       .limit(1);
     let customerId = subs[0]?.stripeCustomerId || undefined;
-    if (!customerId && email) {
-      const customers = await stripe.customers.list({ email, limit: 1 });
-      if (customers.data.length > 0) customerId = customers.data[0].id;
-    }
     if (!customerId) {
       return res.status(404).json({
         error: "no_customer",
