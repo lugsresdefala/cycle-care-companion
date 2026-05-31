@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, examHistory, patients } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { requireAuth, type AuthedRequest } from "../lib/auth";
+import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 
 const PREMIUM_CALC_TYPES = ["trisomy_risk", "preeclampsia_risk"] as const;
 
@@ -22,7 +22,7 @@ router.get("/exams", requireAuth, async (req, res): Promise<any> => {
   res.json(rows);
 });
 
-router.post("/exams", requireAuth, async (req, res): Promise<any> => {
+router.post("/exams", requireBootstrap, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
   const {
     patientId,

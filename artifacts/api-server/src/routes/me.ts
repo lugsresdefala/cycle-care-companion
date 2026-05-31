@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, profiles } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { requireAuth, isAdmin, type AuthedRequest } from "../lib/auth";
+import { requireAuth, requireBootstrap, isAdmin, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -20,7 +20,7 @@ router.get("/me", requireAuth, async (req, res): Promise<any> => {
   });
 });
 
-router.patch("/me", requireAuth, async (req, res): Promise<any> => {
+router.patch("/me", requireBootstrap, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
   const { fullName, specialty, crmNumber, phone } = req.body || {};
   const update: any = {};

@@ -9,12 +9,12 @@ import {
   stripeCheckoutAttempts,
 } from "@workspace/db";
 import { eq, desc, and } from "drizzle-orm";
-import { requireAuth, type AuthedRequest } from "../lib/auth";
+import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 import { stripe, resolveOrigin, PRODUCT_TIER_MAP } from "../lib/stripe";
 
 const router: IRouter = Router();
 
-router.post("/stripe/checkout", requireAuth, async (req, res): Promise<any> => {
+router.post("/stripe/checkout", requireBootstrap, async (req, res): Promise<any> => {
   try {
     const userId = (req as AuthedRequest).userId;
     const email = (req as AuthedRequest).userEmail;
@@ -71,7 +71,7 @@ router.post("/stripe/checkout", requireAuth, async (req, res): Promise<any> => {
   }
 });
 
-router.post("/stripe/portal", requireAuth, async (req, res): Promise<any> => {
+router.post("/stripe/portal", requireBootstrap, async (req, res): Promise<any> => {
   try {
     const userId = (req as AuthedRequest).userId;
     const email = (req as AuthedRequest).userEmail;

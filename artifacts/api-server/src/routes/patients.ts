@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, patients } from "@workspace/db";
 import { eq, and, desc } from "drizzle-orm";
-import { requireAuth, type AuthedRequest } from "../lib/auth";
+import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -15,7 +15,7 @@ router.get("/patients", requireAuth, async (req, res): Promise<any> => {
   res.json(rows);
 });
 
-router.post("/patients", requireAuth, async (req, res): Promise<any> => {
+router.post("/patients", requireBootstrap, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
   const { name, age, medicalRecordId, notes } = req.body || {};
   if (!name) return res.status(400).json({ error: "name required" });
