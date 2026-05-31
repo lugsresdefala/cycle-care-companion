@@ -3,7 +3,7 @@ import { db, examHistory, patients } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 
-const PREMIUM_CALC_TYPES = ["trisomy_risk", "preeclampsia_risk"] as const;
+const PREMIUM_CALC_TYPES = new Set(["trisomy_risk", "preeclampsia_risk"]);
 
 const router: IRouter = Router();
 
@@ -46,24 +46,34 @@ router.post("/exams", requireBootstrap, async (req, res): Promise<any> => {
     }
   }
 
-  if ((PREMIUM_CALC_TYPES as readonly string[]).includes(calcType)) {
+  // Premium calc types require an active subscription with tokens; deduct one atomically
+  if (PREMIUM_CALC_TYPES.has(calcType)) {
     const now = new Date();
-    const rows = await db.execute(sql`
-      SELECT id FROM user_subscriptions
-      WHERE doctor_id = ${userId}
-        AND (status = 'active' OR status = 'trial')
-        AND end_date > ${now}
-      ORDER BY created_at DESC
-      LIMIT 1
+    const updated = await db.execute(sql`
+      UPDATE user_subscriptions
+      SET tokens_remaining = tokens_remaining - 1,
+          tokens_used = tokens_used + 1,
+          updated_at = now()
+      WHERE id = (
+        SELECT id FROM user_subscriptions
+        WHERE doctor_id = ${userId}
+          AND (status = 'active' OR status = 'trial')
+          AND end_date > ${now}
+          AND tokens_remaining > 0
+        ORDER BY created_at DESC
+        LIMIT 1
+        FOR UPDATE
+      )
+      RETURNING tokens_remaining
     `);
     // @ts-ignore
-    const subRow = (rows.rows ?? rows)[0];
-    if (!subRow) {
-      return res.status(402).json({ error: "Active subscription required for premium calculators" });
+    const tokenRow = (updated.rows ?? updated)[0];
+    if (!tokenRow) {
+      return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
     }
   }
 
-  const [row] = await db
+  const [examRow] = await db
     .insert(examHistory)
     .values({
       doctorId: userId,
@@ -76,7 +86,7 @@ router.post("/exams", requireBootstrap, async (req, res): Promise<any> => {
       notes: notes ?? "",
     })
     .returning();
-  res.json(row);
+  res.json(examRow);
 });
 
 router.delete("/exams/:id", requireAuth, async (req, res): Promise<any> => {
