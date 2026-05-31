@@ -58,7 +58,10 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       email = e as string;
       fullName = f as string;
     } catch {}
-    await ensureProfileAndTrial(userId, email, fullName);
+    const safeMethods = new Set(["GET", "HEAD", "OPTIONS"]);
+    if (!safeMethods.has(req.method)) {
+      await ensureProfileAndTrial(userId, email, fullName);
+    }
     (req as AuthedRequest).userId = userId;
     (req as AuthedRequest).userEmail = email;
     next();
