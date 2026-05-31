@@ -20,8 +20,8 @@ interface SaveExamParams {
 export function useExamSave() {
   const { user } = useAuth();
 
-  const saveExam = async (params: SaveExamParams) => {
-    if (!user) return;
+  const saveExam = async (params: SaveExamParams): Promise<boolean> => {
+    if (!user) return false;
     try {
       await apiFetch("/exams", {
         method: "POST",
@@ -36,12 +36,14 @@ export function useExamSave() {
         }),
       });
       toast.success("Exame salvo no histórico");
+      return true;
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
         toast.error("Assinatura necessária", { description: "Assine um plano para usar as calculadoras premium." });
       } else {
         toast.error("Erro ao salvar exame no histórico");
       }
+      return false;
     }
   };
 

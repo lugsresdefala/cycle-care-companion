@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, examHistory } from "@workspace/db";
+import { db, examHistory, patients } from "@workspace/db";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 
@@ -34,6 +34,17 @@ router.post("/exams", requireAuth, async (req, res): Promise<any> => {
     notes,
   } = req.body || {};
   if (!calcType) return res.status(400).json({ error: "calcType required" });
+
+  if (patientId) {
+    const [patient] = await db
+      .select({ id: patients.id })
+      .from(patients)
+      .where(and(eq(patients.id, String(patientId)), eq(patients.doctorId, userId)))
+      .limit(1);
+    if (!patient) {
+      return res.status(403).json({ error: "Patient not found or access denied" });
+    }
+  }
 
   if ((PREMIUM_CALC_TYPES as readonly string[]).includes(calcType)) {
     const now = new Date();

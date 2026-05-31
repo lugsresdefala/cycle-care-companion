@@ -69,7 +69,7 @@ const TrisomyRiskCalculator = () => {
       return;
     }
 
-    if (loading || blocked || needsLogin) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
 
     const granted = await consumeToken();
@@ -87,16 +87,18 @@ const TrisomyRiskCalculator = () => {
     };
 
     const result = calculateTrisomyRisk(input);
-    setResults(result);
 
     if (canSave) {
-      saveExam({
+      const saved = await saveExam({
         calcType: "trisomy_risk",
         inputData: input as unknown as Record<string, unknown>,
         resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
+      if (!saved) return;
     }
+
+    setResults(result);
   };
 
   const formatRisk = (risk: number) => `1 : ${risk.toLocaleString("pt-BR")}`;
@@ -278,7 +280,7 @@ const TrisomyRiskCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={loading || blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <ShieldAlert className="w-4 h-4 mr-1" /> Calcular Risco
         </Button>
       </div>
