@@ -46,6 +46,7 @@ const TrisomyRiskCalculator = () => {
 
   const [error, setError] = useState("");
   const [results, setResults] = useState<TrisomyResult | null>(null);
+  const [calculating, setCalculating] = useState(false);
 
   const handleCalculate = async () => {
     const ageVal = parseFloat(maternalAge);
@@ -71,6 +72,7 @@ const TrisomyRiskCalculator = () => {
 
     if (blocked || needsLogin || loading) return;
     setError("");
+    setCalculating(true);
 
     const granted = await consumeToken();
     if (!granted) return;
@@ -95,9 +97,13 @@ const TrisomyRiskCalculator = () => {
         resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
-      if (!saved) return;
+      if (!saved) {
+        setCalculating(false);
+        return;
+      }
     }
 
+    setCalculating(false);
     setResults(result);
   };
 
@@ -280,8 +286,8 @@ const TrisomyRiskCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <ShieldAlert className="w-4 h-4 mr-1" /> Calcular Risco
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <ShieldAlert className="w-4 h-4 mr-1" /> {calculating ? "Calculando…" : "Calcular Risco"}
         </Button>
       </div>
 

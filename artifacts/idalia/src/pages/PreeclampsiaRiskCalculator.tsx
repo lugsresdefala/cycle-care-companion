@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const PreeclampsiaRiskCalculator = () => {
-  const { blocked, needsLogin, loading, subscription } = useTokenGate("preeclampsia_risk");
+  const { blocked, needsLogin, consuming, loading, subscription, consumeToken } = useTokenGate("preeclampsia_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
@@ -46,6 +46,7 @@ const PreeclampsiaRiskCalculator = () => {
 
   const [error, setError] = useState("");
   const [results, setResults] = useState<PreeclampsiaResult | null>(null);
+  const [calculating, setCalculating] = useState(false);
 
   const handleCalculate = async () => {
     const ageVal = parseFloat(maternalAge);
@@ -71,6 +72,7 @@ const PreeclampsiaRiskCalculator = () => {
 
     if (blocked || needsLogin || loading) return;
     setError("");
+    setCalculating(true);
 
     const granted = await consumeToken();
     if (!granted) return;
@@ -102,9 +104,13 @@ const PreeclampsiaRiskCalculator = () => {
         resultData: result as unknown as Record<string, unknown>,
         patientId: selectedPatientId,
       });
-      if (!saved) return;
+      if (!saved) {
+        setCalculating(false);
+        return;
+      }
     }
 
+    setCalculating(false);
     setResults(result);
   };
 
@@ -261,8 +267,8 @@ const PreeclampsiaRiskCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <HeartPulse className="w-4 h-4 mr-1" /> Calcular Risco de PE
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <HeartPulse className="w-4 h-4 mr-1" /> {calculating ? "Calculando…" : "Calcular Risco de PE"}
         </Button>
       </div>
 
