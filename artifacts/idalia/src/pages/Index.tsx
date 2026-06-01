@@ -350,7 +350,7 @@ const Index = () => {
                     onClick={() => navigate("/sign-up")}
                     className="gap-2 w-full sm:w-auto"
                   >
-                    Criar conta grátis
+                    Criar conta
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                   <Button
