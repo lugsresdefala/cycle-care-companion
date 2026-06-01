@@ -342,6 +342,28 @@ const Index = () => {
                 Calculadoras clínicas de biometria e datação gestacional,
                 fundamentadas em diretrizes internacionais.
               </p>
+
+              {!user && (
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <Button
+                    size="lg"
+                    onClick={() => navigate("/sign-up")}
+                    className="gap-2 w-full sm:w-auto"
+                  >
+                    Criar conta grátis
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => navigate("/sign-in")}
+                    className="gap-2 w-full sm:w-auto"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Entrar
+                  </Button>
+                </div>
+              )}
             </motion.div>
 
             {/* ── Calculator sections ── */}
