@@ -1,13 +1,11 @@
-import { BookOpen, Scale, Shield, ExternalLink, Stethoscope } from "lucide-react";
+import { BookOpen, Scale, Shield, ExternalLink } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { apiFetch } from "@/lib/api";
 
 export interface Reference {
   authors: string;
@@ -34,26 +32,7 @@ const DEFAULT_UNITS = [
 ];
 
 const ScientificFooter = ({ references, units, extraDisclaimer }: ScientificFooterProps) => {
-  const { user } = useAuth();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-  const [profile, setProfile] = useState<{ fullName: string; crmNumber: string } | null>(null);
-
-  useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      return;
-    }
-    apiFetch<any>("/me")
-      .then((data) => {
-        if (data) {
-          setProfile({
-            fullName: data.fullName || "",
-            crmNumber: data.crmNumber || "",
-          });
-        }
-      })
-      .catch(() => setProfile(null));
-  }, [user]);
 
   const toggle = (key: string) =>
     setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -63,34 +42,8 @@ const ScientificFooter = ({ references, units, extraDisclaimer }: ScientificFoot
   const getPubmedUrl = (id: string) => `https://pubmed.ncbi.nlm.nih.gov/${id}/`;
   const getDoiUrl = (doi: string) => `https://doi.org/${doi}`;
 
-  const hasResponsible = profile && (profile.fullName.trim() || profile.crmNumber.trim());
-
   return (
     <div className="space-y-3 mt-8">
-      {/* Responsible physician */}
-      {hasResponsible && (
-        <div className="glass-card-static p-4 border-primary/20">
-          <div className="flex items-start gap-2.5">
-            <Stethoscope className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-            <div className="space-y-0.5">
-              <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-                Médico(a) responsável
-              </h4>
-              {profile.fullName.trim() && (
-                <p className="text-sm text-foreground font-medium leading-snug">
-                  {profile.fullName.trim()}
-                </p>
-              )}
-              {profile.crmNumber.trim() && (
-                <p className="text-xs text-muted-foreground leading-snug">
-                  CRM {profile.crmNumber.trim()}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Legal Disclaimer */}
       <div className="glass-card-static p-4 border-destructive/20">
         <div className="flex items-start gap-2.5">

@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import GlobalFooter from "@/components/GlobalFooter";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -95,6 +96,7 @@ const App = () => (
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <GlobalFooter />
           </Suspense>
           </ErrorBoundary>
         </BrowserRouter>
