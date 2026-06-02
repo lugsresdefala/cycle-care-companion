@@ -25,7 +25,8 @@ const fetalDevelopment: Record<number, { size: string; weight: string; length: s
   24: { size: "Espiga de milho",    weight: "600g",  length: "30cm",   milestone: "Viabilidade fetal" },
   28: { size: "Berinjela",          weight: "1kg",   length: "37.6cm", milestone: "Abre e fecha os olhos" },
   32: { size: "Abóbora",            weight: "1.7kg", length: "42.4cm", milestone: "Ossos endurecendo" },
-  36: { size: "Melão",              weight: "2.6kg", length: "47.4cm", milestone: "Considerado a termo" },
+  36: { size: "Melão",              weight: "2.6kg", length: "47.4cm", milestone: "Pré-termo tardio" },
+  37: { size: "Alface romana",      weight: "2.9kg", length: "48.6cm", milestone: "Considerado a termo (≥ 37 semanas)" },
   40: { size: "Melancia",           weight: "3.5kg", length: "51.2cm", milestone: "Nascimento esperado" },
 };
 
