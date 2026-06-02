@@ -1,1 +1,2 @@
 - [react-day-picker v9 classNames](react-day-picker-v9.md) — calendar.tsx must use v9 keys (day=wrapper, day_button=button, Chevron); v8 keys silently break alignment
+- [Clerk web proxyUrl](clerk-web-proxyurl.md) — prod auth breaks if web ClerkProvider omits proxyUrl/publishableKeyFromHost; dev still works (false-healthy).

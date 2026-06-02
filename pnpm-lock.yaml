@@ -248,6 +248,9 @@ importers:
       '@clerk/clerk-react':
         specifier: ^5.61.6
         version: 5.61.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared':
+        specifier: ^4.13.1
+        version: 4.13.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@supabase/supabase-js':
         specifier: ^2.106.2
         version: 2.106.2
