@@ -45,8 +45,9 @@ export function gestationalAgeFromMultipleBiometry(params: {
   }
 
   if (params.hc && params.hc >= 50 && params.hc <= 380) {
-    // HC: GA = 8.96 + 0.540 × HC + 0.0003 × HC² (HC in mm, Hadlock 1984)
-    const gaWeeks = 8.96 + 0.0540 * params.hc + 0.000003 * params.hc * params.hc;
+    // HC → GA (Hadlock 1984): MA = 8.96 + 0.540 × HC + 0.0003 × HC³ (HC in cm)
+    const hcCm = params.hc / 10;
+    const gaWeeks = 8.96 + 0.540 * hcCm + 0.0003 * hcCm * hcCm * hcCm;
     const totalDays = Math.round(gaWeeks * 7);
     estimates.push({ label: "CC", weeks: Math.floor(totalDays / 7), days: totalDays % 7, totalDays });
   }
