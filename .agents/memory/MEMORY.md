@@ -1,2 +1,3 @@
 - [react-day-picker v9 classNames](react-day-picker-v9.md) — calendar.tsx must use v9 keys (day=wrapper, day_button=button, Chevron); v8 keys silently break alignment
 - [Clerk web proxyUrl](clerk-web-proxyurl.md) — prod auth breaks if web ClerkProvider omits proxyUrl/publishableKeyFromHost; dev still works (false-healthy).
+- [INTERGROWTH tables inflated](intergrowth-tables-inflated.md) — idalia growth/percentile tables shipped inflated 10-75% vs official; verify against anchors, never trust AI-summarized values.
