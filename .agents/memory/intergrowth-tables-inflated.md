@@ -1,28 +1,31 @@
 ---
-name: INTERGROWTH-21st reference tables are inflated (idalia)
-description: The growth-curve/percentile reference tables in idalia are wrong (inflated), causing bad percentile classification. Do not trust them; verify against official anchors.
+name: INTERGROWTH-21st fetal tables — authoritative source & extraction
+description: Where the official INTERGROWTH-21st fetal growth centiles come from and how to re-extract them verbatim (avoid AI-synthesized medical values).
 ---
 
-# IDALIA INTERGROWTH-21st tables were inflated vs official values
+# INTERGROWTH-21st fetal growth standards (IDALIA)
 
-`artifacts/idalia/src/lib/intergrowth.ts` shipped EFW/HC/AC/FL/BPD centile tables
-that are systematically INFLATED vs the official INTERGROWTH-21st published values
-(by ~10–75%). This is the root cause of the clinician's "diversas inconsistências
-e erros graves" in the growth-curve / percentile calculators.
+The web app's `artifacts/idalia/src/lib/intergrowth.ts` percentile tables (EFW/HC/AC/FL/BPD,
+P3/P10/P50/P90/P97) were once grossly inflated (e.g. EFW p50@32w ≈ 2982 vs official 1755;
+p97@40w an impossible 6896 g). They have been replaced with the **official published values**.
 
-**Evidence (50th centile, official vs app):**
-- EFW 32wk: 1726 g official vs 2982 g app (+73%); 24wk 639 vs 868; 40wk 3338 vs 4524.
-- AC 32wk: 283 mm official vs 409 mm app (+44%). HC 40wk: 344 vs 418 (+22%).
+**Rule:** never hand-type or AI-synthesize these medical reference numbers. webSearch only gives
+structure + a few anchors, not the full coefficient/centile set.
 
-**Why it matters:** inflated medians/centiles classify normal fetuses as large and
-mask true growth restriction (CIUR) — a safety issue.
+**Authoritative source & how to re-extract (verifiable):**
+- The `gigs` R package (github `lshtm-gigs/gigs`, `data-raw/ig_fet.R`) points to the official
+  Oxford centile-table PDFs on `media.tghn.org`:
+  - EFW centiles: `2017/12/GROW_EFW_ct_Table_values.pdf` (GA **22–40 wk only**).
+  - Biometry: `2017/03/GROW_Fetal-ct_<hc|ac|fl|bpd|ofd>_Table.pdf` (GA **14–40 wk**).
+  - PDF column order is `GA, P3, P5, P10, P50, P90, P95, P97`.
+- Extract with **positional** parsing (pdfjs `getTextContent`, bucket items by y-row, sort by x).
+  Plain `pdf-parse` concatenates the digits and is ambiguous — do not trust it for the numbers.
+- Validate against anchors before shipping: EFW p50 40w = **3338** (exact), 32w = 1755, 24w = 669.
 
-**How to apply:** Any fix MUST use the official INTERGROWTH-21st published centile
-tables (P3/P10/P50/P90/P97, GA 14–40), NOT AI-summarized numbers. Validate against
-known anchors before trusting: EFW p50 639@24w, 1726@32w, 3338@40w; HC p50 176@20w,
-298@32w, 344@40w; AC p50 148@20w, 283@32w, 362@40w; FL p50 33@20w, 63@32w, 76@40w.
-Separately, `biometry.ts getEFWPercentiles` is a SECOND, roughly-Hadlock EFW
-percentile source (~reasonable) that diverges from the intergrowth.ts table — unify
-to one source. EFW *formula* (Hadlock 3-param HC,AC,FL) is correct and matches the
-INTERGROWTH-21st 2020 recommendation, so keep it. The CC→IG (HC→GA) formula bug
-(quadratic+mm instead of Hadlock cubic+cm) was already fixed.
+**App consequences of the real ranges:**
+- EFW standard is undefined < 22 wk → `GROWTH_PARAMS` efw `minGA: 22`; `getEFWPercentiles` returns
+  `null` below 22 wk. `getEFWPercentiles` (biometry.ts) now reads the same official EFW table
+  (single source) instead of its own simplified curve.
+
+**Why:** this is a live clinical tool (idcalc.com); inflated tables cause both false IUGR alarms
+and missed macrosomia. Correctness of the reference data outweighs convenience.

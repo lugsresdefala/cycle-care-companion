@@ -3,9 +3,15 @@
  * References: Hadlock et al. (1984, 1985), Robinson & Fleming (1975), Shepard (1982)
  */
 
+import { getGrowthData } from "./intergrowth";
+
 // ---- CRL → Gestational Age (Robinson & Fleming 1975) ----
 // GA (days) = 8.052 × √(CRL) + 23.73  (CRL in mm)
-export function gestationalAgeFromCRL(crlMm: number): { weeks: number; days: number; totalDays: number } {
+export function gestationalAgeFromCRL(crlMm: number): {
+  weeks: number;
+  days: number;
+  totalDays: number;
+} {
   const totalDays = Math.round(8.052 * Math.sqrt(crlMm) + 23.73);
   return { weeks: Math.floor(totalDays / 7), days: totalDays % 7, totalDays };
 }
@@ -17,7 +23,11 @@ export function isValidCRL(crlMm: number): boolean {
 
 // ---- BPD → Gestational Age (Hadlock 1982) ----
 // GA (weeks) = 9.54 + 1.482 × BPD + 0.1676 × BPD²  (BPD in cm)
-export function gestationalAgeFromBPD(bpdMm: number): { weeks: number; days: number; totalDays: number } {
+export function gestationalAgeFromBPD(bpdMm: number): {
+  weeks: number;
+  days: number;
+  totalDays: number;
+} {
   const bpdCm = bpdMm / 10;
   const gaWeeks = 9.54 + 1.482 * bpdCm + 0.1676 * bpdCm * bpdCm;
   const totalDays = Math.round(gaWeeks * 7);
@@ -33,11 +43,21 @@ export function isValidBPD(bpdMm: number): boolean {
 // Uses average of individual estimates
 export function gestationalAgeFromMultipleBiometry(params: {
   bpd?: number; // mm
-  hc?: number;  // mm
-  ac?: number;  // mm
-  fl?: number;  // mm
-}): { weeks: number; days: number; totalDays: number; estimates: { label: string; weeks: number; days: number }[] } {
-  const estimates: { label: string; weeks: number; days: number; totalDays: number }[] = [];
+  hc?: number; // mm
+  ac?: number; // mm
+  fl?: number; // mm
+}): {
+  weeks: number;
+  days: number;
+  totalDays: number;
+  estimates: { label: string; weeks: number; days: number }[];
+} {
+  const estimates: {
+    label: string;
+    weeks: number;
+    days: number;
+    totalDays: number;
+  }[] = [];
 
   if (params.bpd && isValidBPD(params.bpd)) {
     const r = gestationalAgeFromBPD(params.bpd);
@@ -47,9 +67,14 @@ export function gestationalAgeFromMultipleBiometry(params: {
   if (params.hc && params.hc >= 50 && params.hc <= 380) {
     // HC → GA (Hadlock 1984): MA = 8.96 + 0.540 × HC + 0.0003 × HC³ (HC in cm)
     const hcCm = params.hc / 10;
-    const gaWeeks = 8.96 + 0.540 * hcCm + 0.0003 * hcCm * hcCm * hcCm;
+    const gaWeeks = 8.96 + 0.54 * hcCm + 0.0003 * hcCm * hcCm * hcCm;
     const totalDays = Math.round(gaWeeks * 7);
-    estimates.push({ label: "CC", weeks: Math.floor(totalDays / 7), days: totalDays % 7, totalDays });
+    estimates.push({
+      label: "CC",
+      weeks: Math.floor(totalDays / 7),
+      days: totalDays % 7,
+      totalDays,
+    });
   }
 
   if (params.ac && params.ac >= 40 && params.ac <= 400) {
@@ -57,27 +82,43 @@ export function gestationalAgeFromMultipleBiometry(params: {
     const acCm = params.ac / 10;
     const gaWeeks = 8.14 + 0.753 * acCm + 0.0036 * acCm * acCm;
     const totalDays = Math.round(gaWeeks * 7);
-    estimates.push({ label: "CA", weeks: Math.floor(totalDays / 7), days: totalDays % 7, totalDays });
+    estimates.push({
+      label: "CA",
+      weeks: Math.floor(totalDays / 7),
+      days: totalDays % 7,
+      totalDays,
+    });
   }
 
   if (params.fl && params.fl >= 10 && params.fl <= 85) {
     // FL: GA = 10.35 + 2.460 × FL + 0.170 × FL² (FL in cm)
     const flCm = params.fl / 10;
-    const gaWeeks = 10.35 + 2.460 * flCm + 0.170 * flCm * flCm;
+    const gaWeeks = 10.35 + 2.46 * flCm + 0.17 * flCm * flCm;
     const totalDays = Math.round(gaWeeks * 7);
-    estimates.push({ label: "CF", weeks: Math.floor(totalDays / 7), days: totalDays % 7, totalDays });
+    estimates.push({
+      label: "CF",
+      weeks: Math.floor(totalDays / 7),
+      days: totalDays % 7,
+      totalDays,
+    });
   }
 
   if (estimates.length === 0) {
     return { weeks: 0, days: 0, totalDays: 0, estimates: [] };
   }
 
-  const avgDays = Math.round(estimates.reduce((s, e) => s + e.totalDays, 0) / estimates.length);
+  const avgDays = Math.round(
+    estimates.reduce((s, e) => s + e.totalDays, 0) / estimates.length,
+  );
   return {
     weeks: Math.floor(avgDays / 7),
     days: avgDays % 7,
     totalDays: avgDays,
-    estimates: estimates.map(e => ({ label: e.label, weeks: e.weeks, days: e.days })),
+    estimates: estimates.map((e) => ({
+      label: e.label,
+      weeks: e.weeks,
+      days: e.days,
+    })),
   };
 }
 
@@ -85,17 +126,27 @@ export function gestationalAgeFromMultipleBiometry(params: {
 // log10(EFW) = 1.326 - 0.00326 × AC × FL + 0.0107 × HC + 0.0438 × AC + 0.158 × FL
 // All measurements in cm; EFW in grams
 export function estimatedFetalWeight(params: {
-  hc: number;  // mm
-  ac: number;  // mm
-  fl: number;  // mm
+  hc: number; // mm
+  ac: number; // mm
+  fl: number; // mm
   bpd?: number; // mm (optional, for Shepard formula)
-}): { weightG: number; weightKg: string; percentileRange: string; formula: string } {
+}): {
+  weightG: number;
+  weightKg: string;
+  percentileRange: string;
+  formula: string;
+} {
   const hcCm = params.hc / 10;
   const acCm = params.ac / 10;
   const flCm = params.fl / 10;
 
   // Hadlock 3-parameter (HC, AC, FL)
-  const log10EFW = 1.326 - 0.00326 * acCm * flCm + 0.0107 * hcCm + 0.0438 * acCm + 0.158 * flCm;
+  const log10EFW =
+    1.326 -
+    0.00326 * acCm * flCm +
+    0.0107 * hcCm +
+    0.0438 * acCm +
+    0.158 * flCm;
   const efw = Math.pow(10, log10EFW);
   const weightG = Math.round(efw);
 
@@ -107,31 +158,24 @@ export function estimatedFetalWeight(params: {
   if (weightG < 500) percentileRange = "Peso muito baixo — avaliar CIUR";
   else if (weightG > 4500) percentileRange = "Macrossomia fetal";
 
-  return { weightG, weightKg, percentileRange, formula: "Hadlock (HC, AC, FL)" };
+  return {
+    weightG,
+    weightKg,
+    percentileRange,
+    formula: "Hadlock (HC, AC, FL)",
+  };
 }
 
-// ---- EFW Percentile by GA (simplified Hadlock curves) ----
-export function getEFWPercentiles(gaWeeks: number): { p10: number; p50: number; p90: number } | null {
-  const table: Record<number, { p10: number; p50: number; p90: number }> = {
-    20: { p10: 249, p50: 331, p90: 414 },
-    22: { p10: 375, p50: 478, p90: 594 },
-    24: { p10: 524, p50: 660, p90: 823 },
-    26: { p10: 700, p50: 887, p90: 1100 },
-    28: { p10: 908, p50: 1146, p90: 1420 },
-    30: { p10: 1153, p50: 1450, p90: 1790 },
-    32: { p10: 1429, p50: 1800, p90: 2230 },
-    34: { p10: 1735, p50: 2200, p90: 2730 },
-    36: { p10: 2064, p50: 2622, p90: 3270 },
-    38: { p10: 2395, p50: 3030, p90: 3790 },
-    40: { p10: 2680, p50: 3400, p90: 4200 },
-  };
-
-  const keys = Object.keys(table).map(Number).sort((a, b) => a - b);
-  let closest = keys[0];
-  for (const k of keys) {
-    if (Math.abs(k - gaWeeks) < Math.abs(closest - gaWeeks)) closest = k;
-  }
-  return table[closest] || null;
+// ---- EFW Percentile by GA — INTERGROWTH-21st official table (single source) ----
+// Defined for GA 22–40 weeks (the INTERGROWTH-21st EFW standard is not defined < 22 weeks).
+export function getEFWPercentiles(
+  gaWeeks: number,
+): { p10: number; p50: number; p90: number } | null {
+  const data = getGrowthData("efw");
+  const ga = Math.round(gaWeeks);
+  const row = data.find((r) => r.ga === ga);
+  if (!row) return null;
+  return { p10: row.p10, p50: row.p50, p90: row.p90 };
 }
 
 // ---- Due date from GA ----
