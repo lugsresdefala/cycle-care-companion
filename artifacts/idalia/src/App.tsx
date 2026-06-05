@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense, Component } from "react";
 import type { ReactNode } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
@@ -62,6 +63,7 @@ const queryClient = new QueryClient();
 const basename = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "") || "/";
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
@@ -103,6 +105,7 @@ const App = () => (
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

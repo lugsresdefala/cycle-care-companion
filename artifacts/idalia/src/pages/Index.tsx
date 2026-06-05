@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { PageMeta } from "@/components/PageMeta";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, Waves, TrendingUp, User, LogIn, ShieldAlert, HeartPulse } from "lucide-react";
@@ -181,6 +182,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
+      <PageMeta
+        title="Calculadoras Obstétricas e de Saúde Reprodutiva"
+        description="Calculadoras baseadas em evidências para período fértil, biometria fetal, idade gestacional e risco obstétrico. Precisão clínica para obstetras e ginecologistas."
+        path="/"
+      />
       <JsonLd data={HOME_SCHEMA as Record<string, unknown>} />
       {/* Ambient background */}
       <div

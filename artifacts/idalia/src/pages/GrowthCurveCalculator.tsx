@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { PageMeta } from "@/components/PageMeta";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
 import { PatientSelector } from "@/components/PatientSelector";
@@ -136,6 +137,11 @@ const GrowthCurveCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Curvas de Crescimento Fetal"
+        description="Acompanhe o crescimento fetal ao longo da gestação com curvas baseadas nas referências INTERGROWTH-21st e Hadlock. Avalie percentis e tendências — IDALIA Calc."
+        path="/growth-curve"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       {/* ── Parameter selector ── */}

@@ -4,6 +4,7 @@ import { useExamSave } from "@/hooks/useExamSave";
 import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
+import { PageMeta } from "@/components/PageMeta";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -122,6 +123,11 @@ const BiometryCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Calculadora de Biometria Fetal"
+        description="Avalie DBP, CA, CC e CF para estimar a idade gestacional e o peso fetal. Biometria fetal baseada nas referências INTERGROWTH-21st — IDALIA Calc."
+        path="/biometry"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 

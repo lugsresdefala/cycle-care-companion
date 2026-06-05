@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PageMeta } from "@/components/PageMeta";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -141,6 +142,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Planos e Preços"
+        description="Conheça os planos do IDALIA Calc: acesso gratuito e premium a calculadoras obstétricas baseadas em evidências para profissionais de saúde."
+        path="/pricing"
+      />
       <JsonLd data={PRICING_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">

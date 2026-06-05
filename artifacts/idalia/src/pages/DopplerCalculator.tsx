@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
+import { PageMeta } from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -584,6 +585,11 @@ const DopplerCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Calculadora de Dopplervelocimetria Fetal"
+        description="Avalie índices de resistência e pulsatilidade das artérias umbilical, cerebral média, uterina e ductus venoso. Dopplervelocimetria fetal baseada em evidências — IDALIA Calc."
+        path="/doppler"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <div className="space-y-2">
         <div className="flex items-center gap-2">

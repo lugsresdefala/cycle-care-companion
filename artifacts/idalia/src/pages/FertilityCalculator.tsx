@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { PageMeta } from "@/components/PageMeta";
 import { useTokenGate } from "@/hooks/useTokenGate";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
 import { Button } from "@/components/ui/button";
@@ -174,6 +175,11 @@ const FertilityCalculator = () => {
 
   return (
     <div className="space-y-5">
+      <PageMeta
+        title="Calculadora do Período Fértil"
+        description="Identifique os dias férteis, a ovulação e a janela de concepção com base no ciclo menstrual. Calculadora de período fértil baseada em evidências — IDALIA Calc."
+        path="/fertility"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
 
       {/* ─── Input Section ─────────────────────────────── */}

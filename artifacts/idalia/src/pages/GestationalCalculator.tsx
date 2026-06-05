@@ -3,6 +3,7 @@ import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
 import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
+import { PageMeta } from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -109,6 +110,11 @@ const GestationalCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Calculadora de Idade Gestacional"
+        description="Calcule a idade gestacional pela DUM, ultrassom ou FIV. Estime a data provável do parto com precisão baseada em evidências — IDALIA Calc."
+        path="/gestational"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       {/* Input */}

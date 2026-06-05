@@ -3,6 +3,7 @@ import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
 import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
+import { PageMeta } from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -100,6 +101,11 @@ const EFWCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Calculadora de Peso Fetal Estimado"
+        description="Estime o peso fetal (PFE) pelas fórmulas de Hadlock. Avalie o percentil e identifique restrição de crescimento intrauterino (RCIU) — IDALIA Calc."
+        path="/efw"
+      />
       <TokenGateAlert
         needsLogin={needsLogin}
         blocked={blocked}

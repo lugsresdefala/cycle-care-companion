@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
+import { PageMeta } from "@/components/PageMeta";
 import JsonLd from "@/components/JsonLd";
 
 const TERMS_SCHEMA = {
@@ -21,6 +22,11 @@ const TermsOfUse = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Termos de Uso"
+        description="Leia os Termos de Uso do IDALIA Calc. Conheça as condições de uso das calculadoras obstétricas e os direitos e responsabilidades dos usuários."
+        path="/termos"
+      />
       <JsonLd data={TERMS_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">

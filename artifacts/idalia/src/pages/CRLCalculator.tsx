@@ -3,6 +3,7 @@ import { useTokenGate } from "@/hooks/useTokenGate";
 import { useExamSave } from "@/hooks/useExamSave";
 import { PatientSelector } from "@/components/PatientSelector";
 import { TokenGateAlert } from "@/components/TokenGateAlert";
+import { PageMeta } from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,11 @@ const CRLCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <PageMeta
+        title="Calculadora de CCN — Comprimento Cabeça-Nádega"
+        description="Calcule a idade gestacional pelo Comprimento Cabeça-Nádega (CCN/CRL) no primeiro trimestre. Referência de Robinson & Fleming — IDALIA Calc."
+        path="/crl"
+      />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">

@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 import JsonLd from "@/components/JsonLd";
+import { PageMeta } from "@/components/PageMeta";
 
 const PRIVACY_SCHEMA = {
   "@context": "https://schema.org",
@@ -21,6 +22,11 @@ const PrivacyPolicy = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta
+        title="Política de Privacidade"
+        description="Saiba como o IDALIA Calc coleta, usa e protege seus dados. Nossa política de privacidade garante transparência no tratamento de informações de saúde."
+        path="/privacidade"
+      />
       <JsonLd data={PRIVACY_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
