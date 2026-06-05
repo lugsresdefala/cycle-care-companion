@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, Waves, TrendingUp, User, LogIn, ShieldAlert, HeartPulse } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import logoSm from "@/assets/logo-sm.webp";
+import logoMd from "@/assets/logo-md.webp";
 import JsonLd from "@/components/JsonLd";
 
 const HOME_SCHEMA = {
@@ -217,7 +218,7 @@ const Index = () => {
             aria-label="Ir para página inicial"
           >
             <img
-              src={logo}
+              src={logoSm}
               alt="IDALIA Calc"
               className="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-primary/10 group-hover:ring-primary/25 transition-all duration-300"
             />
@@ -272,7 +273,7 @@ const Index = () => {
                 }}
               />
               <img
-                src={logo}
+                src={logoMd}
                 alt="IDALIA Calc"
                 className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-lg ring-4 ring-primary/10"
               />

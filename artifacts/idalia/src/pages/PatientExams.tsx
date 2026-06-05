@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 
 const CALC_LABELS: Record<string, string> = {
   biometry: "Biometria",

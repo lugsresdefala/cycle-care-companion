@@ -12,7 +12,7 @@ import {
   Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
 import JsonLd from "@/components/JsonLd";
 

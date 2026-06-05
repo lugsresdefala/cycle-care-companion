@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Plus, Search, ArrowLeft, Users, FileText, Trash2, Pencil } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 
 interface Patient {
   id: string;

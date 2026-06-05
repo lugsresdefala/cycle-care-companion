@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 
 const ProfileEdit = () => {
   const { user } = useAuth();

@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins, UserCog, ShieldCheck } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 
 interface ProfileData {
   id: string;

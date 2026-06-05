@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 // @ts-ignore
 import { SignIn, SignUp, useUser } from "@clerk/clerk-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 
 const Auth = () => {
   const navigate = useNavigate();

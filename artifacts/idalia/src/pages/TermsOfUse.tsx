@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-sm.webp";
 import { PageMeta } from "@/components/PageMeta";
 import JsonLd from "@/components/JsonLd";
 
