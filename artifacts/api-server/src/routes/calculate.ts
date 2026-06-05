@@ -38,35 +38,39 @@ async function deductToken(userId: string): Promise<boolean> {
 router.post("/calculate/trisomy-risk", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
 
+  // Compute first so malformed input fails (400) WITHOUT charging a token.
+  let result;
+  try {
+    result = calculateTrisomyRisk(req.body as TrisomyInput);
+  } catch (err: any) {
+    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  }
+
   const ok = await deductToken(userId);
   if (!ok) {
     return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
   }
 
-  try {
-    const input = req.body as TrisomyInput;
-    const result = calculateTrisomyRisk(input);
-    return res.json(result);
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
-  }
+  return res.json(result);
 });
 
 router.post("/calculate/preeclampsia-risk", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
 
+  // Compute first so malformed input fails (400) WITHOUT charging a token.
+  let result;
+  try {
+    result = calculatePreeclampsiaRisk(req.body as PreeclampsiaInput);
+  } catch (err: any) {
+    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  }
+
   const ok = await deductToken(userId);
   if (!ok) {
     return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
   }
 
-  try {
-    const input = req.body as PreeclampsiaInput;
-    const result = calculatePreeclampsiaRisk(input);
-    return res.json(result);
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
-  }
+  return res.json(result);
 });
 
 export default router;

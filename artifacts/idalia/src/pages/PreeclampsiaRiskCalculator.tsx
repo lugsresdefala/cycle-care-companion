@@ -95,21 +95,19 @@ const PreeclampsiaRiskCalculator = () => {
         body: JSON.stringify(input),
       });
 
+      // Show the result first — the token was already charged by /calculate.
+      // History saving is best-effort; saveExam surfaces its own error toast.
+      setResults(result);
+      void refetch();
+
       if (canSave) {
-        const saved = await saveExam({
+        void saveExam({
           calcType: "preeclampsia_risk",
           inputData: input as unknown as Record<string, unknown>,
           resultData: result as unknown as Record<string, unknown>,
           patientId: selectedPatientId,
         });
-        if (!saved) {
-          setCalculating(false);
-          return;
-        }
       }
-
-      setResults(result);
-      void refetch();
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
         setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
