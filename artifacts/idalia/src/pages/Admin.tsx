@@ -78,8 +78,8 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl">
-        <div className="container max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="border-b border-border/60 bg-card/20">
+        <div className="container max-w-6xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
               <ArrowLeft className="w-4 h-4 mr-1" /> Dashboard

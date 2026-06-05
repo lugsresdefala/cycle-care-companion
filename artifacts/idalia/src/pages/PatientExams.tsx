@@ -10,7 +10,6 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import logo from "@/assets/logo-sm.webp";
 
 const CALC_LABELS: Record<string, string> = {
   biometry: "Biometria",
@@ -92,17 +91,14 @@ const PatientExams = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
-        <div className="container max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
+      <header className="border-b border-border/60 bg-card/20">
+        <div className="container max-w-4xl mx-auto px-4 h-12 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/patients")}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="IDALIA" className="w-7 h-7 rounded-full object-cover" />
-            <div>
-              <span className="font-display text-sm font-semibold text-foreground">{patientName}</span>
-              <p className="text-[10px] text-muted-foreground">Histórico de exames</p>
-            </div>
+          <div>
+            <span className="font-display text-sm font-semibold text-foreground">{patientName}</span>
+            <p className="text-[10px] text-muted-foreground">Histórico de exames</p>
           </div>
         </div>
       </header>

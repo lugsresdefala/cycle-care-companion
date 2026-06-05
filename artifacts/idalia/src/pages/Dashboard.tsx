@@ -6,9 +6,7 @@ import { apiFetch } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, CreditCard, LogOut, ChevronRight, Plus, Coins, UserCog, ShieldCheck } from "lucide-react";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
-import logo from "@/assets/logo-sm.webp";
+import { Users, FileText, CreditCard, ChevronRight, Plus, Coins, UserCog } from "lucide-react";
 
 interface ProfileData {
   id: string;
@@ -19,10 +17,9 @@ interface ProfileData {
 }
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { subscription, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
-  const { isAdmin } = useIsAdmin();
   useCheckoutStatus();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [patientCount, setPatientCount] = useState(0);
@@ -59,30 +56,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
-        <div className="container max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="flex items-center gap-2 group">
-            <img src={logo} alt="IDALIA" className="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-primary/10" />
-            <span className="font-display text-base font-semibold text-foreground">
-              IDALIA<span className="font-script text-accent text-lg ml-0.5">Calc</span>
-            </span>
-          </button>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              Calculadoras
-            </Button>
-            {isAdmin && (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="gap-1">
-                <ShieldCheck className="w-4 h-4" /> Admin
-              </Button>
-            )}
-            <Button variant="ghost" size="icon" onClick={signOut} title="Sair">
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-1">
           <h1 className="font-display text-2xl font-semibold text-foreground">

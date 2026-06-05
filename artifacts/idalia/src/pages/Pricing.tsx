@@ -12,7 +12,6 @@ import {
   Loader2, ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
-import logo from "@/assets/logo-sm.webp";
 import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
 import JsonLd from "@/components/JsonLd";
 
@@ -148,12 +147,11 @@ const Pricing = () => {
         path="/pricing"
       />
       <JsonLd data={PRICING_SCHEMA as Record<string, unknown>} />
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
-        <div className="container max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
+      <header className="border-b border-border/60 bg-card/20">
+        <div className="container max-w-5xl mx-auto px-4 h-12 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <img src={logo} alt="" className="w-7 h-7 rounded-full object-cover" />
           <span className="font-display text-sm font-semibold text-foreground">Planos</span>
         </div>
       </header>

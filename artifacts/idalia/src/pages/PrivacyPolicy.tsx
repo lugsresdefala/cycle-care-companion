@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo-sm.webp";
 import JsonLd from "@/components/JsonLd";
 import { PageMeta } from "@/components/PageMeta";
 
@@ -28,15 +27,12 @@ const PrivacyPolicy = () => {
         path="/privacidade"
       />
       <JsonLd data={PRIVACY_SCHEMA as Record<string, unknown>} />
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
-        <div className="container max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+      <header className="border-b border-border/60 bg-card/20">
+        <div className="container max-w-3xl mx-auto px-4 h-12 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="IDALIA" className="w-7 h-7 rounded-full object-cover" />
-            <span className="font-display text-sm font-semibold text-foreground">Política de Privacidade</span>
-          </div>
+          <span className="font-display text-sm font-semibold text-foreground">Política de Privacidade</span>
         </div>
       </header>
 

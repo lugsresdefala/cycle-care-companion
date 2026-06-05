@@ -1,11 +1,9 @@
-import { lazy, Suspense, useEffect, useState } from "react";
 import { PageMeta } from "@/components/PageMeta";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Microscope, Waves, TrendingUp, User, LogIn, ShieldAlert, HeartPulse } from "lucide-react";
+import { Heart, Baby, ArrowRight, Shield, Scale, Activity, BookOpen, Microscope, Waves, TrendingUp, ShieldAlert, HeartPulse } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import logoSm from "@/assets/logo-sm.webp";
 import logoMd from "@/assets/logo-md.webp";
 import JsonLd from "@/components/JsonLd";
 
@@ -173,13 +171,6 @@ const REFERENCES = [
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
@@ -202,46 +193,6 @@ const Index = () => {
         className="hero-gradient-orb w-[420px] h-[420px] bottom-[8%] left-[22%] fixed"
         style={{ background: "radial-gradient(circle, hsla(25,88%,56%,0.08) 0%, transparent 65%)" }}
       />
-
-      {/* ── Header ── */}
-      <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="container max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 group shrink-0"
-            aria-label="Ir para página inicial"
-          >
-            <img
-              src={logoSm}
-              alt="IDALIA Calc"
-              className="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-primary/10 group-hover:ring-primary/25 transition-all duration-300"
-            />
-            <span className="font-display text-base font-semibold text-foreground tracking-tight leading-none">
-              IDALIA<span className="font-script text-accent text-lg leading-none ml-0.5">Calc</span>
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-            {user ? (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="gap-1.5 text-xs">
-                <User className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Painel</span>
-              </Button>
-            ) : (
-              <Button variant="outline" size="sm" onClick={() => navigate("/auth")} className="gap-1.5 text-xs">
-                <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Entrar</span>
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
 
       {/* ── Main ── */}
       <main className="container max-w-4xl mx-auto px-4 sm:px-6 py-8 relative z-10">

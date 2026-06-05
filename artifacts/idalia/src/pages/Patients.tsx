@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Plus, Search, ArrowLeft, Users, FileText, Trash2, Pencil } from "lucide-react";
-import logo from "@/assets/logo-sm.webp";
 
 interface Patient {
   id: string;
@@ -110,16 +109,13 @@ const Patients = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
-        <div className="container max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="border-b border-border/60 bg-card/20">
+        <div className="container max-w-4xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <div className="flex items-center gap-2">
-              <img src={logo} alt="IDALIA" className="w-7 h-7 rounded-full object-cover" />
-              <span className="font-display text-sm font-semibold text-foreground">Pacientes</span>
-            </div>
+            <span className="font-display text-sm font-semibold text-foreground">Pacientes</span>
           </div>
           <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) closeDialog(); else setDialogOpen(true); }}>
             <DialogTrigger asChild>

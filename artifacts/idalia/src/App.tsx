@@ -10,6 +10,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
 import GlobalFooter from "@/components/GlobalFooter";
+import GlobalHeader from "@/components/GlobalHeader";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -70,6 +71,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter basename={basename}>
+          <GlobalHeader />
           <ErrorBoundary>
           <Suspense fallback={<div className="flex items-center justify-center min-h-screen text-sm text-muted-foreground">Carregando...</div>}>
             <Routes>
