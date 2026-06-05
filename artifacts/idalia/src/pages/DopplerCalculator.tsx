@@ -588,7 +588,7 @@ const DopplerCalculator = () => {
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Waves className="w-5 h-5 text-primary" />
-          <h2 className="font-display text-xl text-foreground">Doppler Obstétrico</h2>
+          <h1 className="font-display text-xl text-foreground">Doppler Obstétrico</h1>
         </div>
         <p className="text-sm text-muted-foreground">
           Avaliação dos índices de velocimetria Doppler nas artérias umbilical, cerebral média, uterina e razão cerebroplacentária.

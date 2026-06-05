@@ -111,9 +111,9 @@ const EFWCalculator = () => {
       />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
-          <h2 className="font-display text-xl text-foreground">
+          <h1 className="font-display text-xl text-foreground">
             Peso Fetal Estimado (PFE)
-          </h2>
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Cálculo do peso fetal estimado pela fórmula de Hadlock com CC, CA e
             CF.

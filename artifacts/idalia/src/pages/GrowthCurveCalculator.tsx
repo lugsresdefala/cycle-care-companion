@@ -141,7 +141,7 @@ const GrowthCurveCalculator = () => {
       {/* ── Parameter selector ── */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-blue">
         <div>
-          <h2 className="font-display text-xl text-foreground">Curva de Crescimento Fetal</h2>
+          <h1 className="font-display text-xl text-foreground">Curva de Crescimento Fetal</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Percentis INTERGROWTH-21st — padrão internacional de crescimento fetal.
           </p>

@@ -127,7 +127,7 @@ const BiometryCalculator = () => {
 
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
-          <h2 className="font-display text-xl text-foreground">Biometria Fetal</h2>
+          <h1 className="font-display text-xl text-foreground">Biometria Fetal</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Estimativa da idade gestacional por medida individual ou biometria composta.
           </p>

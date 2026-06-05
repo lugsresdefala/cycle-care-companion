@@ -133,7 +133,7 @@ const PreeclampsiaRiskCalculator = () => {
       {/* ── Input Form ── */}
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
-          <h2 className="font-display text-xl text-foreground">Risco de Pré-Eclâmpsia — 1º Trimestre</h2>
+          <h1 className="font-display text-xl text-foreground">Risco de Pré-Eclâmpsia — 1º Trimestre</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Rastreamento baseado no modelo de riscos competitivos da FMF, com fatores maternos, medidas biofísicas e marcadores bioquímicos opcionais.
           </p>

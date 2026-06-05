@@ -184,7 +184,7 @@ const FertilityCalculator = () => {
               <Heart className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <h2 className="font-display text-lg text-foreground leading-tight">Calculadora de Ciclo Menstrual e Fertilidade   </h2>
+              <h1 className="font-display text-lg text-foreground leading-tight">Calculadora de Ciclo Menstrual e Fertilidade</h1>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Período Fértil & Ovulação</p>
             </div>
           </div>
