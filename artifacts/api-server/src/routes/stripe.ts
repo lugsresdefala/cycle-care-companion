@@ -45,7 +45,7 @@ router.post("/stripe/checkout", requireBootstrap, async (req, res): Promise<any>
     // this user. Explicit creation guarantees a fresh, user-scoped customer.
     if (!customerId) {
       const newCustomer = await stripe.customers.create({
-        email,
+        email: email ?? undefined,
         metadata: { user_id: userId },
       });
       customerId = newCustomer.id;
@@ -86,7 +86,6 @@ router.post("/stripe/checkout", requireBootstrap, async (req, res): Promise<any>
 router.post("/stripe/portal", requireBootstrap, async (req, res): Promise<any> => {
   try {
     const userId = (req as AuthedRequest).userId;
-    const email = (req as AuthedRequest).userEmail;
     const subs = await db
       .select()
       .from(userSubscriptions)
@@ -244,6 +243,7 @@ async function lookupUserIdBySub(
   stripeSubId: string,
   stripeCustomerId?: string,
 ): Promise<string> {
+  // Primary: look up by subscription ID — most specific binding.
   const bySub = await db
     .select()
     .from(userSubscriptions)
