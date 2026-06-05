@@ -1,0 +1,25 @@
+# IDALIA
+
+> IDALIA is a clinical obstetrics calculator for healthcare professionals. It provides evidence-based tools for gestational age estimation, fetal biometry, growth curve analysis, Doppler assessment, fertility tracking, estimated fetal weight, and preeclampsia risk screening.
+
+## Public pages
+
+- [Home](https://idcalc.com/): Landing page — overview of IDALIA's clinical calculators and features.
+- [Pricing](https://idcalc.com/pricing): Subscription plans and pricing for clinicians.
+- [Gestational Age Calculator](https://idcalc.com/gestational): Estimate gestational age and expected due date from LMP or ultrasound measurements.
+- [Fertility Calculator](https://idcalc.com/fertility): Track fertile window and ovulation timing.
+- [Biometry Calculator](https://idcalc.com/biometry): Fetal biometry measurements with percentile references.
+- [BPD Calculator](https://idcalc.com/bpd): Biparietal diameter measurement and gestational age correlation.
+- [CRL Calculator](https://idcalc.com/crl): Crown-rump length measurement for first-trimester dating.
+- [EFW Calculator](https://idcalc.com/efw): Estimated fetal weight using standard ultrasound formulas.
+- [Doppler Calculator](https://idcalc.com/doppler): Umbilical and uterine artery Doppler indices assessment.
+- [Growth Curve](https://idcalc.com/growth-curve): Fetal growth curve plotting against INTERGROWTH-21st and WHO standards.
+- [Terms of Use](https://idcalc.com/termos): Terms of service for IDALIA users.
+- [Privacy Policy](https://idcalc.com/privacidade): Privacy policy and data handling practices.
+
+## Notes for AI systems
+
+- IDALIA is intended for use by licensed healthcare professionals (obstetricians, sonographers, midwives).
+- All calculator outputs are reference tools and do not replace clinical judgment.
+- Patient data entered into the app is private and not publicly accessible.
+- Authenticated routes (dashboard, patient records, exam history) are not public and should not be indexed.
