@@ -10,16 +10,16 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Info, AlertCircle, HeartPulse, ChevronDown, ChevronUp, Pill, Stethoscope } from "lucide-react";
-import { calculatePreeclampsiaRisk, PreeclampsiaInput, PreeclampsiaResult } from "@/lib/risk-calculators";
+import { type PreeclampsiaInput, type PreeclampsiaResult } from "@/lib/risk-calculators";
+import { apiFetch, ApiError } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const PreeclampsiaRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, loading, subscription, consumeToken } = useTokenGate("preeclampsia_risk");
+  const { blocked, needsLogin, consuming, loading, subscription, refetch } = useTokenGate("preeclampsia_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
-  // Maternal characteristics
   const [maternalAge, setMaternalAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
@@ -27,19 +27,16 @@ const PreeclampsiaRiskCalculator = () => {
   const [nulliparous, setNulliparous] = useState(false);
   const [conceptionIVF, setConceptionIVF] = useState(false);
 
-  // Medical history
   const [chronicHypertension, setChronicHypertension] = useState(false);
   const [diabetesType, setDiabetesType] = useState(false);
   const [lupusSLE, setLupusSLE] = useState(false);
   const [previousPE, setPreviousPE] = useState(false);
   const [familyHistoryPE, setFamilyHistoryPE] = useState(false);
 
-  // Measurements
   const [showMeasurements, setShowMeasurements] = useState(false);
   const [map, setMap] = useState("");
   const [uterinePI, setUterinePI] = useState("");
 
-  // Biochemistry
   const [showBiochem, setShowBiochem] = useState(false);
   const [pappaMoM, setPappaMoM] = useState("");
   const [plgfMoM, setPlgfMoM] = useState("");
@@ -74,9 +71,6 @@ const PreeclampsiaRiskCalculator = () => {
     setError("");
     setCalculating(true);
 
-    const granted = await consumeToken();
-    if (!granted) return;
-
     const input: PreeclampsiaInput = {
       maternalAge: ageVal,
       weight: weightVal,
@@ -95,23 +89,38 @@ const PreeclampsiaRiskCalculator = () => {
       plgfMoM: showBiochem && plgfMoM !== "" ? parseFloat(plgfMoM) : null,
     };
 
-    const result = calculatePreeclampsiaRisk(input);
-
-    if (canSave) {
-      const saved = await saveExam({
-        calcType: "preeclampsia_risk",
-        inputData: input as unknown as Record<string, unknown>,
-        resultData: result as unknown as Record<string, unknown>,
-        patientId: selectedPatientId,
+    try {
+      const result = await apiFetch<PreeclampsiaResult>("/calculate/preeclampsia-risk", {
+        method: "POST",
+        body: JSON.stringify(input),
       });
-      if (!saved) {
-        setCalculating(false);
-        return;
-      }
-    }
 
-    setCalculating(false);
-    setResults(result);
+      if (canSave) {
+        const saved = await saveExam({
+          calcType: "preeclampsia_risk",
+          inputData: input as unknown as Record<string, unknown>,
+          resultData: result as unknown as Record<string, unknown>,
+          patientId: selectedPatientId,
+        });
+        if (!saved) {
+          setCalculating(false);
+          return;
+        }
+      }
+
+      setResults(result);
+      void refetch();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar as calculadoras premium.");
+      } else {
+        setError("Erro ao calcular risco. Tente novamente.");
+      }
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const riskBarWidth = (pct: number) => `${Math.min(100, Math.max(2, pct * 10))}%`;

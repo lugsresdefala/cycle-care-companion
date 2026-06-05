@@ -7,6 +7,7 @@ import plansRouter from "./plans";
 import subscriptionRouter from "./subscription";
 import stripeRouter from "./stripe";
 import adminRouter from "./admin";
+import calculateRouter from "./calculate";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(plansRouter);
 router.use(subscriptionRouter);
 router.use(stripeRouter);
 router.use(adminRouter);
+router.use(calculateRouter);
 
 export default router;

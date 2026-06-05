@@ -17,26 +17,24 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Info, AlertCircle, ShieldAlert, ChevronDown, ChevronUp } from "lucide-react";
-import { calculateTrisomyRisk, TrisomyInput, TrisomyResult } from "@/lib/risk-calculators";
+import { type TrisomyInput, type TrisomyResult } from "@/lib/risk-calculators";
+import { apiFetch, ApiError } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const TrisomyRiskCalculator = () => {
-  const { blocked, needsLogin, consuming, loading, subscription, consumeToken } = useTokenGate("trisomy_risk");
+  const { blocked, needsLogin, consuming, loading, subscription, refetch } = useTokenGate("trisomy_risk");
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
 
-  // Required inputs
   const [maternalAge, setMaternalAge] = useState("");
   const [crl, setCrl] = useState("");
   const [nt, setNt] = useState("");
 
-  // Optional biochemistry
   const [showBiochem, setShowBiochem] = useState(false);
   const [pappaMoM, setPappaMoM] = useState("");
   const [bhcgMoM, setBhcgMoM] = useState("");
 
-  // Optional additional markers
   const [showAdditional, setShowAdditional] = useState(false);
   const [nasalBone, setNasalBone] = useState<"present" | "absent" | "none">("none");
   const [ductusPIAbnormal, setDuctusPIAbnormal] = useState(false);
@@ -74,9 +72,6 @@ const TrisomyRiskCalculator = () => {
     setError("");
     setCalculating(true);
 
-    const granted = await consumeToken();
-    if (!granted) return;
-
     const input: TrisomyInput = {
       maternalAge: ageVal,
       crl: crlVal,
@@ -88,23 +83,38 @@ const TrisomyRiskCalculator = () => {
       tricuspidRegurg: showAdditional && useTricuspid ? tricuspidRegurg : null,
     };
 
-    const result = calculateTrisomyRisk(input);
-
-    if (canSave) {
-      const saved = await saveExam({
-        calcType: "trisomy_risk",
-        inputData: input as unknown as Record<string, unknown>,
-        resultData: result as unknown as Record<string, unknown>,
-        patientId: selectedPatientId,
+    try {
+      const result = await apiFetch<TrisomyResult>("/calculate/trisomy-risk", {
+        method: "POST",
+        body: JSON.stringify(input),
       });
-      if (!saved) {
-        setCalculating(false);
-        return;
-      }
-    }
 
-    setCalculating(false);
-    setResults(result);
+      if (canSave) {
+        const saved = await saveExam({
+          calcType: "trisomy_risk",
+          inputData: input as unknown as Record<string, unknown>,
+          resultData: result as unknown as Record<string, unknown>,
+          patientId: selectedPatientId,
+        });
+        if (!saved) {
+          setCalculating(false);
+          return;
+        }
+      }
+
+      setResults(result);
+      void refetch();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar as calculadoras premium.");
+      } else {
+        setError("Erro ao calcular risco. Tente novamente.");
+      }
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const formatRisk = (risk: number) => `1 : ${risk.toLocaleString("pt-BR")}`;
