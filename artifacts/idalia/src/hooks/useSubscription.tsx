@@ -40,6 +40,12 @@ function toInfo(s: SubscriptionState | null): SubscriptionInfo | null {
   };
 }
 
+// Module-level so the one-time onboarding bootstrap runs once per signed-in
+// user, not once per useSubscription mount (the hook is used in many
+// components). Tracking the userId (rather than a boolean) re-runs bootstrap
+// when the account changes, even without an intermediate signed-out state.
+let bootstrappedUserId: string | null = null;
+
 export function useSubscription() {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -57,6 +63,17 @@ export function useSubscription() {
     setLoading(false);
   }, [user]);
 
+  const bootstrap = useCallback(async () => {
+    if (!user) return;
+    try {
+      const s = await apiFetch<SubscriptionState>("/bootstrap", { method: "POST" });
+      setSubscription(toInfo(s));
+      setLoading(false);
+    } catch {
+      await fetchSubscription();
+    }
+  }, [user, fetchSubscription]);
+
   const syncStripe = useCallback(async () => {
     if (!user) return;
     try {
@@ -68,7 +85,15 @@ export function useSubscription() {
     }
   }, [user, fetchSubscription]);
 
-  useEffect(() => { fetchSubscription(); }, [fetchSubscription]);
+  useEffect(() => {
+    if (!user) { bootstrappedUserId = null; void fetchSubscription(); return; }
+    if (bootstrappedUserId !== user.id) {
+      bootstrappedUserId = user.id;
+      void bootstrap();
+    } else {
+      void fetchSubscription();
+    }
+  }, [user, bootstrap, fetchSubscription]);
 
   useEffect(() => {
     if (!user) { syncedRef.current = false; return; }

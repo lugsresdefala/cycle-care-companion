@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, userSubscriptions, subscriptionPlans } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
-import { requireAuth, type AuthedRequest } from "../lib/auth";
+import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -47,6 +47,15 @@ router.get("/subscription", requireAuth, async (req, res) => {
 });
 
 router.post("/subscription/refresh", requireAuth, async (req, res) => {
+  const userId = (req as AuthedRequest).userId;
+  res.json(await loadState(userId));
+});
+
+// First-run onboarding: requireBootstrap provisions the profile + free trial
+// (an explicit, state-changing write — never on a GET). The client calls this
+// once right after sign-in so new users immediately receive their trial tokens
+// instead of waiting until they happen to hit another write route.
+router.post("/bootstrap", requireBootstrap, async (req, res) => {
   const userId = (req as AuthedRequest).userId;
   res.json(await loadState(userId));
 });
