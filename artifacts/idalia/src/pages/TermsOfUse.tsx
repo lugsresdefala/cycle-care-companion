@@ -2,12 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
+import JsonLd from "@/components/JsonLd";
+
+const TERMS_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://idcalc.com/termos",
+  "url": "https://idcalc.com/termos",
+  "name": "Termos de Uso — IDALIA Calc",
+  "description": "Termos de Uso da plataforma IDALIA Calc, aplicável a todos os usuários da ferramenta de calculadoras clínicas.",
+  "isPartOf": { "@id": "https://idcalc.com/#website" },
+  "inLanguage": "pt-BR",
+  "dateModified": "2026-03-28"
+};
 
 const TermsOfUse = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={TERMS_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

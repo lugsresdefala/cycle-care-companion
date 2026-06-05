@@ -2,12 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
+import JsonLd from "@/components/JsonLd";
+
+const PRIVACY_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://idcalc.com/privacidade",
+  "url": "https://idcalc.com/privacidade",
+  "name": "Política de Privacidade — IDALIA Calc",
+  "description": "Política de Privacidade da plataforma IDALIA Calc, em conformidade com a LGPD (Lei nº 13.709/2018).",
+  "isPartOf": { "@id": "https://idcalc.com/#website" },
+  "inLanguage": "pt-BR",
+  "dateModified": "2026-03-28"
+};
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={PRIVACY_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>

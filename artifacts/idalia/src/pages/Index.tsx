@@ -5,6 +5,29 @@ import { Heart, Baby, ArrowRight, Shield, Ruler, Scale, Activity, BookOpen, Micr
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
+import JsonLd from "@/components/JsonLd";
+
+const HOME_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://idcalc.com/#webapplication",
+  "name": "IDALIA Calc",
+  "url": "https://idcalc.com/",
+  "applicationCategory": "MedicalApplication",
+  "operatingSystem": "Web",
+  "description": "Calculadoras clínicas de biometria e datação gestacional, fundamentadas em diretrizes internacionais. Inclui cálculo de período fértil, idade gestacional, biometria fetal, peso fetal estimado, Doppler obstétrico, curva de crescimento fetal, risco de trissomias e risco de pré-eclâmpsia.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "BRL"
+  },
+  "audience": {
+    "@type": "MedicalAudience",
+    "audienceType": "Clinician"
+  },
+  "inLanguage": "pt-BR",
+  "isPartOf": { "@id": "https://idcalc.com/#website" }
+};
 
 const FertilityCalculator = lazy(() => import("@/pages/FertilityCalculator"));
 const GestationalCalculator = lazy(() => import("@/pages/GestationalCalculator"));
@@ -212,6 +235,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
+      <JsonLd data={HOME_SCHEMA as Record<string, unknown>} />
       {/* Ambient background */}
       <div
         className="hero-gradient-orb w-[700px] h-[700px] -top-[250px] -left-[250px] fixed"

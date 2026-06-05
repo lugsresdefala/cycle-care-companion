@@ -38,6 +38,36 @@
     <!-- Preconnect for fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Structured Data: WebSite + Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://idcalc.com/#website",
+          "url": "https://idcalc.com/",
+          "name": "IDALIA Calc",
+          "description": "Calculadoras baseadas em evidências para período fértil e gestação. Resultados precisos, conteúdo educativo e privacidade.",
+          "inLanguage": "pt-BR",
+          "publisher": { "@id": "https://idcalc.com/#organization" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://idcalc.com/#organization",
+          "name": "IDALIA Calc",
+          "url": "https://idcalc.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://idcalc.com/apple-touch-icon.png"
+          },
+          "description": "Plataforma de calculadoras clínicas para saúde reprodutiva e medicina fetal, fundamentadas em diretrizes internacionais.",
+          "inLanguage": "pt-BR"
+        }
+      ]
+    }
+    </script>
     
   
   

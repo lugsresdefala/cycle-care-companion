@@ -13,6 +13,18 @@ import {
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { useCheckoutStatus } from "@/hooks/useCheckoutStatus";
+import JsonLd from "@/components/JsonLd";
+
+const PRICING_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://idcalc.com/pricing",
+  "url": "https://idcalc.com/pricing",
+  "name": "Planos — IDALIA Calc",
+  "description": "Escolha entre os planos gratuito, pessoal e clínico da IDALIA Calc para acesso às calculadoras de saúde reprodutiva e medicina fetal.",
+  "isPartOf": { "@id": "https://idcalc.com/#website" },
+  "inLanguage": "pt-BR"
+};
 
 interface Plan {
   id: string;
@@ -129,6 +141,7 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <JsonLd data={PRICING_SCHEMA as Record<string, unknown>} />
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
         <div className="container max-w-5xl mx-auto px-4 h-14 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
