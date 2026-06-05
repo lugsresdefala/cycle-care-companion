@@ -38,6 +38,19 @@ router.post("/stripe/checkout", requireBootstrap, async (req, res): Promise<any>
       .limit(1);
     let customerId = existing[0]?.stripeCustomerId || undefined;
 
+    // If no locally-bound Stripe customer exists, create one explicitly.
+    // We must NOT pass customer_email without customer — Stripe may reuse an
+    // existing customer record that shares this email address (email recycling,
+    // shared clinic inboxes) and would bind a different account's billing to
+    // this user. Explicit creation guarantees a fresh, user-scoped customer.
+    if (!customerId) {
+      const newCustomer = await stripe.customers.create({
+        email,
+        metadata: { user_id: userId },
+      });
+      customerId = newCustomer.id;
+    }
+
     const origin = resolveOrigin(req);
     const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
     const bucket = Math.floor(Date.now() / 60000);
@@ -46,7 +59,6 @@ router.post("/stripe/checkout", requireBootstrap, async (req, res): Promise<any>
     const session = await stripe.checkout.sessions.create(
       {
         customer: customerId,
-        customer_email: customerId ? undefined : email,
         line_items: [{ price: priceId, quantity: 1 }],
         mode: "subscription",
         success_url: `${origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
@@ -162,7 +174,26 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = (session.metadata?.user_id as string) || "";
         const subId = session.subscription as string;
+        const sessionCustomerId = session.customer as string;
         if (userId && subId) {
+          // Guard: verify the Stripe customer returned by this checkout is not
+          // already bound to a *different* local user. Fetch ALL rows for this
+          // customer (no limit) to catch legacy duplicates before the unique
+          // constraint was enforced. Any foreign-owner row aborts the sync.
+          if (sessionCustomerId) {
+            const customerRows = await db
+              .select()
+              .from(userSubscriptions)
+              .where(eq(userSubscriptions.stripeCustomerId, sessionCustomerId));
+            const foreignOwner = customerRows.find((r) => r.doctorId !== userId);
+            if (foreignOwner) {
+              req.log?.error(
+                { userId, sessionCustomerId, existingOwnerId: foreignOwner.doctorId },
+                "SECURITY: checkout.session.completed customer already owned by different user — aborting sync",
+              );
+              break;
+            }
+          }
           await syncSubscription(userId, subId, undefined, true);
         }
         break;
@@ -219,14 +250,22 @@ async function lookupUserIdBySub(
     .where(eq(userSubscriptions.stripeSubscriptionId, stripeSubId))
     .limit(1);
   if (bySub[0]) return bySub[0].doctorId;
+
+  // Customer-ID fallback: only trust this when ALL matching rows resolve to the
+  // same owner. Multiple rows (legacy data before the unique constraint) are
+  // ambiguous — we fail closed rather than guess.
   if (stripeCustomerId) {
     const byCust = await db
       .select()
       .from(userSubscriptions)
-      .where(eq(userSubscriptions.stripeCustomerId, stripeCustomerId))
-      .orderBy(desc(userSubscriptions.createdAt))
-      .limit(1);
-    if (byCust[0]) return byCust[0].doctorId;
+      .where(eq(userSubscriptions.stripeCustomerId, stripeCustomerId));
+    const ownerIds = new Set(byCust.map((r) => r.doctorId));
+    if (ownerIds.size === 1) return byCust[0].doctorId;
+    if (ownerIds.size > 1) {
+      console.error(
+        `SECURITY: lookupUserIdBySub found ${ownerIds.size} distinct owners for stripeCustomerId ${stripeCustomerId} — failing closed`,
+      );
+    }
   }
   return "";
 }
@@ -238,6 +277,7 @@ async function syncSubscription(
   resetTokens: boolean = false,
 ) {
   const sub = preloaded || (await stripe.subscriptions.retrieve(stripeSubId));
+  const incomingCustomerId = sub.customer as string;
   const productId = sub.items.data[0]?.price.product as string;
   const tier = PRODUCT_TIER_MAP[productId] || "basic";
 
@@ -264,12 +304,30 @@ async function syncSubscription(
     )
     .limit(1);
 
+  // Shared guard: verify the incoming stripeCustomerId is not owned by a
+  // different user. Fetch ALL rows for this customer (no limit) to catch
+  // legacy duplicates that existed before the unique constraint was enforced.
+  // Any row belonging to a different user is grounds for rejection.
+  if (incomingCustomerId) {
+    const customerRows = await db
+      .select()
+      .from(userSubscriptions)
+      .where(eq(userSubscriptions.stripeCustomerId, incomingCustomerId));
+    const foreignOwner = customerRows.find((r) => r.doctorId !== userId);
+    if (foreignOwner) {
+      console.error(
+        `SECURITY: syncSubscription blocked — stripeCustomerId ${incomingCustomerId} is bound to user ${foreignOwner.doctorId}, refusing operation for ${userId}`,
+      );
+      return;
+    }
+  }
+
   if (existing[0]) {
     const fields: Record<string, unknown> = {
       planId: plan[0].id,
       status,
       endDate,
-      stripeCustomerId: sub.customer as string,
+      stripeCustomerId: incomingCustomerId,
       updatedAt: new Date(),
     };
     if (resetTokens) {
@@ -287,7 +345,7 @@ async function syncSubscription(
       startDate: new Date(),
       endDate,
       tokensRemaining: plan[0].tokensPerPeriod,
-      stripeCustomerId: sub.customer as string,
+      stripeCustomerId: incomingCustomerId,
       stripeSubscriptionId: stripeSubId,
     });
   }
