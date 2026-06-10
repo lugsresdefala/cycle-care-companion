@@ -70,6 +70,9 @@ export function useSubscription() {
       setSubscription(toInfo(s));
       setLoading(false);
     } catch {
+      // Bootstrap didn't complete — clear the module flag so a later mount
+      // retries provisioning instead of leaving a new user stranded at 0 tokens.
+      bootstrappedUserId = null;
       await fetchSubscription();
     }
   }, [user, fetchSubscription]);

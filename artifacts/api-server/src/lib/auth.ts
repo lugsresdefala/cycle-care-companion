@@ -13,7 +13,21 @@ async function ensureProfileAndTrial(userId: string, email: string, fullName: st
   const existing = await db.select().from(profiles).where(eq(profiles.id, userId)).limit(1);
   if (existing.length === 0) {
     await db.insert(profiles).values({ id: userId, fullName: fullName || "", email });
-    // create free trial subscription
+  } else if (email && existing[0].email !== email) {
+    await db.update(profiles).set({ email }).where(eq(profiles.id, userId));
+  }
+
+  // Provision the free trial INDEPENDENTLY of profile creation so a partial
+  // failure (profile inserted but trial insert failed on an earlier call) heals
+  // on the next bootstrap instead of permanently stranding the account. Only
+  // create a trial when the user has NO subscription row at all — never override
+  // an existing trial or a paid subscription.
+  const subs = await db
+    .select({ id: userSubscriptions.id })
+    .from(userSubscriptions)
+    .where(eq(userSubscriptions.doctorId, userId))
+    .limit(1);
+  if (subs.length === 0) {
     const trialPlan = await db
       .select()
       .from(subscriptionPlans)
@@ -33,8 +47,6 @@ async function ensureProfileAndTrial(userId: string, email: string, fullName: st
         tokensRemaining: 3,
       });
     }
-  } else if (email && existing[0].email !== email) {
-    await db.update(profiles).set({ email }).where(eq(profiles.id, userId));
   }
 }
 

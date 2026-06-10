@@ -156,14 +156,16 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
     return res.status(400).json({ error: `Invalid signature: ${e?.message}` });
   }
 
-  // idempotency
-  try {
-    await db.insert(stripeWebhookEvents).values({
-      eventId: event.id,
-      eventType: event.type,
-      payloadCreatedAt: new Date(event.created * 1000),
-    });
-  } catch {
+  // Idempotency: short-circuit events we have ALREADY fully processed. The
+  // event is recorded only AFTER successful processing (below), so a
+  // previously-FAILED event has no row here and will be retried by Stripe
+  // instead of being permanently marked as seen.
+  const seen = await db
+    .select({ id: stripeWebhookEvents.id })
+    .from(stripeWebhookEvents)
+    .where(eq(stripeWebhookEvents.eventId, event.id))
+    .limit(1);
+  if (seen[0]) {
     return res.status(200).json({ received: true, duplicate: true });
   }
 
@@ -234,6 +236,22 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
     }
   } catch (e: any) {
     req.log?.error({ err: e }, "webhook handler error");
+    // Do NOT record the event — return non-2xx so Stripe retries delivery and
+    // the subscription can still reconcile after a transient DB/Stripe failure.
+    return res.status(500).json({ error: "Webhook processing failed" });
+  }
+
+  // Record the event only after successful processing. A concurrent delivery of
+  // the same event may have inserted it already; that unique-constraint
+  // violation is a benign duplicate and is safely ignored.
+  try {
+    await db.insert(stripeWebhookEvents).values({
+      eventId: event.id,
+      eventType: event.type,
+      payloadCreatedAt: new Date(event.created * 1000),
+    });
+  } catch {
+    /* already recorded by a concurrent delivery — fine */
   }
 
   res.json({ received: true });

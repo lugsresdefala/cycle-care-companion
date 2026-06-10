@@ -2,3 +2,5 @@
 - [Clerk web proxyUrl](clerk-web-proxyurl.md) — prod auth breaks if web ClerkProvider omits proxyUrl/publishableKeyFromHost; dev still works (false-healthy).
 - [INTERGROWTH tables inflated](intergrowth-tables-inflated.md) — idalia growth/percentile tables shipped inflated 10-75% vs official; verify against anchors, never trust AI-summarized values.
 - [IDALIA trial bootstrap boundary](idalia-trial-bootstrap.md) — profile+trial only created in requireBootstrap (writes); token-gated requireAuth features must ensure POST /bootstrap ran or new users get 0 tokens.
+- [useAuth stable user ref](useauth-stable-ref.md) — idalia useAuth must memoize authUser; a fresh object literal per render caused a fetch→setState→refetch storm across all user-keyed effects.
+- [Stripe webhook idempotency order](stripe-webhook-idempotency.md) — record the event row only AFTER successful processing + return non-2xx on failure, else a transient sync error permanently strands a paying user.
