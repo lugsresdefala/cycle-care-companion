@@ -269,7 +269,7 @@ export function getPrenatalCareRecommendations(weeks: number): PrenatalCare {
       lifestyle: "Manutenção de atividade física moderada. Uso de cinto de segurança posicionado abaixo do abdome gravídico. Decúbito lateral (preferencialmente esquerdo) para repouso noturno.",
       warning_signs: "Contrações uterinas regulares antes da 37ª semana, sangramento vaginal, edema súbito de face e/ou extremidades superiores, alterações visuais, cefaleia persistente. Procurar avaliação obstétrica.",
       examinations: "Ultrassonografia morfológica fetal (20–24 semanas). Teste oral de tolerância à glicose — TOTG 75 g (24–28 semanas). Hemograma. EAS. Monitoramento de ganho ponderal e pressão arterial.",
-      vaccines: "dTpa (entre 27 e 36 semanas, preferencialmente). Influenza, caso não administrada no 1º trimestre.",
+      vaccines: "dTpa recomendada a partir da 20ª semana (uma dose a cada gestação). Influenza, caso não administrada no 1º trimestre.",
       special_care: "Atenção à percepção de movimentos fetais (habitualmente percebidos a partir desta fase). Possibilidade de iniciar preparação para o parto. Hidratação cutânea para prevenção de estrias.",
     };
   }
@@ -278,7 +278,7 @@ export function getPrenatalCareRecommendations(weeks: number): PrenatalCare {
     lifestyle: "Organização de itens para a maternidade. Reconhecimento dos sinais de trabalho de parto. Exercícios respiratórios e técnicas de relaxamento.",
     warning_signs: "Redução da movimentação fetal, contrações uterinas regulares com intervalo decrescente, amniorrexe (ruptura de membranas), sangramento vaginal, elevação pressórica, edema acentuado. Procurar atendimento obstétrico imediato.",
     examinations: "Consultas quinzenais (32–36 semanas) e semanais (a partir da 37ª semana). Avaliação do crescimento fetal. Cardiotocografia fetal quando indicada. Pesquisa de Streptococcus do grupo B — cultura retovaginal (35–37 semanas).",
-    vaccines: "Completar esquema de dTpa caso não realizado entre 27 e 36 semanas.",
+    vaccines: "dTpa caso ainda não realizada nesta gestação (recomendada a partir da 20ª semana; pode ser administrada até 45 dias após o parto). Influenza, se ainda não vacinada.",
     special_care: "Elaboração do plano de parto. Diferenciação entre trabalho de parto verdadeiro e falso (pródromos). Avaliação da apresentação fetal. Preparo perineal, se desejado. Rede de apoio emocional e suporte familiar.",
   };
 }
