@@ -42,12 +42,14 @@ const SCENE_START_SEC: Record<string, number> = (() => {
 
 const AUDIO_SEEK_EPSILON_SEC = 0.18;
 
+// Continuous background motion states
 const backgroundPositions = [
   { scale: 1, x: '0%', y: '0%', opacity: 1 },
-  { scale: 1.5, x: '-10%', y: '20%', opacity: 0.8 },
-  { scale: 1.2, x: '10%', y: '-10%', opacity: 0.9 },
-  { scale: 1.1, x: '5%', y: '5%', opacity: 1 },
-  { scale: 1.3, x: '-5%', y: '-15%', opacity: 0.8 },
+  { scale: 1.2, x: '-5%', y: '10%', opacity: 0.9 },
+  { scale: 1.1, x: '8%', y: '-8%', opacity: 1 },
+  { scale: 1.15, x: '3%', y: '5%', opacity: 0.85 },
+  { scale: 1.25, x: '-8%', y: '-10%', opacity: 0.8 },
+  { scale: 1.1, x: '5%', y: '0%', opacity: 0.95 },
   { scale: 1, x: '0%', y: '0%', opacity: 1 },
 ];
 
@@ -132,63 +134,73 @@ export default function VideoTemplate({
   const bgPos = backgroundPositions[sceneIndex] ?? backgroundPositions[0];
 
   return (
-    <div className="w-full h-screen overflow-hidden relative" style={{ backgroundColor: 'var(--color-bg-light)' }}>
+    <div className="w-full h-screen overflow-hidden relative bg-[var(--color-bg-light)]">
+      {/* Persistent Background Layer */}
       <motion.div
         className="absolute inset-0 mesh-bg origin-center"
         animate={bgPos}
-        transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 4, ease: [0.25, 1, 0.5, 1] }}
+      />
+      
+      {/* Abstract Grid overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: 'linear-gradient(var(--color-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-primary) 1px, transparent 1px)',
+          backgroundSize: '4vw 4vw'
+        }}
       />
 
-      <div className="absolute inset-0 pointer-events-none opacity-40">
+      <div className="absolute inset-0 pointer-events-none opacity-50 mix-blend-multiply">
         <motion.div
-          className="absolute w-[800px] h-[800px] rounded-full blur-[100px] -top-40 -left-40"
+          className="absolute w-[900px] h-[900px] rounded-full blur-[120px] -top-20 -left-20"
           style={{ background: 'var(--color-primary)' }}
           animate={{
-            x: sceneIndex % 2 === 0 ? '10%' : '-10%',
-            y: sceneIndex % 2 === 0 ? '5%' : '-5%',
-            scale: sceneIndex % 2 === 0 ? 1 : 1.1,
+            x: sceneIndex % 2 === 0 ? '15%' : '-15%',
+            y: sceneIndex % 2 === 0 ? '10%' : '-10%',
+            scale: sceneIndex % 2 === 0 ? 1 : 1.15,
+            opacity: sceneIndex === 0 ? 0.3 : 0.15
           }}
-          transition={{ duration: 4, ease: 'easeInOut' }}
+          transition={{ duration: 6, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute w-[600px] h-[600px] rounded-full blur-[80px] bottom-[-20%] right-[-10%]"
+          className="absolute w-[700px] h-[700px] rounded-full blur-[100px] bottom-[-20%] right-[-10%]"
           style={{ background: 'var(--color-accent)' }}
           animate={{
-            x: sceneIndex % 2 === 0 ? '-5%' : '5%',
-            y: sceneIndex % 2 === 0 ? '-10%' : '10%',
-            opacity: sceneIndex === 1 ? 0.6 : 0.3,
+            x: sceneIndex % 2 === 0 ? '-10%' : '10%',
+            y: sceneIndex % 2 === 0 ? '-15%' : '15%',
+            opacity: sceneIndex === 1 ? 0.25 : 0.1
           }}
-          transition={{ duration: 5, ease: 'easeInOut' }}
+          transition={{ duration: 8, ease: 'easeInOut' }}
         />
       </div>
 
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="sync">
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
       </AnimatePresence>
+
+      {/* Persistent Brand Watermark */}
+      <div className="absolute top-[5vh] right-[5vw] z-40 opacity-40">
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="IDALIA" className="h-[3vh] w-auto grayscale contrast-200" />
+      </div>
 
       <div className="absolute inset-x-0 bottom-0 z-30 pointer-events-none flex justify-center pb-[5vh] px-[8vw]">
         <AnimatePresence mode="wait">
           {captionText && (
             <motion.div
               key={captionText}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-[80%] rounded-xl px-6 py-3 text-center"
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-[75%] rounded-xl px-7 py-3 text-center glass-panel"
               style={{
-                background: 'rgba(15, 23, 42, 0.72)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
                 borderTop: '2px solid var(--color-primary)',
               }}
             >
               <p
-                className="text-white text-[1.6vw] leading-snug font-medium"
+                className="text-[1.6vw] leading-snug font-medium text-slate-900"
                 style={{
                   fontFamily: 'var(--font-display)',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.4)',
                 }}
               >
                 {captionText}
