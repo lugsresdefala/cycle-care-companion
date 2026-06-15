@@ -4,3 +4,4 @@
 - [IDALIA trial bootstrap boundary](idalia-trial-bootstrap.md) — profile+trial only created in requireBootstrap (writes); token-gated requireAuth features must ensure POST /bootstrap ran or new users get 0 tokens.
 - [useAuth stable user ref](useauth-stable-ref.md) — idalia useAuth must memoize authUser; a fresh object literal per render caused a fetch→setState→refetch storm across all user-keyed effects.
 - [Stripe webhook idempotency order](stripe-webhook-idempotency.md) — record the event row only AFTER successful processing + return non-2xx on failure, else a transient sync error permanently strands a paying user.
+- [Stripe missing key fallback](stripe-missing-key-fallback.md) — checkout 500 `Invalid API Key …lder` means STRIPE_SECRET_KEY unset (silent sk_test_placeholder default); fix is config, re-publish prod.
