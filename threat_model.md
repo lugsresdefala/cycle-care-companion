@@ -13,7 +13,7 @@ The current production deployment is public (`https://idcalc.com`). Per deployme
 - **Subscription and billing state** — Stripe customer IDs, Stripe subscription IDs, checkout sessions, trial state, and token balances. Corruption here can grant paid access, deny service, or misassign subscriptions.
 - **Administrative capabilities** — admin-only visibility into all users plus the ability to grant tokens. Abuse materially affects every tenant.
 - **Application secrets and service credentials** — database connection string, Clerk secret key, Stripe secret/webhook secrets. Exposure would allow account or billing compromise.
-- **Clinical calculation logic** — premium calculators and risk models embedded in the client. Even when based on published formulas, access restrictions and integrity of premium-only features still matter to the product’s trust model.
+- **Clinical calculation logic** — several premium calculators remain embedded in the public web client, while the premium trisomy/preeclampsia risk models are now calculated server-side. Even when based on published formulas, access restrictions and integrity of premium-only features still matter to the product’s trust model.
 
 ## Trust Boundaries
 
@@ -30,11 +30,12 @@ The current production deployment is public (`https://idcalc.com`). Per deployme
 - **Production API entry points:** `artifacts/api-server/src/index.ts`, `artifacts/api-server/src/app.ts`, `artifacts/api-server/src/routes/*.ts`
 - **Highest-risk backend areas:** `artifacts/api-server/src/lib/auth.ts`, `artifacts/api-server/src/routes/patients.ts`, `artifacts/api-server/src/routes/exams.ts`, `artifacts/api-server/src/routes/stripe.ts`, `artifacts/api-server/src/routes/admin.ts`
 - **Highest-risk client areas:** `artifacts/idalia/src/App.tsx`, calculator pages under `artifacts/idalia/src/pages/`, token/subscription hooks under `artifacts/idalia/src/hooks/`
-- **Premium-access caveat:** the public landing page in `artifacts/idalia/src/pages/Index.tsx` can lazy-load premium calculator modules, and the premium risk formulas live in `artifacts/idalia/src/lib/risk-calculators.ts`, so future scans should treat client-side entitlement enforcement as a primary attack surface.
+- **Premium-access caveat:** the public landing page in `artifacts/idalia/src/pages/Index.tsx` can lazy-load premium calculator modules. The premium trisomy/preeclampsia risk formulas are now server-side, but client-side biometry/EFW/doppler/growth-curve logic still ships to the browser, so future scans should keep client-side entitlement enforcement as a primary attack surface.
 - **Shared data and authorization model:** `lib/db/src/schema/index.ts`, `lib/api-spec/openapi.yaml`
 - **Auth/bootstrap caveat:** profile and free-trial creation currently live in `requireBootstrap()` rather than `requireAuth()`, so future scans should verify that bootstrap middleware stays limited to intentional write/onboarding routes.
 - **Billing-binding caveat:** the current Stripe flow binds accounts through stored Stripe IDs plus Stripe metadata and schema uniqueness constraints, so future scans should verify those bindings stay intact if checkout or webhook reconciliation changes.
 - **Mobile-session caveat:** `artifacts/idalia-mobile/app/_layout.tsx` now clears the shared TanStack Query cache and bearer-token getter on sign-out, so the current logout boundary looks mitigated; however, generated mobile query keys in `lib/api-client-react/src/generated/api.ts` remain route-based rather than user-scoped, so any future account-switching or query-persistence feature should be reviewed as a potential cross-session PHI leak.
+- **Mobile-web deployment caveat:** the native Expo client is in scope, but the standalone mobile-web landing/server artifact under `artifacts/idalia-mobile/server/` should be treated as out of scope unless there is evidence it is separately deployed in production.
 - **Usually ignore unless proven reachable in production:** `artifacts/mockup-sandbox`, `artifacts/pitch-deck*`, `artifacts/idalia-promo`, `.migration-backup`, most build scripts under `scripts/` and `artifacts/*/scripts/`
 
 ## Threat Categories
