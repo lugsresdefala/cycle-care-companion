@@ -16,10 +16,8 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, Area, ReferenceDot, Legend,
 } from "recharts";
-import {
-  GrowthParameter, GROWTH_PARAMS, getGrowthData, assessGrowth,
-  type GrowthAssessment, type PercentileRow,
-} from "@/lib/intergrowth";
+import { GROWTH_PARAMS, type GrowthParameter, type GrowthAssessment, type PercentileRow } from "@/lib/intergrowth";
+import { apiFetch, ApiError } from "@/lib/api";
 
 interface Measurement {
   id: string;
@@ -36,7 +34,7 @@ const PERCENTILE_COLORS = {
 };
 
 const GrowthCurveCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -44,10 +42,11 @@ const GrowthCurveCalculator = () => {
     { id: crypto.randomUUID(), ga: "", value: "" },
   ]);
   const [assessments, setAssessments] = useState<GrowthAssessment[]>([]);
+  const [curveData, setCurveData] = useState<PercentileRow[]>([]);
   const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
 
   const paramMeta = GROWTH_PARAMS.find((p) => p.key === selectedParam)!;
-  const curveData = useMemo(() => getGrowthData(selectedParam), [selectedParam]);
 
   const addMeasurement = () => {
     setMeasurements((prev) => [...prev, { id: crypto.randomUUID(), ga: "", value: "" }]);
@@ -73,27 +72,36 @@ const GrowthCurveCalculator = () => {
       }
       valid.push({ ga, value });
     }
-    if (valid.length === 0) {
-      setError("Insira pelo menos uma medida válida.");
-      return;
-    }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (valid.length === 0) { setError("Insira pelo menos uma medida válida."); return; }
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const results = valid.map((v) => assessGrowth(selectedParam, v.ga, v.value));
-    setAssessments(results);
-    if (canSave) {
-      saveExam({
-        calcType: "growth_curve",
-        inputData: { parameter: selectedParam, measurements: valid },
-        resultData: { assessments: results },
-        gestationalAgeWeeks: valid[0]?.ga,
-        patientId: selectedPatientId,
-      });
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ assessments: GrowthAssessment[]; curveData: PercentileRow[] }>(
+        "/calculate/growth-curve",
+        { method: "POST", body: JSON.stringify({ param: selectedParam, measurements: valid }) },
+      );
+      setAssessments(result.assessments);
+      setCurveData(result.curveData);
+      void refetch();
+      if (canSave) {
+        void saveExam({
+          calcType: "growth_curve",
+          inputData: { parameter: selectedParam, measurements: valid },
+          resultData: { assessments: result.assessments },
+          gestationalAgeWeeks: valid[0]?.ga,
+          patientId: selectedPatientId,
+        });
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
+      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
+      else setError("Erro ao calcular. Tente novamente.");
+    } finally {
+      setCalculating(false);
     }
   };
 
-  // Build chart data merging percentile curves + measurements
   const chartData = useMemo(() => {
     const base = curveData.map((row) => ({
       ga: row.ga,
@@ -104,7 +112,6 @@ const GrowthCurveCalculator = () => {
       p97: row.p97,
       measured: undefined as number | undefined,
     }));
-    // Overlay measurements
     for (const a of assessments) {
       const existing = base.find((r) => r.ga === Math.round(a.ga));
       if (existing) {
@@ -126,11 +133,7 @@ const GrowthCurveCalculator = () => {
   }, [curveData, assessments]);
 
   const severityClass = (s: string) =>
-    s === "critical"
-      ? "border-destructive/40 bg-destructive/5"
-      : s === "warning"
-        ? "border-accent/40 bg-accent/5"
-        : "border-primary/40 bg-primary/5";
+    s === "critical" ? "border-destructive/40 bg-destructive/5" : s === "warning" ? "border-accent/40 bg-accent/5" : "border-primary/40 bg-primary/5";
 
   const severityDot = (s: string) =>
     s === "critical" ? "bg-destructive" : s === "warning" ? "bg-accent" : "bg-primary";
@@ -144,33 +147,20 @@ const GrowthCurveCalculator = () => {
       />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
-      {/* ── Parameter selector ── */}
+
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-blue">
         <div>
           <h1 className="font-display text-xl text-foreground">Curva de Crescimento Fetal</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Percentis INTERGROWTH-21st — padrão internacional de crescimento fetal.
-          </p>
-          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">
-            INTERGROWTH-21st, 2014
-          </Badge>
+          <p className="text-sm text-muted-foreground mt-1">Percentis INTERGROWTH-21st — padrão internacional de crescimento fetal.</p>
+          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">INTERGROWTH-21st, 2014</Badge>
         </div>
 
-        {/* Parameter tabs */}
         <div className="flex flex-wrap gap-2">
           {GROWTH_PARAMS.map((p) => (
             <button
               key={p.key}
-              onClick={() => {
-                setSelectedParam(p.key);
-                setAssessments([]);
-                setError("");
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                selectedParam === p.key
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted/60 text-muted-foreground hover:bg-muted"
-              }`}
+              onClick={() => { setSelectedParam(p.key); setAssessments([]); setCurveData([]); setError(""); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedParam === p.key ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
             >
               {p.label}
               <span className="hidden sm:inline ml-1 opacity-70">({p.unit})</span>
@@ -178,16 +168,11 @@ const GrowthCurveCalculator = () => {
           ))}
         </div>
 
-        {/* Measurement inputs */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-foreground">
-              Medidas — {paramMeta.fullName} ({paramMeta.unit})
-            </Label>
+            <Label className="text-sm font-medium text-foreground">Medidas — {paramMeta.fullName} ({paramMeta.unit})</Label>
             <Tooltip>
-              <TooltipTrigger>
-                <Info className="w-3.5 h-3.5 text-muted-foreground" />
-              </TooltipTrigger>
+              <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
               <TooltipContent>Adicione múltiplas medidas para plotar a trajetória de crescimento</TooltipContent>
             </Tooltip>
           </div>
@@ -195,37 +180,17 @@ const GrowthCurveCalculator = () => {
           {measurements.map((m, i) => (
             <div key={m.id} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-5 shrink-0 tabular-nums">{i + 1}.</span>
-              <Input
-                type="number"
-                step="0.1"
-                placeholder="IG (sem)"
-                value={m.ga}
-                onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)}
-                className="input-glass tabular-nums w-24"
-              />
-              <Input
-                type="number"
-                step="0.1"
-                placeholder={`${paramMeta.label} (${paramMeta.unit})`}
-                value={m.value}
-                onChange={(e) => updateMeasurement(m.id, "value", e.target.value)}
-                className="input-glass tabular-nums flex-1"
-              />
+              <Input type="number" step="0.1" placeholder="IG (sem)" value={m.ga} onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)} className="input-glass tabular-nums w-24" />
+              <Input type="number" step="0.1" placeholder={`${paramMeta.label} (${paramMeta.unit})`} value={m.value} onChange={(e) => updateMeasurement(m.id, "value", e.target.value)} className="input-glass tabular-nums flex-1" />
               {measurements.length > 1 && (
-                <button
-                  onClick={() => removeMeasurement(m.id)}
-                  className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                >
+                <button onClick={() => removeMeasurement(m.id)} className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           ))}
 
-          <button
-            onClick={addMeasurement}
-            className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
-          >
+          <button onClick={addMeasurement} className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 font-medium transition-colors">
             <Plus className="w-3.5 h-3.5" /> Adicionar medida
           </button>
         </div>
@@ -236,12 +201,11 @@ const GrowthCurveCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <TrendingUp className="w-4 h-4 mr-1" /> Plotar na Curva
         </Button>
       </div>
 
-      {/* ── Chart ── */}
       <AnimatePresence>
         {assessments.length > 0 && (
           <motion.div
@@ -259,64 +223,26 @@ const GrowthCurveCalculator = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
-                    <XAxis
-                      dataKey="ga"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      label={{ value: "IG (semanas)", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      label={{ value: paramMeta.unit, angle: -90, position: "insideLeft", offset: 10, fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                    />
+                    <XAxis dataKey="ga" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} label={{ value: "IG (semanas)", position: "insideBottomRight", offset: -5, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                    <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} label={{ value: paramMeta.unit, angle: -90, position: "insideLeft", offset: 10, fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
                     <RechartsTooltip
-                      contentStyle={{
-                        background: "hsl(var(--background))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: 8,
-                        fontSize: 12,
-                      }}
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                       formatter={(value: number, name: string) => {
-                        const labels: Record<string, string> = {
-                          p3: "P3", p10: "P10", p50: "P50", p90: "P90", p97: "P97", measured: "Medido",
-                        };
+                        const labels: Record<string, string> = { p3: "P3", p10: "P10", p50: "P50", p90: "P90", p97: "P97", measured: "Medido" };
                         return [value != null ? `${value} ${paramMeta.unit}` : "—", labels[name] || name];
                       }}
                       labelFormatter={(ga) => `${ga} semanas`}
                     />
-
-                    {/* Shaded band P10–P90 */}
-                    <Area
-                      dataKey="p90"
-                      stroke="none"
-                      fill="hsl(var(--primary))"
-                      fillOpacity={0.06}
-                      type="monotone"
-                      isAnimationActive={false}
-                    />
-
-                    {/* Percentile lines */}
+                    <Area dataKey="p90" stroke="none" fill="hsl(var(--primary))" fillOpacity={0.06} type="monotone" isAnimationActive={false} />
                     <Line dataKey="p3" stroke={PERCENTILE_COLORS.p3} strokeWidth={1} strokeDasharray="4 4" dot={false} type="monotone" name="p3" />
                     <Line dataKey="p10" stroke={PERCENTILE_COLORS.p10} strokeWidth={1.5} strokeDasharray="3 3" dot={false} type="monotone" name="p10" />
                     <Line dataKey="p50" stroke={PERCENTILE_COLORS.p50} strokeWidth={2.5} dot={false} type="monotone" name="p50" />
                     <Line dataKey="p90" stroke={PERCENTILE_COLORS.p90} strokeWidth={1.5} strokeDasharray="3 3" dot={false} type="monotone" name="p90" />
                     <Line dataKey="p97" stroke={PERCENTILE_COLORS.p97} strokeWidth={1} strokeDasharray="4 4" dot={false} type="monotone" name="p97" />
-
-                    {/* Measured points */}
-                    <Line
-                      dataKey="measured"
-                      stroke="hsl(var(--foreground))"
-                      strokeWidth={2}
-                      dot={{ r: 5, fill: "hsl(var(--foreground))", stroke: "hsl(var(--background))", strokeWidth: 2 }}
-                      connectNulls
-                      type="monotone"
-                      name="measured"
-                    />
-
+                    <Line dataKey="measured" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ r: 5, fill: "hsl(var(--foreground))", stroke: "hsl(var(--background))", strokeWidth: 2 }} connectNulls type="monotone" name="measured" />
                     <Legend
                       formatter={(value: string) => {
-                        const labels: Record<string, string> = {
-                          p3: "P3", p10: "P10", p50: "P50 (mediana)", p90: "P90", p97: "P97", measured: "Medido",
-                        };
+                        const labels: Record<string, string> = { p3: "P3", p10: "P10", p50: "P50 (mediana)", p90: "P90", p97: "P97", measured: "Medido" };
                         return <span className="text-xs">{labels[value] || value}</span>;
                       }}
                     />
@@ -325,33 +251,15 @@ const GrowthCurveCalculator = () => {
               </div>
             </div>
 
-            {/* ── Assessment cards ── */}
             <div className="space-y-3">
               {assessments.map((a, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className={`glass-card-static p-4 border ${severityClass(a.severity)}`}
-                >
+                <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }} className={`glass-card-static p-4 border ${severityClass(a.severity)}`}>
                   <div className="flex items-start gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${severityDot(a.severity)}`} />
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-foreground">
-                          IG {a.ga} sem — {a.value} {paramMeta.unit}
-                        </span>
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${
-                            a.severity === "critical"
-                              ? "border-destructive/40 text-destructive"
-                              : a.severity === "warning"
-                                ? "border-accent/40 text-accent"
-                                : "border-primary/40 text-primary"
-                          }`}
-                        >
+                        <span className="text-sm font-semibold text-foreground">IG {a.ga} sem — {a.value} {paramMeta.unit}</span>
+                        <Badge variant="outline" className={`text-xs ${a.severity === "critical" ? "border-destructive/40 text-destructive" : a.severity === "warning" ? "border-accent/40 text-accent" : "border-primary/40 text-primary"}`}>
                           {a.percentileLabel}
                         </Badge>
                       </div>
@@ -372,30 +280,9 @@ const GrowthCurveCalculator = () => {
 
       <ScientificFooter
         references={[
-          {
-            authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al.",
-            title: "International standards for fetal growth based on serial ultrasound measurements: the Fetal Growth Longitudinal Study of the INTERGROWTH-21st Project",
-            journal: "Lancet",
-            year: 2014,
-            doi: "10.1016/S0140-6736(14)61490-2",
-            pubmedId: "25209488",
-          },
-          {
-            authors: "Stirnemann J, Villar J, Salomon LJ, et al.",
-            title: "International estimated fetal weight standards of the INTERGROWTH-21st Project",
-            journal: "Ultrasound Obstet Gynecol",
-            year: 2017,
-            doi: "10.1002/uog.17347",
-            pubmedId: "27804212",
-          },
-          {
-            authors: "Villar J, Giuliani F, Fenton TR, et al.",
-            title: "INTERGROWTH-21st very preterm size at birth reference charts",
-            journal: "Lancet",
-            year: 2016,
-            doi: "10.1016/S0140-6736(16)00384-6",
-            pubmedId: "26794078",
-          },
+          { authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al.", title: "International standards for fetal growth based on serial ultrasound measurements: the Fetal Growth Longitudinal Study of the INTERGROWTH-21st Project", journal: "Lancet", year: 2014, doi: "10.1016/S0140-6736(14)61490-2", pubmedId: "25209488" },
+          { authors: "Stirnemann J, Villar J, Salomon LJ, et al.", title: "International estimated fetal weight standards of the INTERGROWTH-21st Project", journal: "Ultrasound Obstet Gynecol", year: 2017, doi: "10.1002/uog.17347", pubmedId: "27804212" },
+          { authors: "Villar J, Giuliani F, Fenton TR, et al.", title: "INTERGROWTH-21st very preterm size at birth reference charts", journal: "Lancet", year: 2016, doi: "10.1016/S0140-6736(16)00384-6", pubmedId: "26794078" },
         ]}
         units={[
           { param: "PFE", unit: "g", description: "Peso fetal estimado em gramas" },

@@ -11,12 +11,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Info, Ruler, Baby, Calendar, Activity, AlertCircle } from "lucide-react";
-import {
-  gestationalAgeFromCRL, isValidCRL,
-  gestationalAgeFromBPD, isValidBPD,
-  gestationalAgeFromMultipleBiometry,
-  dueDateFromGA,
-} from "@/lib/biometry";
+import { isValidCRL, isValidBPD } from "@/lib/biometry";
+import { apiFetch, ApiError } from "@/lib/api";
 import { formatDateLongBR, formatGAShort } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
@@ -33,16 +29,13 @@ interface GAResult {
 }
 
 const BiometryCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [mode, setMode] = useState<CalcMode>("crl");
 
-  // CRL state
   const [crl, setCrl] = useState("");
-  // BPD state
   const [bpdSingle, setBpdSingle] = useState("");
-  // Composite state
   const [bpd, setBpd] = useState("");
   const [hc, setHc] = useState("");
   const [ac, setAc] = useState("");
@@ -50,6 +43,7 @@ const BiometryCalculator = () => {
 
   const [error, setError] = useState("");
   const [results, setResults] = useState<GAResult | null>(null);
+  const [calculating, setCalculating] = useState(false);
 
   const clearResults = () => { setError(""); setResults(null); };
 
@@ -60,7 +54,7 @@ const BiometryCalculator = () => {
 
   const save = (calcType: "crl" | "bpd" | "biometry", inputData: Record<string, unknown>, ga: { weeks: number; days: number; totalDays: number }) => {
     if (canSave) {
-      saveExam({
+      void saveExam({
         calcType,
         inputData,
         resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
@@ -75,24 +69,48 @@ const BiometryCalculator = () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const ga = gestationalAgeFromCRL(value);
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
-    save("crl", { crl: value }, ga);
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry",
+        { method: "POST", body: JSON.stringify({ mode: "crl", crl: value }) },
+      );
+      setResults({ ...result, dueDate: new Date(result.dueDate) });
+      void refetch();
+      save("crl", { crl: value }, result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
+      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
+      else setError("Erro ao calcular. Tente novamente.");
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const handleBPD = async () => {
     const value = parseFloat(bpdSingle);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const ga = gestationalAgeFromBPD(value);
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
-    save("bpd", { bpd: value }, ga);
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry",
+        { method: "POST", body: JSON.stringify({ mode: "bpd", bpd: value }) },
+      );
+      setResults({ ...result, dueDate: new Date(result.dueDate) });
+      void refetch();
+      save("bpd", { bpd: value }, result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
+      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
+      else setError("Erro ao calcular. Tente novamente.");
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const handleComposite = async () => {
@@ -105,13 +123,25 @@ const BiometryCalculator = () => {
     if (!params.bpd && !params.hc && !params.ac && !params.fl) {
       setError("Insira ao menos uma medida biométrica."); return;
     }
-    const ga = gestationalAgeFromMultipleBiometry(params);
-    if (ga.estimates.length === 0) { setError("Valores fora do intervalo aceitável."); return; }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
-    setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays), estimates: ga.estimates });
-    save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, ga);
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string; estimates: { label: string; weeks: number; days: number }[] }>(
+        "/calculate/biometry",
+        { method: "POST", body: JSON.stringify({ mode: "composite", ...params }) },
+      );
+      setResults({ ...result, dueDate: new Date(result.dueDate) });
+      void refetch();
+      save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 400) setError(err.body?.error ?? "Valores fora do intervalo aceitável.");
+      else if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
+      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
+      else setError("Erro ao calcular. Tente novamente.");
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const compositeFields = [
@@ -134,28 +164,22 @@ const BiometryCalculator = () => {
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
         <div>
           <h1 className="font-display text-xl text-foreground">Biometria Fetal</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Estimativa da idade gestacional por medida individual ou biometria composta.
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Estimativa da idade gestacional por medida individual ou biometria composta.</p>
         </div>
 
         <Tabs value={mode} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="crl" className="text-xs sm:text-sm">
-              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />
-              CCN (1º Tri)
+              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />CCN (1º Tri)
             </TabsTrigger>
             <TabsTrigger value="bpd" className="text-xs sm:text-sm">
-              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />
-              DBP
+              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />DBP
             </TabsTrigger>
             <TabsTrigger value="composite" className="text-xs sm:text-sm">
-              <Activity className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />
-              Composta
+              <Activity className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />Composta
             </TabsTrigger>
           </TabsList>
 
-          {/* ── CRL Tab ── */}
           <TabsContent value="crl" className="space-y-4 mt-4">
             <Badge variant="outline" className="text-xs border-accent/30 text-accent">Robinson & Fleming, 1975</Badge>
             <div className="space-y-2">
@@ -171,12 +195,11 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">mm</span>
               </div>
             </div>
-            <Button onClick={handleCRL} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+            <Button onClick={handleCRL} disabled={blocked || needsLogin || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> Calcular IG
             </Button>
           </TabsContent>
 
-          {/* ── BPD Tab ── */}
           <TabsContent value="bpd" className="space-y-4 mt-4">
             <Badge variant="outline" className="text-xs border-primary/30 text-primary">Hadlock, 1982</Badge>
             <div className="space-y-2">
@@ -192,12 +215,11 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">mm</span>
               </div>
             </div>
-            <Button onClick={handleBPD} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+            <Button onClick={handleBPD} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> Calcular IG
             </Button>
           </TabsContent>
 
-          {/* ── Composite Tab ── */}
           <TabsContent value="composite" className="space-y-4 mt-4">
             <Badge variant="outline" className="text-xs border-accent/30 text-accent">Hadlock, 1984</Badge>
             <div className="grid grid-cols-2 gap-4">
@@ -214,7 +236,7 @@ const BiometryCalculator = () => {
                 </div>
               ))}
             </div>
-            <Button onClick={handleComposite} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+            <Button onClick={handleComposite} disabled={blocked || needsLogin || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> Calcular IG Composta
             </Button>
           </TabsContent>
@@ -227,7 +249,6 @@ const BiometryCalculator = () => {
         )}
       </div>
 
-      {/* ── Results ── */}
       <AnimatePresence mode="wait">
         {results && (
           <motion.div
@@ -252,13 +273,10 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">dias</span>
               </div>
               {results.estimates && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Média de {results.estimates.length} medida{results.estimates.length > 1 ? "s" : ""}
-                </p>
+                <p className="text-xs text-muted-foreground mt-2">Média de {results.estimates.length} medida{results.estimates.length > 1 ? "s" : ""}</p>
               )}
             </div>
 
-            {/* Individual composite estimates */}
             {results.estimates && results.estimates.length > 0 && (
               <div className="grid grid-cols-2 gap-3">
                 {results.estimates.map((est) => (
@@ -267,29 +285,23 @@ const BiometryCalculator = () => {
                       <Activity className="w-3.5 h-3.5 text-primary" />
                       <span className="text-xs font-medium text-muted-foreground">{est.label}</span>
                     </div>
-                    <p className="tabular-nums text-lg font-display text-foreground">
-                      {formatGAShort(est.weeks, est.days)}
-                    </p>
+                    <p className="tabular-nums text-lg font-display text-foreground">{formatGAShort(est.weeks, est.days)}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Due date */}
             <div className="glass-card-static p-5 space-y-2">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
               </div>
-              <p className="tabular-nums text-lg font-display text-foreground">
-                {formatDateLongBR(results.dueDate)}
-              </p>
+              <p className="tabular-nums text-lg font-display text-foreground">{formatDateLongBR(results.dueDate)}</p>
               <p className="text-xs text-muted-foreground">
                 {mode === "crl" ? "DPP estimada (±5 dias no 1º trimestre)" : "DPP estimada (±7–14 dias no 2º/3º trimestre)"}
               </p>
             </div>
 
-            {/* Reference tables for individual modes */}
             {mode === "crl" && (
               <div className="glass-card-static p-5 space-y-3">
                 <h4 className="text-sm font-medium text-foreground flex items-center gap-2">

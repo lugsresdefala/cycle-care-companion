@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Info, Ruler, Baby, Calendar, AlertCircle } from "lucide-react";
-import { gestationalAgeFromCRL, isValidCRL, dueDateFromGA } from "@/lib/biometry";
+import { isValidCRL } from "@/lib/biometry";
+import { apiFetch, ApiError } from "@/lib/api";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +19,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 import { CRL_REFERENCE } from "@/lib/biometry-references";
 
 const CRLCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [crl, setCrl] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -26,26 +27,43 @@ const CRLCalculator = () => {
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
 
   const handleCalculate = async () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const ga = gestationalAgeFromCRL(value);
-    const res = { ...ga, dueDate: dueDateFromGA(ga.totalDays) };
-    setResults(res);
-    if (canSave) {
-      saveExam({
-        calcType: "crl",
-        inputData: { crl: value },
-        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
-        gestationalAgeWeeks: ga.weeks,
-        gestationalAgeDays: ga.days,
-        patientId: selectedPatientId,
-      });
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry",
+        { method: "POST", body: JSON.stringify({ mode: "crl", crl: value }) },
+      );
+      const dueDate = new Date(result.dueDate);
+      setResults({ weeks: result.weeks, days: result.days, totalDays: result.totalDays, dueDate });
+      void refetch();
+      if (canSave) {
+        void saveExam({
+          calcType: "crl",
+          inputData: { crl: value },
+          resultData: { weeks: result.weeks, days: result.days, totalDays: result.totalDays },
+          gestationalAgeWeeks: result.weeks,
+          gestationalAgeDays: result.days,
+          patientId: selectedPatientId,
+        });
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar as calculadoras premium.");
+      } else {
+        setError("Erro ao calcular. Tente novamente.");
+      }
+    } finally {
+      setCalculating(false);
     }
   };
 
@@ -96,7 +114,7 @@ const CRLCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>
@@ -134,7 +152,6 @@ const CRLCalculator = () => {
               <p className="text-xs text-muted-foreground">DPP estimada (±5 dias no 1º trimestre)</p>
             </div>
 
-            {/* Reference Table */}
             <div className="glass-card-static p-5 space-y-3">
               <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Ruler className="w-4 h-4 text-primary" />
@@ -165,30 +182,9 @@ const CRLCalculator = () => {
 
       <ScientificFooter
         references={[
-          {
-            authors: "Robinson HP, Fleming JEE",
-            title: "A critical evaluation of sonar crown-rump length measurements",
-            journal: "Br J Obstet Gynaecol",
-            year: 1975,
-            doi: "10.1111/j.1471-0528.1975.tb00710.x",
-            pubmedId: "1191154",
-          },
-          {
-            authors: "Hadlock FP, Shah YP, Kanon DJ, Lindsey JV",
-            title: "Fetal crown-rump length: reevaluation of relation to menstrual age (5–18 weeks) with high-resolution real-time US",
-            journal: "Radiology",
-            year: 1992,
-            doi: "10.1148/radiology.182.2.1732960",
-            pubmedId: "1732960",
-          },
-          {
-            authors: "ISUOG",
-            title: "Practice guidelines: performance of first-trimester fetal ultrasound scan",
-            journal: "Ultrasound Obstet Gynecol",
-            year: 2013,
-            doi: "10.1002/uog.12342",
-            pubmedId: "23371446",
-          },
+          { authors: "Robinson HP, Fleming JEE", title: "A critical evaluation of sonar crown-rump length measurements", journal: "Br J Obstet Gynaecol", year: 1975, doi: "10.1111/j.1471-0528.1975.tb00710.x", pubmedId: "1191154" },
+          { authors: "Hadlock FP, Shah YP, Kanon DJ, Lindsey JV", title: "Fetal crown-rump length: reevaluation of relation to menstrual age (5–18 weeks) with high-resolution real-time US", journal: "Radiology", year: 1992, doi: "10.1148/radiology.182.2.1732960", pubmedId: "1732960" },
+          { authors: "ISUOG", title: "Practice guidelines: performance of first-trimester fetal ultrasound scan", journal: "Ultrasound Obstet Gynecol", year: 2013, doi: "10.1002/uog.12342", pubmedId: "23371446" },
         ]}
         units={[
           { param: "CCN", unit: "mm", description: "Comprimento crânio-caudal medido no plano sagital médio" },

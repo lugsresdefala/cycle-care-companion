@@ -7,29 +7,23 @@ import { PageMeta } from "@/components/PageMeta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Info, Scale, Baby, AlertCircle, TrendingUp } from "lucide-react";
-import { estimatedFetalWeight, getEFWPercentiles } from "@/lib/biometry";
+import { apiFetch, ApiError } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } =
-    useTokenGate();
+  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
-  const [selectedPatientId, setSelectedPatientId] = useState<
-    string | undefined
-  >();
+  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
   const [gaWeeks, setGaWeeks] = useState("");
   const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
   const [results, setResults] = useState<{
     weightG: number;
     weightKg: string;
@@ -43,59 +37,43 @@ const EFWCalculator = () => {
     const acVal = parseFloat(ac);
     const flVal = parseFloat(fl);
 
-    if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) {
-      setError("Preencha CC, CA e CF para o cálculo do peso fetal.");
-      return;
-    }
-    if (hcVal < 50 || hcVal > 380) {
-      setError("CC deve estar entre 50 e 380 mm.");
-      return;
-    }
-    if (acVal < 40 || acVal > 400) {
-      setError("CA deve estar entre 40 e 400 mm.");
-      return;
-    }
-    if (flVal < 10 || flVal > 85) {
-      setError("CF deve estar entre 10 e 85 mm.");
-      return;
-    }
-
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) { setError("Preencha CC, CA e CF para o cálculo do peso fetal."); return; }
+    if (hcVal < 50 || hcVal > 380) { setError("CC deve estar entre 50 e 380 mm."); return; }
+    if (acVal < 40 || acVal > 400) { setError("CA deve estar entre 40 e 400 mm."); return; }
+    if (flVal < 10 || flVal > 85) { setError("CF deve estar entre 10 e 85 mm."); return; }
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const efw = estimatedFetalWeight({ hc: hcVal, ac: acVal, fl: flVal });
-    const gaW = gaWeeks ? parseFloat(gaWeeks) : null;
-    const percentiles = gaW !== null ? getEFWPercentiles(gaW) : null;
-
-    let percentileRange: string;
-    if (percentiles) {
-      if (efw.weightG < percentiles.p10)
-        percentileRange = "Abaixo do percentil 10 — avaliar CIUR";
-      else if (efw.weightG > percentiles.p90)
-        percentileRange = "Acima do percentil 90 — avaliar macrossomia";
-      else percentileRange = "Entre percentis 10 e 90 — Adequado para IG (AIG)";
-    } else if (gaW !== null) {
-      percentileRange =
-        "Percentil indisponível — padrão INTERGROWTH-21st definido para IG 22–40 semanas";
-    } else {
-      percentileRange =
-        "Informe a IG (22–40 semanas) para classificação por percentil";
-    }
-
-    setResults({ ...efw, percentileRange, percentiles });
-    if (canSave) {
-      const gaW2 = gaW ?? undefined;
-      saveExam({
-        calcType: "efw",
-        inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW2 },
-        resultData: {
-          weightG: efw.weightG,
-          weightKg: efw.weightKg,
-          percentileRange,
-        },
-        gestationalAgeWeeks: gaW2,
-        patientId: selectedPatientId,
+    setCalculating(true);
+    try {
+      const gaW = gaWeeks ? parseFloat(gaWeeks) : undefined;
+      const result = await apiFetch<{
+        weightG: number; weightKg: string; percentileRange: string; formula: string;
+        percentiles: { p10: number; p50: number; p90: number } | null;
+      }>("/calculate/efw", {
+        method: "POST",
+        body: JSON.stringify({ hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW }),
       });
+      setResults(result);
+      void refetch();
+      if (canSave) {
+        void saveExam({
+          calcType: "efw",
+          inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW },
+          resultData: { weightG: result.weightG, weightKg: result.weightKg, percentileRange: result.percentileRange },
+          gestationalAgeWeeks: gaW,
+          patientId: selectedPatientId,
+        });
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar as calculadoras premium.");
+      } else {
+        setError("Erro ao calcular. Tente novamente.");
+      }
+    } finally {
+      setCalculating(false);
     }
   };
 
@@ -106,83 +84,31 @@ const EFWCalculator = () => {
         description="Estime o peso fetal (PFE) pelas fórmulas de Hadlock. Avalie o percentil e identifique restrição de crescimento intrauterino (RCIU) — IDALIA Calc."
         path="/efw"
       />
-      <TokenGateAlert
-        needsLogin={needsLogin}
-        blocked={blocked}
-        tokensRemaining={subscription?.tokens_remaining}
-      />
-      <PatientSelector
-        value={selectedPatientId}
-        onChange={setSelectedPatientId}
-      />
+      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
-          <h1 className="font-display text-xl text-foreground">
-            Peso Fetal Estimado (PFE)
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cálculo do peso fetal estimado pela fórmula de Hadlock com CC, CA e
-            CF.
-          </p>
-          <Badge
-            variant="outline"
-            className="mt-2 text-xs border-primary/30 text-primary"
-          >
-            Hadlock, 1985
-          </Badge>
+          <h1 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h1>
+          <p className="text-sm text-muted-foreground mt-1">Cálculo do peso fetal estimado pela fórmula de Hadlock com CC, CA e CF.</p>
+          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Hadlock, 1985</Badge>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           {[
-            {
-              label: "CC (mm)",
-              desc: "Circunferência Cefálica",
-              value: hc,
-              set: setHc,
-              range: "50–380",
-            },
-            {
-              label: "CA (mm)",
-              desc: "Circunferência Abdominal",
-              value: ac,
-              set: setAc,
-              range: "40–400",
-            },
-            {
-              label: "CF (mm)",
-              desc: "Comprimento do Fêmur",
-              value: fl,
-              set: setFl,
-              range: "10–85",
-            },
-            {
-              label: "IG (sem)",
-              desc: "Idade gestacional para percentil",
-              value: gaWeeks,
-              set: setGaWeeks,
-              range: "22–40",
-            },
+            { label: "CC (mm)", desc: "Circunferência Cefálica", value: hc, set: setHc, range: "50–380" },
+            { label: "CA (mm)", desc: "Circunferência Abdominal", value: ac, set: setAc, range: "40–400" },
+            { label: "CF (mm)", desc: "Comprimento do Fêmur", value: fl, set: setFl, range: "10–85" },
+            { label: "IG (sem)", desc: "Idade gestacional para percentil", value: gaWeeks, set: setGaWeeks, range: "22–40" },
           ].map((f) => (
             <div key={f.label} className="space-y-1.5">
               <div className="flex items-center gap-1.5">
                 <Label className="text-sm text-foreground">{f.label}</Label>
                 <Tooltip>
-                  <TooltipTrigger>
-                    <Info className="w-3.5 h-3.5 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {f.desc} ({f.range})
-                  </TooltipContent>
+                  <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                  <TooltipContent>{f.desc} ({f.range})</TooltipContent>
                 </Tooltip>
               </div>
-              <Input
-                type="number"
-                step={0.1}
-                value={f.value}
-                onChange={(e) => f.set(e.target.value)}
-                placeholder={f.label.split(" ")[0]}
-                className="input-glass tabular-nums"
-              />
+              <Input type="number" step={0.1} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label.split(" ")[0]} className="input-glass tabular-nums" />
             </div>
           ))}
         </div>
@@ -193,11 +119,7 @@ const EFWCalculator = () => {
           </div>
         )}
 
-        <Button
-          onClick={handleCalculate}
-          disabled={blocked || needsLogin || consuming}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50"
-        >
+        <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
           <Scale className="w-4 h-4 mr-1" /> Calcular PFE
         </Button>
       </div>
@@ -210,50 +132,27 @@ const EFWCalculator = () => {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-4"
           >
-            {/* Weight result */}
             <div className="glass-card-static p-6 md:p-8 mesh-coral">
               <div className="flex items-center gap-2 mb-2">
                 <Scale className="w-5 h-5 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Peso Fetal Estimado
-                </span>
+                <span className="text-xs uppercase tracking-wider text-muted-foreground">Peso Fetal Estimado</span>
               </div>
               <div className="flex items-baseline gap-3">
-                <span className="tabular-nums text-4xl font-display text-foreground">
-                  {results.weightG}
-                </span>
+                <span className="tabular-nums text-4xl font-display text-foreground">{results.weightG}</span>
                 <span className="text-lg text-muted-foreground">g</span>
-                <span className="text-sm text-muted-foreground ml-2">
-                  ({results.weightKg} kg)
-                </span>
+                <span className="text-sm text-muted-foreground ml-2">({results.weightKg} kg)</span>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Fórmula: {results.formula}
-              </p>
+              <p className="text-xs text-muted-foreground mt-2">Fórmula: {results.formula}</p>
             </div>
 
-            {/* Percentile classification */}
-            <div
-              className={`glass-card-static p-5 space-y-2 ${
-                results.percentileRange.includes("CIUR")
-                  ? "border-destructive/30"
-                  : results.percentileRange.includes("macrossomia")
-                    ? "border-ovulatory/30"
-                    : "border-accent/30"
-              }`}
-            >
+            <div className={`glass-card-static p-5 space-y-2 ${results.percentileRange.includes("CIUR") ? "border-destructive/30" : results.percentileRange.includes("macrossomia") ? "border-ovulatory/30" : "border-accent/30"}`}>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-foreground">
-                  Classificação
-                </span>
+                <span className="text-sm font-medium text-foreground">Classificação</span>
               </div>
-              <p className="text-sm text-foreground">
-                {results.percentileRange}
-              </p>
+              <p className="text-sm text-foreground">{results.percentileRange}</p>
             </div>
 
-            {/* Percentile chart if GA provided */}
             {results.percentiles && (
               <div className="glass-card-static p-5 space-y-3">
                 <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
@@ -262,43 +161,18 @@ const EFWCalculator = () => {
                 </h4>
                 <div className="space-y-2">
                   {[
-                    {
-                      label: "P10",
-                      value: results.percentiles.p10,
-                      color: "bg-destructive/60",
-                    },
-                    {
-                      label: "P50",
-                      value: results.percentiles.p50,
-                      color: "bg-accent/60",
-                    },
-                    {
-                      label: "P90",
-                      value: results.percentiles.p90,
-                      color: "bg-primary/60",
-                    },
+                    { label: "P10", value: results.percentiles.p10, color: "bg-destructive/60" },
+                    { label: "P50", value: results.percentiles.p50, color: "bg-accent/60" },
+                    { label: "P90", value: results.percentiles.p90, color: "bg-primary/60" },
                   ].map((p) => (
                     <div key={p.label} className="space-y-1">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">{p.label}</span>
-                        <span className="tabular-nums text-foreground">
-                          {p.value}g
-                        </span>
+                        <span className="tabular-nums text-foreground">{p.value}g</span>
                       </div>
                       <div className="h-2 bg-muted rounded-full overflow-hidden relative">
-                        <div
-                          className={`h-full rounded-full ${p.color}`}
-                          style={{
-                            width: `${(p.value / results.percentiles!.p90) * 80}%`,
-                          }}
-                        />
-                        {/* EFW marker */}
-                        <div
-                          className="absolute top-0 h-full w-0.5 bg-foreground"
-                          style={{
-                            left: `${Math.min(100, (results.weightG / results.percentiles!.p90) * 80)}%`,
-                          }}
-                        />
+                        <div className={`h-full rounded-full ${p.color}`} style={{ width: `${(p.value / results.percentiles!.p90) * 80}%` }} />
+                        <div className="absolute top-0 h-full w-0.5 bg-foreground" style={{ left: `${Math.min(100, (results.weightG / results.percentiles!.p90) * 80)}%` }} />
                       </div>
                     </div>
                   ))}
@@ -315,57 +189,15 @@ const EFWCalculator = () => {
 
       <ScientificFooter
         references={[
-          {
-            authors: "Hadlock FP, Harrist RB, Sharman RS, Deter RL, Park SK",
-            title:
-              "Estimation of fetal weight with the use of head, body, and femur measurements — a prospective study",
-            journal: "Am J Obstet Gynecol",
-            year: 1985,
-            doi: "10.1016/0002-9378(85)90298-4",
-            pubmedId: "3881966",
-          },
-          {
-            authors:
-              "Shepard MJ, Richards VA, Berkowitz RL, Warsof SL, Hobbins JC",
-            title:
-              "An evaluation of two equations for predicting fetal weight by ultrasound",
-            journal: "Am J Obstet Gynecol",
-            year: 1982,
-            doi: "10.1016/0002-9378(82)90272-0",
-            pubmedId: "7058805",
-          },
-          {
-            authors:
-              "Papageorghiou AT, Ohuma EO, Altman DG, et al. (INTERGROWTH-21st)",
-            title:
-              "International standards for fetal growth based on serial ultrasound measurements",
-            journal: "Lancet",
-            year: 2014,
-            doi: "10.1016/S0140-6736(14)61490-2",
-            pubmedId: "25209488",
-          },
+          { authors: "Hadlock FP, Harrist RB, Sharman RS, Deter RL, Park SK", title: "Estimation of fetal weight with the use of head, body, and femur measurements — a prospective study", journal: "Am J Obstet Gynecol", year: 1985, doi: "10.1016/0002-9378(85)90298-4", pubmedId: "3881966" },
+          { authors: "Shepard MJ, Richards VA, Berkowitz RL, Warsof SL, Hobbins JC", title: "An evaluation of two equations for predicting fetal weight by ultrasound", journal: "Am J Obstet Gynecol", year: 1982, doi: "10.1016/0002-9378(82)90272-0", pubmedId: "7058805" },
+          { authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al. (INTERGROWTH-21st)", title: "International standards for fetal growth based on serial ultrasound measurements", journal: "Lancet", year: 2014, doi: "10.1016/S0140-6736(14)61490-2", pubmedId: "25209488" },
         ]}
         units={[
-          {
-            param: "CC / CA",
-            unit: "mm",
-            description: "Circunferências em milímetros",
-          },
-          {
-            param: "CF",
-            unit: "mm",
-            description: "Comprimento do fêmur em milímetros",
-          },
-          {
-            param: "Peso fetal",
-            unit: "g / kg",
-            description: "Gramas (primário) e quilogramas",
-          },
-          {
-            param: "IG (para percentil)",
-            unit: "semanas",
-            description: "Semanas completas para classificação",
-          },
+          { param: "CC / CA", unit: "mm", description: "Circunferências em milímetros" },
+          { param: "CF", unit: "mm", description: "Comprimento do fêmur em milímetros" },
+          { param: "Peso fetal", unit: "g / kg", description: "Gramas (primário) e quilogramas" },
+          { param: "IG (para percentil)", unit: "semanas", description: "Semanas completas para classificação" },
         ]}
         extraDisclaimer="O PFE tem margem de erro de ±15%. A classificação por percentil usa o padrão oficial INTERGROWTH-21st (IG 22–40 semanas)."
       />

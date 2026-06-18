@@ -89,12 +89,12 @@ const App = () => (
               <Route path="/patient/:id/exams" element={<ProtectedRoute><PatientExams /></ProtectedRoute>} />
               <Route path="/gestational" element={<GestationalCalculator />} />
               <Route path="/fertility" element={<FertilityCalculator />} />
-              <Route path="/biometry" element={<BiometryCalculator />} />
-              <Route path="/bpd" element={<BPDCalculator />} />
-              <Route path="/crl" element={<CRLCalculator />} />
-              <Route path="/efw" element={<EFWCalculator />} />
-              <Route path="/doppler" element={<DopplerCalculator />} />
-              <Route path="/growth-curve" element={<GrowthCurveCalculator />} />
+              <Route path="/biometry" element={<ProtectedRoute><BiometryCalculator /></ProtectedRoute>} />
+              <Route path="/bpd" element={<ProtectedRoute><BPDCalculator /></ProtectedRoute>} />
+              <Route path="/crl" element={<ProtectedRoute><CRLCalculator /></ProtectedRoute>} />
+              <Route path="/efw" element={<ProtectedRoute><EFWCalculator /></ProtectedRoute>} />
+              <Route path="/doppler" element={<ProtectedRoute><DopplerCalculator /></ProtectedRoute>} />
+              <Route path="/growth-curve" element={<ProtectedRoute><GrowthCurveCalculator /></ProtectedRoute>} />
               <Route path="/trisomy-risk" element={<ProtectedRoute><TrisomyRiskCalculator /></ProtectedRoute>} />
               <Route path="/preeclampsia-risk" element={<ProtectedRoute><PreeclampsiaRiskCalculator /></ProtectedRoute>} />
               <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />

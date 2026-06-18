@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Info, Ruler, Baby, Calendar, AlertCircle } from "lucide-react";
-import { gestationalAgeFromBPD, isValidBPD, dueDateFromGA } from "@/lib/biometry";
+import { isValidBPD } from "@/lib/biometry";
+import { apiFetch, ApiError } from "@/lib/api";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +19,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 import { BPD_REFERENCE } from "@/lib/biometry-references";
 
 const BPDCalculator = () => {
-  const { blocked, needsLogin, consuming, subscription, consumeToken } = useTokenGate();
+  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -26,26 +27,43 @@ const BPDCalculator = () => {
     weeks: number; days: number; dueDate: Date; totalDays: number;
   } | null>(null);
   const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
 
   const handleCalculate = async () => {
     const value = parseFloat(bpd);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
-    const ok = await consumeToken();
-    if (!ok) return;
+    if (blocked || needsLogin || loading) return;
     setError("");
-    const ga = gestationalAgeFromBPD(value);
-    const res = { ...ga, dueDate: dueDateFromGA(ga.totalDays) };
-    setResults(res);
-    if (canSave) {
-      saveExam({
-        calcType: "bpd",
-        inputData: { bpd: value },
-        resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
-        gestationalAgeWeeks: ga.weeks,
-        gestationalAgeDays: ga.days,
-        patientId: selectedPatientId,
-      });
+    setCalculating(true);
+    try {
+      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry",
+        { method: "POST", body: JSON.stringify({ mode: "bpd", bpd: value }) },
+      );
+      const dueDate = new Date(result.dueDate);
+      setResults({ weeks: result.weeks, days: result.days, totalDays: result.totalDays, dueDate });
+      void refetch();
+      if (canSave) {
+        void saveExam({
+          calcType: "bpd",
+          inputData: { bpd: value },
+          resultData: { weeks: result.weeks, days: result.days, totalDays: result.totalDays },
+          gestationalAgeWeeks: result.weeks,
+          gestationalAgeDays: result.days,
+          patientId: selectedPatientId,
+        });
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar as calculadoras premium.");
+      } else {
+        setError("Erro ao calcular. Tente novamente.");
+      }
+    } finally {
+      setCalculating(false);
     }
   };
 
@@ -96,7 +114,7 @@ const BPDCalculator = () => {
             </div>
           )}
 
-          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
             <Ruler className="w-4 h-4 mr-1" /> Calcular IG
           </Button>
         </div>
@@ -164,22 +182,8 @@ const BPDCalculator = () => {
 
       <ScientificFooter
         references={[
-          {
-            authors: "Hadlock FP, Deter RL, Harrist RB, Park SK",
-            title: "Estimating fetal age: computer-assisted analysis of multiple fetal growth parameters",
-            journal: "Radiology",
-            year: 1984,
-            doi: "10.1148/radiology.152.2.6739822",
-            pubmedId: "6739822",
-          },
-          {
-            authors: "Hadlock FP, Deter RL, Harrist RB, Park SK",
-            title: "Fetal biparietal diameter: a critical re-evaluation of the relation to menstrual age by means of real-time ultrasound",
-            journal: "J Ultrasound Med",
-            year: 1982,
-            doi: "10.7863/jum.1982.1.3.97",
-            pubmedId: "6152941",
-          },
+          { authors: "Hadlock FP, Deter RL, Harrist RB, Park SK", title: "Estimating fetal age: computer-assisted analysis of multiple fetal growth parameters", journal: "Radiology", year: 1984, doi: "10.1148/radiology.152.2.6739822", pubmedId: "6739822" },
+          { authors: "Hadlock FP, Deter RL, Harrist RB, Park SK", title: "Fetal biparietal diameter: a critical re-evaluation of the relation to menstrual age by means of real-time ultrasound", journal: "J Ultrasound Med", year: 1982, doi: "10.7863/jum.1982.1.3.97", pubmedId: "6152941" },
         ]}
         units={[
           { param: "DBP", unit: "mm", description: "Diâmetro biparietal — borda externa a borda interna" },
