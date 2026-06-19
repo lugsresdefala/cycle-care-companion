@@ -8,7 +8,7 @@ import {
   stripeWebhookEvents,
   stripeCheckoutAttempts,
 } from "@workspace/db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 import { stripe, resolveOrigin, PRODUCT_TIER_MAP } from "../lib/stripe";
 
@@ -340,6 +340,8 @@ async function syncSubscription(
     }
   }
 
+  let upsertedId: string | undefined;
+
   if (existing[0]) {
     const fields: Record<string, unknown> = {
       planId: plan[0].id,
@@ -355,17 +357,39 @@ async function syncSubscription(
       .update(userSubscriptions)
       .set(fields)
       .where(eq(userSubscriptions.id, existing[0].id));
+    upsertedId = existing[0].id;
   } else {
-    await db.insert(userSubscriptions).values({
-      doctorId: userId,
-      planId: plan[0].id,
-      status,
-      startDate: new Date(),
-      endDate,
-      tokensRemaining: plan[0].tokensPerPeriod,
-      stripeCustomerId: incomingCustomerId,
-      stripeSubscriptionId: stripeSubId,
-    });
+    const inserted = await db
+      .insert(userSubscriptions)
+      .values({
+        doctorId: userId,
+        planId: plan[0].id,
+        status,
+        startDate: new Date(),
+        endDate,
+        tokensRemaining: plan[0].tokensPerPeriod,
+        stripeCustomerId: incomingCustomerId,
+        stripeSubscriptionId: stripeSubId,
+      })
+      .returning({ id: userSubscriptions.id });
+    upsertedId = inserted[0]?.id;
+  }
+
+  // Retire any leftover free-trial rows so they cannot be spent alongside the
+  // paid subscription. This closes the billing integrity gap where a user could
+  // exhaust their paid tokens and then continue using trial credits that were
+  // never closed when the paid plan was activated.
+  if (isActive && upsertedId) {
+    await db
+      .update(userSubscriptions)
+      .set({ status: "expired", tokensRemaining: 0, updatedAt: new Date() })
+      .where(
+        and(
+          eq(userSubscriptions.doctorId, userId),
+          eq(userSubscriptions.status, "trial"),
+          ne(userSubscriptions.id, upsertedId),
+        ),
+      );
   }
 }
 
