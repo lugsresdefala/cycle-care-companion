@@ -14,7 +14,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 const EFWCalculator = () => {
-  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate("efw");
   const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();

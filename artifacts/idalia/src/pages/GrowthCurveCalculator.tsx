@@ -38,7 +38,7 @@ const PERCENTILE_COLORS = {
 };
 
 const GrowthCurveCalculator = () => {
-  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate("growth_curve");
   const { saveExam, canSave } = useExamSave();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();

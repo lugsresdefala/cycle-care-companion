@@ -419,7 +419,7 @@ function DVTab({ disabled, onSuccess }: TabProps) {
 }
 
 export default function DopplerCalculator() {
-  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate("doppler");
   const disabled = blocked || needsLogin;
 
   return (

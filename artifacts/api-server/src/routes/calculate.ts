@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, userSubscriptions } from "@workspace/db";
+import { db } from "@workspace/db";
 import { sql } from "drizzle-orm";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 import {
@@ -32,22 +32,33 @@ import {
 
 const router: IRouter = Router();
 
-async function deductToken(userId: string): Promise<boolean> {
+// Deducts one token from the user's active subscription.
+// When clinicalTiersOnly = true, the subscription's plan must be
+// 'professional' or 'premium'; a 'basic' (Modo Pessoal) subscription is
+// rejected, enforcing the tier boundary between personal and clinical plans.
+async function deductToken(userId: string, clinicalTiersOnly = false): Promise<boolean> {
   const now = new Date();
+
+  const tierCondition = clinicalTiersOnly
+    ? sql`AND sp.tier IN ('professional', 'premium')`
+    : sql``;
+
   const updated = await db.execute(sql`
     UPDATE user_subscriptions
     SET tokens_remaining = tokens_remaining - 1,
         tokens_used = tokens_used + 1,
         updated_at = now()
     WHERE id = (
-      SELECT id FROM user_subscriptions
-      WHERE doctor_id = ${userId}
-        AND (status = 'active' OR status = 'trial')
-        AND end_date > ${now}
-        AND tokens_remaining > 0
-      ORDER BY created_at DESC
+      SELECT us.id FROM user_subscriptions us
+      JOIN subscription_plans sp ON sp.id = us.plan_id
+      WHERE us.doctor_id = ${userId}
+        AND (us.status = 'active' OR us.status = 'trial')
+        AND us.end_date > ${now}
+        AND us.tokens_remaining > 0
+        ${tierCondition}
+      ORDER BY us.created_at DESC
       LIMIT 1
-      FOR UPDATE
+      FOR UPDATE OF us
     )
     RETURNING tokens_remaining
   `);
@@ -66,8 +77,8 @@ router.post("/calculate/trisomy-risk", requireAuth, async (req, res): Promise<an
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -81,8 +92,8 @@ router.post("/calculate/preeclampsia-risk", requireAuth, async (req, res): Promi
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -153,8 +164,8 @@ router.post("/calculate/efw", requireAuth, async (req, res): Promise<any> => {
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -180,8 +191,8 @@ router.post("/calculate/doppler/ua", requireAuth, async (req, res): Promise<any>
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -202,8 +213,8 @@ router.post("/calculate/doppler/mca", requireAuth, async (req, res): Promise<any
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -224,8 +235,8 @@ router.post("/calculate/doppler/uta", requireAuth, async (req, res): Promise<any
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -249,8 +260,8 @@ router.post("/calculate/doppler/cpr", requireAuth, async (req, res): Promise<any
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -271,8 +282,8 @@ router.post("/calculate/doppler/dv", requireAuth, async (req, res): Promise<any>
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
@@ -291,8 +302,8 @@ router.post("/calculate/growth-curve", requireAuth, async (req, res): Promise<an
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
-  const ok = await deductToken(userId);
-  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+  const ok = await deductToken(userId, true);
+  if (!ok) return res.status(402).json({ error: "A professional or premium subscription with available tokens is required for this calculator" });
   return res.json(result);
 });
 
