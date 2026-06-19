@@ -5,3 +5,4 @@
 - [useAuth stable user ref](useauth-stable-ref.md) — idalia useAuth must memoize authUser; a fresh object literal per render caused a fetch→setState→refetch storm across all user-keyed effects.
 - [Stripe webhook idempotency order](stripe-webhook-idempotency.md) — record the event row only AFTER successful processing + return non-2xx on failure, else a transient sync error permanently strands a paying user.
 - [Stripe missing key fallback](stripe-missing-key-fallback.md) — checkout 500 `Invalid API Key …lder` means STRIPE_SECRET_KEY unset (silent sk_test_placeholder default); fix is config, re-publish prod.
+- [Parallel merge conflict markers](parallel-merge-conflict-markers.md) — concurrent task merges on the same fn can strand `<<<<<<<` markers; esbuild dies, API won't boot. grep for markers after merge bursts.
