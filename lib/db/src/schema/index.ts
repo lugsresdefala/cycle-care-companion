@@ -120,6 +120,12 @@ export const userSubscriptions = pgTable(
     uniqueIndex("idx_user_subscriptions_stripe_subscription_unique")
       .on(t.stripeSubscriptionId)
       .where(sql`stripe_subscription_id != ''`),
+    // Prevents concurrent bootstrap requests from creating more than one
+    // trial row per doctor. The partial condition matches exactly the trial
+    // rows that have no Stripe subscription bound.
+    uniqueIndex("idx_user_subscriptions_trial_unique")
+      .on(t.doctorId)
+      .where(sql`stripe_subscription_id = ''`),
   ],
 );
 

@@ -1,8 +1,8 @@
 // @ts-ignore
 import { getAuth, clerkClient } from "@clerk/express";
 import type { Request, Response, NextFunction } from "express";
-import { db, profiles, userSubscriptions, subscriptionPlans, userRoles } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { db, profiles, userRoles } from "@workspace/db";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface AuthedRequest extends Request {
   userId: string;
@@ -19,35 +19,38 @@ async function ensureProfileAndTrial(userId: string, email: string, fullName: st
 
   // Provision the free trial INDEPENDENTLY of profile creation so a partial
   // failure (profile inserted but trial insert failed on an earlier call) heals
-  // on the next bootstrap instead of permanently stranding the account. Only
-  // create a trial when the user has NO subscription row at all — never override
-  // an existing trial or a paid subscription.
-  const subs = await db
-    .select({ id: userSubscriptions.id })
-    .from(userSubscriptions)
-    .where(eq(userSubscriptions.doctorId, userId))
-    .limit(1);
-  if (subs.length === 0) {
-    const trialPlan = await db
-      .select()
-      .from(subscriptionPlans)
-      .where(eq(subscriptionPlans.tier, "free_trial"))
-      .limit(1);
-    if (trialPlan.length > 0) {
-      const now = new Date();
-      const end = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-      await db.insert(userSubscriptions).values({
-        // @ts-ignore
-        doctorId: userId,
-        planId: trialPlan[0].id,
-        status: "trial",
-        startDate: now,
-        endDate: end,
-        trialEndsAt: end,
-        tokensRemaining: 3,
-      });
-    }
-  }
+  // on the next bootstrap instead of permanently stranding the account.
+  //
+  // This is a single atomic statement that combines two guards:
+  //   1. Eligibility: the INSERT ... SELECT only fires when NOT EXISTS returns
+  //      no rows — i.e. the user has zero subscription rows of any kind (trial
+  //      OR paid). This prevents paid users from receiving a new trial row via
+  //      bootstrap-protected routes (/stripe/checkout, /stripe/portal).
+  //   2. Concurrency: ON CONFLICT DO NOTHING silently discards any concurrent
+  //      insert that races past the NOT EXISTS check and then hits the partial
+  //      unique index (doctor_id WHERE stripe_subscription_id = '').
+  // Together these two guards make the operation fully safe under parallel
+  // requests without any application-level locking.
+  const now = new Date();
+  const end = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+  await db.execute(sql`
+    INSERT INTO user_subscriptions
+      (doctor_id, plan_id, status, start_date, end_date, trial_ends_at, tokens_remaining)
+    SELECT
+      ${userId},
+      sp.id,
+      'trial',
+      ${now},
+      ${end},
+      ${end},
+      sp.tokens_per_period
+    FROM subscription_plans sp
+    WHERE sp.tier = 'free_trial'
+      AND NOT EXISTS (
+        SELECT 1 FROM user_subscriptions WHERE doctor_id = ${userId}
+      )
+    ON CONFLICT DO NOTHING
+  `);
 }
 
 async function resolveClerkUser(userId: string): Promise<{ email: string; fullName: string }> {

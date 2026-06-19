@@ -195,7 +195,11 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
               break;
             }
           }
-          await syncSubscription(userId, subId, undefined, true);
+          // Do NOT reset tokens here. If the row is new (INSERT), syncSubscription
+          // always sets full tokensPerPeriod on creation. If the row already exists
+          // (e.g. customer.subscription.created fired first), resetting would restore
+          // any tokens the user already spent during the race window.
+          await syncSubscription(userId, subId, undefined, false);
         }
         break;
       }
@@ -204,7 +208,11 @@ export async function stripeWebhookHandler(req: Request, res: Response): Promise
         const userId =
           (sub.metadata?.user_id as string) ||
           (await lookupUserIdBySub(sub.id, sub.customer as string));
-        if (userId) await syncSubscription(userId, sub.id, sub, true);
+        // Do NOT reset tokens here either. A new row always starts with full
+        // tokensPerPeriod via the INSERT branch; resetting on UPDATE would
+        // restore tokens already spent if checkout.session.completed fired first
+        // and the user consumed premium access during the race window.
+        if (userId) await syncSubscription(userId, sub.id, sub, false);
         break;
       }
       case "customer.subscription.updated":
