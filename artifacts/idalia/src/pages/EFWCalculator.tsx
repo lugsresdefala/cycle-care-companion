@@ -11,8 +11,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Info, Scale, Baby, AlertCircle, TrendingUp } from "lucide-react";
 import { apiFetch, ApiError } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
-import ScientificFooter from "@/components/ScientificFooter";
+import { toast } from "@/hooks/use-toast";
 
 const EFWCalculator = () => {
   const { blocked, needsLogin, subscription, refetch } = useTokenGate();
@@ -41,54 +40,50 @@ const EFWCalculator = () => {
       setError("Preencha CC, CA e CF para o cálculo do peso fetal.");
       return;
     }
-    if (hcVal < 50 || hcVal > 380) {
-      setError("CC deve estar entre 50 e 380 mm.");
-      return;
-    }
-    if (acVal < 40 || acVal > 400) {
-      setError("CA deve estar entre 40 e 400 mm.");
-      return;
-    }
-    if (flVal < 10 || flVal > 85) {
-      setError("CF deve estar entre 10 e 85 mm.");
-      return;
-    }
 
-    setError("");
     setCalculating(true);
+    setError("");
     try {
-      const gaW = gaWeeks ? parseFloat(gaWeeks) : null;
+      const gaW = gaWeeks ? parseFloat(gaWeeks) : undefined;
       const result = await apiFetch<{
-        weightG: number; weightKg: string; percentileRange: string; formula: string;
+        weightG: number;
+        weightKg: string;
+        percentileRange: string;
+        formula: string;
         percentiles: { p10: number; p50: number; p90: number } | null;
-      }>("/calculate/biometry/efw", {
-        method: "POST",
-        body: JSON.stringify({ hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW }),
-      });
+      }>(
+        "/calculate/efw",
+        { method: "POST", body: JSON.stringify({ hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW }) },
+      );
       setResults(result);
-      refetch();
       if (canSave) {
         saveExam({
           calcType: "efw",
-          inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW ?? undefined },
-          resultData: { weightG: result.weightG, weightKg: result.weightKg, percentileRange: result.percentileRange },
-          gestationalAgeWeeks: gaW ?? undefined,
+          inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW },
+          resultData: {
+            weightG: result.weightG,
+            weightKg: result.weightKg,
+            percentileRange: result.percentileRange,
+          },
+          gestationalAgeWeeks: gaW,
           patientId: selectedPatientId,
         });
       }
+      void refetch();
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        setError("Tokens esgotados. Assine um plano para continuar.");
-      } else if (err instanceof ApiError && err.status === 401) {
-        setError("Faça login para usar esta calculadora.");
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError(err.body?.error ?? "Valores fora do intervalo aceito.");
       } else {
-        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
       }
-      refetch();
     } finally {
       setCalculating(false);
     }
   };
+
+  const isDisabled = blocked || needsLogin || calculating;
 
   return (
     <div className="space-y-6">
@@ -99,10 +94,13 @@ const EFWCalculator = () => {
       />
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
+
       <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
         <div>
           <h1 className="font-display text-xl text-foreground">Peso Fetal Estimado (PFE)</h1>
-          <p className="text-sm text-muted-foreground mt-1">Cálculo do peso fetal estimado pela fórmula de Hadlock com CC, CA e CF.</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Cálculo do peso fetal estimado pela fórmula de Hadlock com CC, CA e CF.
+          </p>
           <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Hadlock, 1985</Badge>
         </div>
 
@@ -121,7 +119,11 @@ const EFWCalculator = () => {
                   <TooltipContent>{f.desc} ({f.range})</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.1} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label.split(" ")[0]} className="input-glass tabular-nums" />
+              <Input
+                type="number" step={0.1} value={f.value}
+                onChange={(e) => f.set(e.target.value)}
+                placeholder={f.label.split(" ")[0]} className="input-glass tabular-nums"
+              />
             </div>
           ))}
         </div>
@@ -132,20 +134,15 @@ const EFWCalculator = () => {
           </div>
         )}
 
-        <Button
-          onClick={handleCalculate}
-          disabled={blocked || needsLogin || calculating}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50"
-        >
-          <Scale className="w-4 h-4 mr-1" /> Calcular PFE
+        <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <Scale className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular PFE"}
         </Button>
       </div>
 
       <AnimatePresence>
         {results && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-4"
           >
@@ -162,7 +159,11 @@ const EFWCalculator = () => {
               <p className="text-xs text-muted-foreground mt-2">Fórmula: {results.formula}</p>
             </div>
 
-            <div className={`glass-card-static p-5 space-y-2 ${results.percentileRange.includes("CIUR") ? "border-destructive/30" : results.percentileRange.includes("macrossomia") ? "border-ovulatory/30" : "border-accent/30"}`}>
+            <div className={`glass-card-static p-5 space-y-2 ${
+              results.percentileRange.includes("CIUR") ? "border-destructive/30"
+              : results.percentileRange.includes("macrossomia") ? "border-ovulatory/30"
+              : "border-accent/30"
+            }`}>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium text-foreground">Classificação</span>
@@ -207,7 +208,6 @@ const EFWCalculator = () => {
       <ScientificFooter
         references={[
           { authors: "Hadlock FP, Harrist RB, Sharman RS, Deter RL, Park SK", title: "Estimation of fetal weight with the use of head, body, and femur measurements — a prospective study", journal: "Am J Obstet Gynecol", year: 1985, doi: "10.1016/0002-9378(85)90298-4", pubmedId: "3881966" },
-          { authors: "Shepard MJ, Richards VA, Berkowitz RL, Warsof SL, Hobbins JC", title: "An evaluation of two equations for predicting fetal weight by ultrasound", journal: "Am J Obstet Gynecol", year: 1982, doi: "10.1016/0002-9378(82)90272-0", pubmedId: "7058805" },
           { authors: "Papageorghiou AT, Ohuma EO, Altman DG, et al. (INTERGROWTH-21st)", title: "International standards for fetal growth based on serial ultrasound measurements", journal: "Lancet", year: 2014, doi: "10.1016/S0140-6736(14)61490-2", pubmedId: "25209488" },
         ]}
         units={[

@@ -11,12 +11,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Info, Ruler, Baby, Calendar, Activity, AlertCircle } from "lucide-react";
-import { isValidCRL, isValidBPD } from "@/lib/biometry";
-import { apiFetch, ApiError } from "@/lib/api";
+import { dueDateFromGA } from "@/lib/biometry";
 import { formatDateLongBR, formatGAShort } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 import { CRL_REFERENCE, BPD_REFERENCE } from "@/lib/biometry-references";
+import { apiFetch, ApiError } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 type CalcMode = "crl" | "bpd" | "composite";
 
@@ -33,6 +34,7 @@ const BiometryCalculator = () => {
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [mode, setMode] = useState<CalcMode>("crl");
+  const [calculating, setCalculating] = useState(false);
 
   const [crl, setCrl] = useState("");
   const [bpdSingle, setBpdSingle] = useState("");
@@ -43,7 +45,6 @@ const BiometryCalculator = () => {
 
   const [error, setError] = useState("");
   const [results, setResults] = useState<GAResult | null>(null);
-  const [calculating, setCalculating] = useState(false);
 
   const clearResults = () => { setError(""); setResults(null); };
 
@@ -65,49 +66,59 @@ const BiometryCalculator = () => {
     }
   };
 
-  const wrapCalc = async (fn: () => Promise<void>) => {
-    setError("");
+  const handleCRL = async () => {
+    const value = parseFloat(crl);
+    if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     setCalculating(true);
+    setError("");
     try {
-      await fn();
-      refetch();
+      const ga = await apiFetch<{ weeks: number; days: number; totalDays: number }>(
+        "/calculate/biometry/crl",
+        { method: "POST", body: JSON.stringify({ crl: value }) },
+      );
+      setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+      save("crl", { crl: value }, ga);
+      void refetch();
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        setError("Tokens esgotados. Assine um plano para continuar.");
-      } else if (err instanceof ApiError && err.status === 401) {
-        setError("Faça login para usar esta calculadora.");
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError(err.body?.error ?? "Valor fora do intervalo aceito.");
       } else {
-        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
       }
-      refetch();
     } finally {
       setCalculating(false);
     }
   };
 
-  const handleCRL = () => wrapCalc(async () => {
-    const value = parseFloat(crl);
-    if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
-    if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
-    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-      "/calculate/biometry/crl", { method: "POST", body: JSON.stringify({ crl: value }) }
-    );
-    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
-    save("crl", { crl: value }, ga);
-  });
-
-  const handleBPD = () => wrapCalc(async () => {
+  const handleBPD = async () => {
     const value = parseFloat(bpdSingle);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
-    if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
-    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-      "/calculate/biometry/bpd", { method: "POST", body: JSON.stringify({ bpd: value }) }
-    );
-    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
-    save("bpd", { bpd: value }, ga);
-  });
+    setCalculating(true);
+    setError("");
+    try {
+      const ga = await apiFetch<{ weeks: number; days: number; totalDays: number }>(
+        "/calculate/biometry/bpd",
+        { method: "POST", body: JSON.stringify({ bpd: value }) },
+      );
+      setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays) });
+      save("bpd", { bpd: value }, ga);
+      void refetch();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError(err.body?.error ?? "Valor fora do intervalo aceito.");
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
+    } finally {
+      setCalculating(false);
+    }
+  };
 
-  const handleComposite = () => wrapCalc(async () => {
+  const handleComposite = async () => {
     const params = {
       bpd: bpd ? parseFloat(bpd) : undefined,
       hc: hc ? parseFloat(hc) : undefined,
@@ -117,12 +128,28 @@ const BiometryCalculator = () => {
     if (!params.bpd && !params.hc && !params.ac && !params.fl) {
       setError("Insira ao menos uma medida biométrica."); return;
     }
-    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string; estimates: { label: string; weeks: number; days: number }[] }>(
-      "/calculate/biometry/composite", { method: "POST", body: JSON.stringify(params) }
-    );
-    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
-    save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, ga);
-  });
+    setCalculating(true);
+    setError("");
+    try {
+      const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; estimates: { label: string; weeks: number; days: number }[] }>(
+        "/calculate/biometry/composite",
+        { method: "POST", body: JSON.stringify(params) },
+      );
+      setResults({ ...ga, dueDate: dueDateFromGA(ga.totalDays), estimates: ga.estimates });
+      save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, ga);
+      void refetch();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError(err.body?.error ?? "Valores fora do intervalo aceitável.");
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
+    } finally {
+      setCalculating(false);
+    }
+  };
 
   const compositeFields = [
     { label: "DBP", desc: "Diâmetro Biparietal", value: bpd, set: setBpd, range: "14–100 mm" },
@@ -130,6 +157,8 @@ const BiometryCalculator = () => {
     { label: "CA", desc: "Circunferência Abdominal", value: ac, set: setAc, range: "40–400 mm" },
     { label: "CF", desc: "Comprimento do Fêmur", value: fl, set: setFl, range: "10–85 mm" },
   ];
+
+  const isDisabled = blocked || needsLogin || calculating;
 
   return (
     <div className="space-y-6">
@@ -175,8 +204,8 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">mm</span>
               </div>
             </div>
-            <Button onClick={handleCRL} disabled={blocked || needsLogin || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> Calcular IG
+            <Button onClick={handleCRL} disabled={isDisabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
             </Button>
           </TabsContent>
 
@@ -195,8 +224,8 @@ const BiometryCalculator = () => {
                 <span className="text-sm text-muted-foreground">mm</span>
               </div>
             </div>
-            <Button onClick={handleBPD} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> Calcular IG
+            <Button onClick={handleBPD} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
             </Button>
           </TabsContent>
 
@@ -216,8 +245,8 @@ const BiometryCalculator = () => {
                 </div>
               ))}
             </div>
-            <Button onClick={handleComposite} disabled={blocked || needsLogin || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> Calcular IG Composta
+            <Button onClick={handleComposite} disabled={isDisabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG Composta"}
             </Button>
           </TabsContent>
         </Tabs>
@@ -346,3 +375,4 @@ const BiometryCalculator = () => {
 };
 
 export default BiometryCalculator;
+

@@ -14,10 +14,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
-  ResponsiveContainer, Area, ReferenceDot, Legend,
+  ResponsiveContainer, Area, Legend,
 } from "recharts";
-import { GROWTH_PARAMS, type GrowthParameter, type GrowthAssessment, type PercentileRow } from "@/lib/intergrowth";
+import {
+  GrowthParameter, GROWTH_PARAMS, getGrowthData,
+  type GrowthAssessment, type PercentileRow,
+} from "@/lib/intergrowth";
 import { apiFetch, ApiError } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 interface Measurement {
   id: string;
@@ -72,19 +76,21 @@ const GrowthCurveCalculator = () => {
       }
       valid.push({ ga, value });
     }
-    if (valid.length === 0) { setError("Insira pelo menos uma medida válida."); return; }
-    setError("");
+    if (valid.length === 0) {
+      setError("Insira pelo menos uma medida válida.");
+      return;
+    }
     setCalculating(true);
+    setError("");
     try {
       const result = await apiFetch<{ assessments: GrowthAssessment[]; curveData: PercentileRow[] }>(
         "/calculate/growth-curve",
-        { method: "POST", body: JSON.stringify({ param: selectedParam, measurements: valid }) },
+        { method: "POST", body: JSON.stringify({ parameter: selectedParam, measurements: valid }) },
       );
       setAssessments(result.assessments);
       setCurveData(result.curveData);
-      void refetch();
       if (canSave) {
-        void saveExam({
+        saveExam({
           calcType: "growth_curve",
           inputData: { parameter: selectedParam, measurements: valid },
           resultData: { assessments: result.assessments },
@@ -92,10 +98,15 @@ const GrowthCurveCalculator = () => {
           patientId: selectedPatientId,
         });
       }
+      void refetch();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
-      else setError("Erro ao calcular. Tente novamente.");
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError(err.body?.error ?? "Valores fora do intervalo aceitável.");
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
       void refetch();
     } finally {
       setCalculating(false);
@@ -133,10 +144,14 @@ const GrowthCurveCalculator = () => {
   }, [curveData, assessments]);
 
   const severityClass = (s: string) =>
-    s === "critical" ? "border-destructive/40 bg-destructive/5" : s === "warning" ? "border-accent/40 bg-accent/5" : "border-primary/40 bg-primary/5";
+    s === "critical" ? "border-destructive/40 bg-destructive/5"
+    : s === "warning" ? "border-accent/40 bg-accent/5"
+    : "border-primary/40 bg-primary/5";
 
   const severityDot = (s: string) =>
     s === "critical" ? "bg-destructive" : s === "warning" ? "bg-accent" : "bg-primary";
+
+  const isDisabled = blocked || needsLogin || calculating;
 
   return (
     <div className="space-y-6">
@@ -180,8 +195,17 @@ const GrowthCurveCalculator = () => {
           {measurements.map((m, i) => (
             <div key={m.id} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-5 shrink-0 tabular-nums">{i + 1}.</span>
-              <Input type="number" step="0.1" placeholder="IG (sem)" value={m.ga} onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)} className="input-glass tabular-nums w-24" />
-              <Input type="number" step="0.1" placeholder={`${paramMeta.label} (${paramMeta.unit})`} value={m.value} onChange={(e) => updateMeasurement(m.id, "value", e.target.value)} className="input-glass tabular-nums flex-1" />
+              <Input
+                type="number" step="0.1" placeholder="IG (sem)"
+                value={m.ga} onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)}
+                className="input-glass tabular-nums w-24"
+              />
+              <Input
+                type="number" step="0.1"
+                placeholder={`${paramMeta.label} (${paramMeta.unit})`}
+                value={m.value} onChange={(e) => updateMeasurement(m.id, "value", e.target.value)}
+                className="input-glass tabular-nums flex-1"
+              />
               {measurements.length > 1 && (
                 <button onClick={() => removeMeasurement(m.id)} className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
@@ -201,16 +225,15 @@ const GrowthCurveCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <TrendingUp className="w-4 h-4 mr-1" /> Plotar na Curva
+        <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <TrendingUp className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Plotar na Curva"}
         </Button>
       </div>
 
       <AnimatePresence>
         {assessments.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="space-y-4"
           >
@@ -240,12 +263,10 @@ const GrowthCurveCalculator = () => {
                     <Line dataKey="p90" stroke={PERCENTILE_COLORS.p90} strokeWidth={1.5} strokeDasharray="3 3" dot={false} type="monotone" name="p90" />
                     <Line dataKey="p97" stroke={PERCENTILE_COLORS.p97} strokeWidth={1} strokeDasharray="4 4" dot={false} type="monotone" name="p97" />
                     <Line dataKey="measured" stroke="hsl(var(--foreground))" strokeWidth={2} dot={{ r: 5, fill: "hsl(var(--foreground))", stroke: "hsl(var(--background))", strokeWidth: 2 }} connectNulls type="monotone" name="measured" />
-                    <Legend
-                      formatter={(value: string) => {
-                        const labels: Record<string, string> = { p3: "P3", p10: "P10", p50: "P50 (mediana)", p90: "P90", p97: "P97", measured: "Medido" };
-                        return <span className="text-xs">{labels[value] || value}</span>;
-                      }}
-                    />
+                    <Legend formatter={(value: string) => {
+                      const labels: Record<string, string> = { p3: "P3", p10: "P10", p50: "P50 (mediana)", p90: "P90", p97: "P97", measured: "Medido" };
+                      return <span className="text-xs">{labels[value] || value}</span>;
+                    }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -253,13 +274,24 @@ const GrowthCurveCalculator = () => {
 
             <div className="space-y-3">
               {assessments.map((a, i) => (
-                <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }} className={`glass-card-static p-4 border ${severityClass(a.severity)}`}>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`glass-card-static p-4 border ${severityClass(a.severity)}`}
+                >
                   <div className="flex items-start gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${severityDot(a.severity)}`} />
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-foreground">IG {a.ga} sem — {a.value} {paramMeta.unit}</span>
-                        <Badge variant="outline" className={`text-xs ${a.severity === "critical" ? "border-destructive/40 text-destructive" : a.severity === "warning" ? "border-accent/40 text-accent" : "border-primary/40 text-primary"}`}>
+                        <span className="text-sm font-semibold text-foreground">
+                          IG {a.ga} sem — {a.value} {paramMeta.unit}
+                        </span>
+                        <Badge variant="outline" className={`text-xs ${
+                          a.severity === "critical" ? "border-destructive/40 text-destructive"
+                          : a.severity === "warning" ? "border-accent/40 text-accent"
+                          : "border-primary/40 text-primary"
+                        }`}>
                           {a.percentileLabel}
                         </Badge>
                       </div>

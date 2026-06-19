@@ -10,29 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Info, Activity, AlertCircle, Heart, Brain, ArrowRightLeft, Waves } from "lucide-react";
-import { apiFetch, ApiError } from "@/lib/api";
 import { formatIndex } from "@/lib/units";
-
-type DopplerResult = {
-  value: number;
-  percentile: string;
-  interpretation: string;
-  severity: "normal" | "warning" | "critical";
-  refs?: { p5: number; p50: number; p95: number };
-};
-type CPRResult = {
-  cpr: number;
-  mcaPI: number;
-  uaPI: number;
-  percentile: string;
-  interpretation: string;
-  severity: "normal" | "warning" | "critical";
-  refs?: { p5: number; p50: number; p95: number };
-};
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
-
-interface DopplerRefs { p5: number; p50: number; p95: number; }
+import { apiFetch, ApiError } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
+import type { DopplerResult, CPRResult } from "@/lib/doppler";
 
 const SEVERITY_STYLES = {
   normal: "border-accent/30 bg-accent/5",
@@ -60,7 +43,7 @@ function ResultCard({ label, result }: { label: string; result: DopplerResult })
   );
 }
 
-function RefBar({ value, refs, label }: { value: number; refs: DopplerRefs; label: string }) {
+function RefBar({ value, refs, label }: { value: number; refs: { p5: number; p50: number; p95: number }; label: string }) {
   const min = refs.p5 * 0.7;
   const max = refs.p95 * 1.3;
   const range = max - min;
@@ -83,57 +66,42 @@ function RefBar({ value, refs, label }: { value: number; refs: DopplerRefs; labe
   );
 }
 
-// ── Umbilical Artery Tab ──
-interface TabProps { parentDisabled: boolean; refetch: () => void; }
+interface TabProps {
+  disabled: boolean;
+  onSuccess: () => void;
+}
 
-function UmbilicalArteryTab({ parentDisabled, refetch }: TabProps) {
+function UmbilicalArteryTab({ disabled, onSuccess }: TabProps) {
   const [pi, setPi] = useState("");
   const [ri, setRi] = useState("");
   const [sd, setSd] = useState("");
   const [ga, setGa] = useState("");
   const [error, setError] = useState("");
   const [calculating, setCalculating] = useState(false);
-  const [results, setResults] = useState<{
-    piResult?: DopplerResult;
-    riResult?: DopplerResult;
-    sdResult?: DopplerResult;
-  } | null>(null);
+  const [results, setResults] = useState<{ piResult?: DopplerResult; riResult?: DopplerResult; sdResult?: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
   const handleCalc = async () => {
     const gaVal = parseInt(ga);
-    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
-      setError("Informe a IG entre 20 e 42 semanas.");
-      return;
-    }
+    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("Informe a IG entre 20 e 42 semanas."); return; }
     const piVal = pi ? parseFloat(pi) : NaN;
     const riVal = ri ? parseFloat(ri) : NaN;
     const sdVal = sd ? parseFloat(sd) : NaN;
-
-    if (isNaN(piVal) && isNaN(riVal) && isNaN(sdVal)) {
-      setError("Informe ao menos um índice: IP, IR ou S/D.");
-      return;
-    }
-    setError("");
+    if (isNaN(piVal) && isNaN(riVal) && isNaN(sdVal)) { setError("Informe ao menos um índice: IP, IR ou S/D."); return; }
     setCalculating(true);
+    setError("");
     try {
-      const res = await apiFetch<{ piResult?: DopplerResult; riResult?: DopplerResult; sdResult?: DopplerResult }>(
-        "/calculate/doppler/umbilical",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            ga: gaVal,
-            pi: isNaN(piVal) ? undefined : piVal,
-            ri: isNaN(riVal) ? undefined : riVal,
-            sd: isNaN(sdVal) ? undefined : sdVal,
-          }),
-        },
+      const result = await apiFetch<{ piResult?: DopplerResult; riResult?: DopplerResult; sdResult?: DopplerResult; refs: { p5: number; p50: number; p95: number } }>(
+        "/calculate/doppler/ua",
+        { method: "POST", body: JSON.stringify({ ga: gaVal, pi: isNaN(piVal) ? undefined : piVal, ri: isNaN(riVal) ? undefined : riVal, sd: isNaN(sdVal) ? undefined : sdVal }) },
       );
-      setResults(res);
-      refetch();
+      setResults(result);
+      onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar esta calculadora.");
-      else setError((err as any)?.message || "Erro no cálculo.");
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
     } finally {
       setCalculating(false);
     }
@@ -158,35 +126,15 @@ function UmbilicalArteryTab({ parentDisabled, refetch }: TabProps) {
             </div>
           ))}
         </div>
-
-        {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
-            <AlertCircle className="w-4 h-4" /> {error}
-          </div>
-        )}
-
-        <Button onClick={handleCalc} disabled={parentDisabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Activity className="w-4 h-4 mr-1" /> Avaliar
+        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <Activity className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar"}
         </Button>
       </div>
       <AnimatePresence>
         {results && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="space-y-3"
-          >
-            {results.piResult && (
-              <>
-                <ResultCard label="Índice de Pulsatilidade (IP)" result={results.piResult} />
-                {results.piResult.refs && (
-                  <div className="glass-card-static p-4">
-                    <RefBar value={results.piResult.value} refs={results.piResult.refs} label="IP — Artéria Umbilical" />
-                  </div>
-                )}
-              </>
-            )}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="space-y-3">
+            {results.piResult && (<><ResultCard label="Índice de Pulsatilidade (IP)" result={results.piResult} /><div className="glass-card-static p-4"><RefBar value={results.piResult.value} refs={results.refs} label="IP — Artéria Umbilical" /></div></>)}
             {results.riResult && <ResultCard label="Índice de Resistência (IR)" result={results.riResult} />}
             {results.sdResult && <ResultCard label="Relação S/D" result={results.sdResult} />}
           </motion.div>
@@ -196,38 +144,33 @@ function UmbilicalArteryTab({ parentDisabled, refetch }: TabProps) {
   );
 }
 
-// ── MCA Tab ──
-function MCATab({ parentDisabled, refetch }: TabProps) {
+function MCATab({ disabled, onSuccess }: TabProps) {
   const [pi, setPi] = useState("");
   const [ga, setGa] = useState("");
   const [error, setError] = useState("");
   const [calculating, setCalculating] = useState(false);
-  const [result, setResult] = useState<DopplerResult | null>(null);
+  const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
   const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const piVal = parseFloat(pi);
-    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
-      setError("IG entre 20 e 42 semanas.");
-      return;
-    }
-    if (isNaN(piVal) || piVal <= 0) {
-      setError("Informe o IP da ACM.");
-      return;
-    }
-    setError("");
+    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
+    if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP da ACM."); return; }
     setCalculating(true);
+    setError("");
     try {
-      const res = await apiFetch<DopplerResult>("/calculate/doppler/mca", {
-        method: "POST",
-        body: JSON.stringify({ ga: gaVal, pi: piVal }),
-      });
-      setResult(res);
-      refetch();
+      const r = await apiFetch<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } }>(
+        "/calculate/doppler/mca",
+        { method: "POST", body: JSON.stringify({ ga: gaVal, pi: piVal }) },
+      );
+      setResult(r);
+      onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar esta calculadora.");
-      else setError((err as any)?.message || "Erro no cálculo.");
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
     } finally {
       setCalculating(false);
     }
@@ -242,28 +185,25 @@ function MCATab({ parentDisabled, refetch }: TabProps) {
           <Badge variant="outline" className="mt-2 text-xs border-secondary/30 text-secondary">Ebbing et al., 2007</Badge>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {[{ label: "IG (sem)", value: ga, set: setGa }, { label: "IP da ACM", value: pi, set: setPi }].map((f) => (
-            <div key={f.label} className="space-y-1.5">
-              <Label className="text-sm text-foreground">{f.label}</Label>
-              <Input type="number" step={0.01} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label} className="input-glass tabular-nums" />
-            </div>
-          ))}
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Tooltip><TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger><TooltipContent>Idade gestacional (20–42)</TooltipContent></Tooltip></div>
+            <Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" />
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5"><Label className="text-sm text-foreground">IP da ACM</Label><Tooltip><TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger><TooltipContent>Índice de Pulsatilidade</TooltipContent></Tooltip></div>
+            <Input type="number" step={0.01} value={pi} onChange={(e) => setPi(e.target.value)} placeholder="IP" className="input-glass tabular-nums" />
+          </div>
         </div>
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-
-        <Button onClick={handleCalc} disabled={parentDisabled || calculating} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary disabled:opacity-50">
-          <Brain className="w-4 h-4 mr-1" /> Avaliar ACM
+        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-secondary text-secondary-foreground hover:bg-secondary/90 glow-secondary disabled:opacity-50">
+          <Brain className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar ACM"}
         </Button>
       </div>
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <ResultCard label="IP — Artéria Cerebral Média" result={result} />
-            {result.refs && (
-              <div className="glass-card-static p-4">
-                <RefBar value={result.value} refs={result.refs} label="IP — ACM" />
-              </div>
-            )}
+            <ResultCard label="IP — Artéria Cerebral Média" result={result.res} />
+            <div className="glass-card-static p-4"><RefBar value={result.res.value} refs={result.refs} label="IP — ACM" /></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -271,39 +211,34 @@ function MCATab({ parentDisabled, refetch }: TabProps) {
   );
 }
 
-// ── Uterine Artery Tab ──
-function UterineArteryTab({ parentDisabled, refetch }: TabProps) {
+function UterineArteryTab({ disabled, onSuccess }: TabProps) {
   const [pi, setPi] = useState("");
   const [ga, setGa] = useState("");
   const [notch, setNotch] = useState(false);
   const [error, setError] = useState("");
   const [calculating, setCalculating] = useState(false);
-  const [result, setResult] = useState<DopplerResult | null>(null);
+  const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
 
   const handleCalc = async () => {
     const gaVal = parseInt(ga);
     const piVal = parseFloat(pi);
-    if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
-      setError("IG entre 11 e 42 semanas.");
-      return;
-    }
-    if (isNaN(piVal) || piVal <= 0) {
-      setError("Informe o IP da artéria uterina.");
-      return;
-    }
-    setError("");
+    if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) { setError("IG entre 11 e 42 semanas."); return; }
+    if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP da artéria uterina."); return; }
     setCalculating(true);
+    setError("");
     try {
-      const res = await apiFetch<DopplerResult>("/calculate/doppler/uterine", {
-        method: "POST",
-        body: JSON.stringify({ ga: gaVal, pi: piVal, bilateralNotch: notch }),
-      });
-      setResult(res);
-      refetch();
+      const r = await apiFetch<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } }>(
+        "/calculate/doppler/uta",
+        { method: "POST", body: JSON.stringify({ ga: gaVal, pi: piVal, notch }) },
+      );
+      setResult(r);
+      onSuccess();
     } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar esta calculadora.");
-      else setError((err as any)?.message || "Erro no cálculo.");
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
     } finally {
       setCalculating(false);
     }
@@ -318,204 +253,29 @@ function UterineArteryTab({ parentDisabled, refetch }: TabProps) {
           <Badge variant="outline" className="mt-2 text-xs border-accent/30 text-accent">Gómez et al., 2008</Badge>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" /></div>
-          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP médio</Label><Input type="number" step={0.01} value={pi} onChange={(e) => setPi(e.target.value)} placeholder="IP" className="input-glass tabular-nums" /></div>
-        </div>
-        <div className="flex items-center gap-3"><Switch checked={notch} onCheckedChange={setNotch} /><Label className="text-sm text-foreground">Incisura protodiastólica bilateral</Label></div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-
-        <Button onClick={handleCalc} disabled={parentDisabled || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
-          <Heart className="w-4 h-4 mr-1" /> Avaliar Uterina
-        </Button>
-      </div>
-      <AnimatePresence>
-        {result && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <ResultCard label="IP — Artéria Uterina" result={result} />
-            {result.refs && (
-              <div className="glass-card-static p-4">
-                <RefBar value={result.value} refs={result.refs} label="IP — Art. Uterina" />
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ── CPR Tab ──
-function CPRTab({ parentDisabled, refetch }: TabProps) {
-  const [mcaPi, setMcaPi] = useState("");
-  const [uaPi, setUaPi] = useState("");
-  const [ga, setGa] = useState("");
-  const [error, setError] = useState("");
-  const [calculating, setCalculating] = useState(false);
-  const [result, setResult] = useState<CPRResult | null>(null);
-
-  const handleCalc = async () => {
-    const gaVal = parseInt(ga);
-    const mcaVal = parseFloat(mcaPi);
-    const uaVal = parseFloat(uaPi);
-    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
-      setError("IG entre 20 e 42 semanas.");
-      return;
-    }
-    if (isNaN(mcaVal) || mcaVal <= 0) {
-      setError("Informe o IP da ACM.");
-      return;
-    }
-    if (isNaN(uaVal) || uaVal <= 0) {
-      setError("Informe o IP da AU.");
-      return;
-    }
-    setError("");
-    setCalculating(true);
-    try {
-      const res = await apiFetch<CPRResult>("/calculate/doppler/cpr", {
-        method: "POST",
-        body: JSON.stringify({ ga: gaVal, mcaPI: mcaVal, uaPI: uaVal }),
-      });
-      setResult(res);
-      refetch();
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar esta calculadora.");
-      else setError((err as any)?.message || "Erro no cálculo.");
-    } finally {
-      setCalculating(false);
-    }
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-warm">
-        <div>
-          <h3 className="font-display text-lg text-foreground">Razão Cerebroplacentária (RCP)</h3>
-          <p className="text-xs text-muted-foreground mt-1">RCP = IP ACM / IP AU — indicador de redistribuição hemodinâmica fetal.</p>
-          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Baschat & Gembruch, 2003</Badge>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="space-y-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" /></div>
-          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP ACM</Label><Input type="number" step={0.01} value={mcaPi} onChange={(e) => setMcaPi(e.target.value)} placeholder="ACM" className="input-glass tabular-nums" /></div>
-          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP AU</Label><Input type="number" step={0.01} value={uaPi} onChange={(e) => setUaPi(e.target.value)} placeholder="AU" className="input-glass tabular-nums" /></div>
-        </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={parentDisabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <ArrowRightLeft className="w-4 h-4 mr-1" /> Calcular RCP
-        </Button>
-      </div>
-      <AnimatePresence>
-        {result && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <div className={`glass-card-static p-5 space-y-3 ${SEVERITY_STYLES[result.severity]}`}>
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase tracking-wider text-muted-foreground">Razão Cerebroplacentária</span>
-                <Badge variant="outline" className={`text-[10px] ${SEVERITY_ICON_COLOR[result.severity]} border-current/30`}>
-                  {SEVERITY_LABELS[result.severity]}
-                </Badge>
-              </div>
-              <div className="flex items-baseline gap-3">
-                <span className="tabular-nums text-3xl font-display text-foreground">{result.cpr}</span>
-                <span className="text-xs text-muted-foreground">{result.percentile}</span>
-              </div>
-              <div className="flex gap-4 text-xs text-muted-foreground">
-                <span>IP ACM: <strong className="text-foreground">{result.mcaPI}</strong></span>
-                <span>IP AU: <strong className="text-foreground">{result.uaPI}</strong></span>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">{result.interpretation}</p>
-            </div>
-            {result.refs && (
-              <div className="glass-card-static p-4">
-                <RefBar value={result.cpr} refs={result.refs} label="RCP (ACM/AU)" />
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ── Ductus Venosus Tab ──
-function DuctusVenosusTab({ parentDisabled, refetch }: TabProps) {
-  const [piv, setPiv] = useState("");
-  const [ga, setGa] = useState("");
-  const [waveAReversed, setWaveAReversed] = useState(false);
-  const [error, setError] = useState("");
-  const [calculating, setCalculating] = useState(false);
-  const [result, setResult] = useState<{
-    pivResult?: DopplerResult;
-    waveAResult: DopplerResult;
-  } | null>(null);
-
-  const handleCalc = async () => {
-    const gaVal = parseInt(ga);
-    if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
-      setError("Informe a IG entre 11 e 42 semanas.");
-      return;
-    }
-    const pivVal = piv ? parseFloat(piv) : NaN;
-    setError("");
-    setCalculating(true);
-    try {
-      const res = await apiFetch<{ pivResult?: DopplerResult; waveAResult: DopplerResult }>(
-        "/calculate/doppler/ductus",
-        {
-          method: "POST",
-          body: JSON.stringify({ ga: gaVal, piv: isNaN(pivVal) ? undefined : pivVal, waveAReversed }),
-        },
-      );
-      setResult(res);
-      refetch();
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar esta calculadora.");
-      else setError((err as any)?.message || "Erro no cálculo.");
-    } finally {
-      setCalculating(false);
-    }
-  };
-
-  return (
-    <div className="space-y-5">
-      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
-        <div>
-          <h3 className="font-display text-lg text-foreground">Ducto Venoso (DV)</h3>
-          <p className="text-xs text-muted-foreground mt-1">Avaliação do fluxo venoso fetal — marcador de função cardíaca e descompensação hemodinâmica.</p>
-          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Kessler et al., 2006 / DeVore, 2021</Badge>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Tooltip><TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger><TooltipContent>Idade gestacional (11–42)</TooltipContent></Tooltip></div>
             <Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" />
           </div>
           <div className="space-y-1.5">
-            <div className="flex items-center gap-1.5"><Label className="text-sm text-foreground">PIV</Label><Tooltip><TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger><TooltipContent>Pulsatility Index for Veins (opcional se ≥ 20 sem)</TooltipContent></Tooltip></div>
-            <Input type="number" step={0.01} value={piv} onChange={(e) => setPiv(e.target.value)} placeholder="PIV" className="input-glass tabular-nums" />
+            <div className="flex items-center gap-1.5"><Label className="text-sm text-foreground">IP médio</Label><Tooltip><TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger><TooltipContent>Média dos IPs das artérias uterinas D e E</TooltipContent></Tooltip></div>
+            <Input type="number" step={0.01} value={pi} onChange={(e) => setPi(e.target.value)} placeholder="IP" className="input-glass tabular-nums" />
           </div>
         </div>
-        <div className="flex items-center gap-3"><Switch checked={waveAReversed} onCheckedChange={setWaveAReversed} /><Label className="text-sm text-foreground">Onda &apos;a&apos; reversa</Label></div>
+        <div className="flex items-center gap-3">
+          <Switch checked={notch} onCheckedChange={setNotch} />
+          <Label className="text-sm text-foreground">Incisura protodiastólica bilateral</Label>
+        </div>
         {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-
-        <Button onClick={handleCalc} disabled={parentDisabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Waves className="w-4 h-4 mr-1" /> Avaliar DV
+        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+          <Heart className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar Uterina"}
         </Button>
       </div>
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <ResultCard label="Onda 'a' — Ducto Venoso" result={result.waveAResult} />
-            {result.pivResult && (
-              <>
-                <ResultCard label="PIV — Ducto Venoso" result={result.pivResult} />
-                {result.pivResult.refs && (
-                  <div className="glass-card-static p-4">
-                    <RefBar value={result.pivResult.value} refs={result.pivResult.refs} label="PIV — Ducto Venoso" />
-                  </div>
-                )}
-              </>
-            )}
+            <ResultCard label="IP Médio — Artérias Uterinas" result={result.res} />
+            <div className="glass-card-static p-4"><RefBar value={result.res.value} refs={result.refs} label="IP Médio — Uterinas" /></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -523,54 +283,175 @@ function DuctusVenosusTab({ parentDisabled, refetch }: TabProps) {
   );
 }
 
-const DopplerCalculator = () => {
+function CPRTab({ disabled, onSuccess }: TabProps) {
+  const [uaPi, setUaPi] = useState("");
+  const [mcaPi, setMcaPi] = useState("");
+  const [ga, setGa] = useState("");
+  const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
+  const [result, setResult] = useState<{ res: CPRResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
+
+  const handleCalc = async () => {
+    const gaVal = parseInt(ga);
+    const uaPiVal = parseFloat(uaPi);
+    const mcaPiVal = parseFloat(mcaPi);
+    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
+    if (isNaN(uaPiVal) || uaPiVal <= 0) { setError("Informe o IP da umbilical."); return; }
+    if (isNaN(mcaPiVal) || mcaPiVal <= 0) { setError("Informe o IP da cerebral."); return; }
+    setCalculating(true);
+    setError("");
+    try {
+      const r = await apiFetch<{ res: CPRResult; refs: { p5: number; p50: number; p95: number } }>(
+        "/calculate/doppler/cpr",
+        { method: "POST", body: JSON.stringify({ ga: gaVal, uaPi: uaPiVal, mcaPi: mcaPiVal }) },
+      );
+      setResult(r);
+      onSuccess();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-teal">
+        <div>
+          <h3 className="font-display text-lg text-foreground">Relação Cérebro-Placentária (RCP)</h3>
+          <p className="text-xs text-muted-foreground mt-1">Proporção entre a resistência da ACM e da Artéria Umbilical (IP ACM / IP umbilical).</p>
+          <Badge variant="outline" className="mt-2 text-xs border-accent/30 text-accent">Ebbing et al., 2007</Badge>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="space-y-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" /></div>
+          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP Umbilical</Label><Input type="number" step={0.01} value={uaPi} onChange={(e) => setUaPi(e.target.value)} placeholder="IP UA" className="input-glass tabular-nums" /></div>
+          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP Cerebral (ACM)</Label><Input type="number" step={0.01} value={mcaPi} onChange={(e) => setMcaPi(e.target.value)} placeholder="IP ACM" className="input-glass tabular-nums" /></div>
+        </div>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+          <ArrowRightLeft className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar RCP"}
+        </Button>
+      </div>
+      <AnimatePresence>
+        {result && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+            <ResultCard label="Relação Cérebro-Placentária (RCP)" result={result.res as any} />
+            <div className="glass-card-static p-4"><RefBar value={(result.res as any).value} refs={result.refs} label="RCP" /></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function DVTab({ disabled, onSuccess }: TabProps) {
+  const [pi, setPi] = useState("");
+  const [ga, setGa] = useState("");
+  const [waveA, setWaveA] = useState<"positive" | "zero" | "reversed">("positive");
+  const [error, setError] = useState("");
+  const [calculating, setCalculating] = useState(false);
+  const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
+
+  const handleCalc = async () => {
+    const gaVal = parseInt(ga);
+    const piVal = parseFloat(pi);
+    if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) { setError("IG entre 20 e 42 semanas."); return; }
+    if (isNaN(piVal) || piVal <= 0) { setError("Informe o IP do ducto venoso."); return; }
+    setCalculating(true);
+    setError("");
+    try {
+      const r = await apiFetch<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } }>(
+        "/calculate/doppler/dv",
+        { method: "POST", body: JSON.stringify({ ga: gaVal, pi: piVal, waveA }) },
+      );
+      setResult(r);
+      onSuccess();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        toast({ title: "Tokens esgotados", description: "Assine um plano para continuar usando as calculadoras.", variant: "destructive" });
+      } else {
+        toast({ title: "Erro ao calcular", description: "Tente novamente.", variant: "destructive" });
+      }
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-indigo">
+        <div>
+          <h3 className="font-display text-lg text-foreground">Ducto Venoso</h3>
+          <p className="text-xs text-muted-foreground mt-1">Avaliação hemodinâmica fetal avançada e função cardíaca.</p>
+          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Kessler et al., 2006</Badge>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5"><Label className="text-sm text-foreground">IG (sem)</Label><Input type="number" value={ga} onChange={(e) => setGa(e.target.value)} placeholder="IG" className="input-glass tabular-nums" /></div>
+          <div className="space-y-1.5"><Label className="text-sm text-foreground">IP do Ducto Venoso</Label><Input type="number" step={0.01} value={pi} onChange={(e) => setPi(e.target.value)} placeholder="IP DV" className="input-glass tabular-nums" /></div>
+          <div className="md:col-span-2 space-y-2">
+            <Label className="text-sm text-foreground">Onda A</Label>
+            <div className="flex gap-2">
+              {[ { v: "positive", l: "Positiva" }, { v: "zero", l: "Ausente" }, { v: "reversed", l: "Reversa" }].map((opt) => (
+                <Button key={opt.v} variant={waveA === opt.v ? "default" : "outline"} size="sm" onClick={() => setWaveA(opt.v as any)} className="flex-1">{opt.l}</Button>
+              ))}
+            </div>
+          </div>
+        </div>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+          <Waves className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar Ducto"}
+        </Button>
+      </div>
+      <AnimatePresence>
+        {result && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
+            <ResultCard label="IP — Ducto Venoso" result={result.res} />
+            <div className="glass-card-static p-4"><RefBar value={result.res.value} refs={result.refs} label="IP — Ducto Venoso" /></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default function DopplerCalculator() {
   const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const disabled = blocked || needsLogin;
 
   return (
-    <div className="space-y-6">
-      <PageMeta
-        title="Calculadora de Dopplervelocimetria Fetal"
-        description="Avalie os índices de Doppler da artéria umbilical, ACM, artéria uterina, razão cerebroplacentária e ducto venoso — IDALIA Calc."
-        path="/doppler"
-      />
-      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+    <div className="min-h-screen pb-20 mesh-gradient">
+      <PageMeta title="Calculadora de Doppler Fetal | Idália" description="Avaliação de Doppler da Artéria Umbilical, Cerebral Média, Uterinas, Ducto Venoso e RCP com percentis." />
+      <div className="container max-w-2xl mx-auto px-4 pt-8 md:pt-12">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2.5 rounded-2xl bg-primary/10 text-primary glow-primary"><Activity className="w-6 h-6" /></div>
+          <div><h1 className="text-2xl font-display text-foreground leading-none">Doppler Fetal</h1><p className="text-sm text-muted-foreground mt-1">Avaliação hemodinâmica fetal e placentária</p></div>
+        </div>
 
-      <Tabs defaultValue="umbilical" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-2">
-          <TabsTrigger value="umbilical" className="text-[10px] sm:text-xs"><Activity className="w-3 h-3 mr-1 hidden sm:inline-block" />AU</TabsTrigger>
-          <TabsTrigger value="mca" className="text-[10px] sm:text-xs"><Brain className="w-3 h-3 mr-1 hidden sm:inline-block" />ACM</TabsTrigger>
-          <TabsTrigger value="uterine" className="text-[10px] sm:text-xs"><Heart className="w-3 h-3 mr-1 hidden sm:inline-block" />Uterina</TabsTrigger>
-          <TabsTrigger value="cpr" className="text-[10px] sm:text-xs"><ArrowRightLeft className="w-3 h-3 mr-1 hidden sm:inline-block" />RCP</TabsTrigger>
-          <TabsTrigger value="ductus" className="text-[10px] sm:text-xs"><Waves className="w-3 h-3 mr-1 hidden sm:inline-block" />DV</TabsTrigger>
-        </TabsList>
+        <TokenGateAlert />
 
-        <TabsContent value="umbilical"><UmbilicalArteryTab parentDisabled={disabled} refetch={refetch} /></TabsContent>
-        <TabsContent value="mca"><MCATab parentDisabled={disabled} refetch={refetch} /></TabsContent>
-        <TabsContent value="uterine"><UterineArteryTab parentDisabled={disabled} refetch={refetch} /></TabsContent>
-        <TabsContent value="cpr"><CPRTab parentDisabled={disabled} refetch={refetch} /></TabsContent>
-        <TabsContent value="ductus"><DuctusVenosusTab parentDisabled={disabled} refetch={refetch} /></TabsContent>
-      </Tabs>
+        <Tabs defaultValue="ua" className="space-y-6">
+          <div className="overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
+            <TabsList className="bg-muted/50 p-1 h-11 w-max min-w-full">
+              <TabsTrigger value="ua" className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">Umbilical</TabsTrigger>
+              <TabsTrigger value="mca" className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">ACM</TabsTrigger>
+              <TabsTrigger value="uta" className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">Uterinas</TabsTrigger>
+              <TabsTrigger value="cpr" className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">RCP</TabsTrigger>
+              <TabsTrigger value="dv" className="data-[state=active]:bg-background data-[state=active]:shadow-sm px-4">Ducto Venoso</TabsTrigger>
+            </TabsList>
+          </div>
 
-      <ScientificFooter
-        references={[
-          { authors: "Acharya G, Wilsgaard T, Berntsen GKR, Maltau JM, Kiserud T", title: "Reference ranges for serial measurements of umbilical artery Doppler indices in the second half of pregnancy", journal: "Am J Obstet Gynecol", year: 2005, doi: "10.1016/j.ajog.2004.11.067", pubmedId: "15902139" },
-          { authors: "Ebbing C, Rasmussen S, Kiserud T", title: "Middle cerebral artery blood flow velocities and pulsatility index and the ductus venosus blood flow velocity in the second half of pregnancy", journal: "Acta Obstet Gynecol Scand", year: 2007, doi: "10.1080/00016340701323998", pubmedId: "17609866" },
-          { authors: "Gómez O, Figueras F, Fernández S, et al.", title: "Reference ranges for uterine artery mean pulsatility index at 11-41 weeks of gestation", journal: "Ultrasound Obstet Gynecol", year: 2008, doi: "10.1002/uog.5315", pubmedId: "18481871" },
-          { authors: "Baschat AA, Gembruch U", title: "The cerebroplacental Doppler ratio revisited", journal: "Ultrasound Obstet Gynecol", year: 2003, doi: "10.1002/uog.51", pubmedId: "12601836" },
-          { authors: "Kessler J, Rasmussen S, Kiserud T", title: "The ductus venosus in the second half of pregnancy: physiological and pathophysiological considerations", journal: "Prenatal Diagnosis", year: 2006, doi: "10.1002/pd.1431", pubmedId: "16688757" },
-        ]}
-        units={[
-          { param: "IP", unit: "adimensional", description: "Índice de pulsatilidade — avalia pulsatilidade do fluxo" },
-          { param: "IR", unit: "adimensional", description: "Índice de resistência (0–1)" },
-          { param: "S/D", unit: "adimensional", description: "Relação sístole/diástole" },
-          { param: "RCP", unit: "adimensional", description: "Razão cerebroplacentária = IP ACM / IP AU" },
-          { param: "PIV", unit: "adimensional", description: "Índice de pulsatilidade venosa do ducto venoso" },
-        ]}
-        extraDisclaimer="Os valores de referência são baseados em estudos populacionais específicos. A interpretação deve considerar o contexto clínico completo e as tendências seriadas."
-      />
+          <TabsContent value="ua" className="focus-visible:outline-none"><UmbilicalArteryTab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
+          <TabsContent value="mca" className="focus-visible:outline-none"><MCATab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
+          <TabsContent value="uta" className="focus-visible:outline-none"><UterineArteryTab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
+          <TabsContent value="cpr" className="focus-visible:outline-none"><CPRTab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
+          <TabsContent value="dv" className="focus-visible:outline-none"><DVTab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
+        </Tabs>
+      </div>
+      <ScientificFooter />
     </div>
   );
-};
-
-export default DopplerCalculator;
+}
