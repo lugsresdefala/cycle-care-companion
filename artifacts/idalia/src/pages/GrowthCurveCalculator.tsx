@@ -34,7 +34,7 @@ const PERCENTILE_COLORS = {
 };
 
 const GrowthCurveCalculator = () => {
-  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [selectedParam, setSelectedParam] = useState<GrowthParameter>("efw");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -73,7 +73,6 @@ const GrowthCurveCalculator = () => {
       valid.push({ ga, value });
     }
     if (valid.length === 0) { setError("Insira pelo menos uma medida válida."); return; }
-    if (blocked || needsLogin || loading) return;
     setError("");
     setCalculating(true);
     try {
@@ -97,6 +96,7 @@ const GrowthCurveCalculator = () => {
       if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
       else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
       else setError("Erro ao calcular. Tente novamente.");
+      void refetch();
     } finally {
       setCalculating(false);
     }

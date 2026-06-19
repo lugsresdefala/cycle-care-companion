@@ -29,7 +29,7 @@ interface GAResult {
 }
 
 const BiometryCalculator = () => {
-  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [mode, setMode] = useState<CalcMode>("crl");
@@ -65,55 +65,49 @@ const BiometryCalculator = () => {
     }
   };
 
-  const handleCRL = async () => {
+  const wrapCalc = async (fn: () => Promise<void>) => {
+    setError("");
+    setCalculating(true);
+    try {
+      await fn();
+      refetch();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 402) {
+        setError("Tokens esgotados. Assine um plano para continuar.");
+      } else if (err instanceof ApiError && err.status === 401) {
+        setError("Faça login para usar esta calculadora.");
+      } else {
+        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
+      }
+      refetch();
+    } finally {
+      setCalculating(false);
+    }
+  };
+
+  const handleCRL = () => wrapCalc(async () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
-    if (blocked || needsLogin || loading) return;
-    setError("");
-    setCalculating(true);
-    try {
-      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-        "/calculate/biometry",
-        { method: "POST", body: JSON.stringify({ mode: "crl", crl: value }) },
-      );
-      setResults({ ...result, dueDate: new Date(result.dueDate) });
-      void refetch();
-      save("crl", { crl: value }, result);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
-      else setError("Erro ao calcular. Tente novamente.");
-    } finally {
-      setCalculating(false);
-    }
-  };
+    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+      "/calculate/biometry/crl", { method: "POST", body: JSON.stringify({ crl: value }) }
+    );
+    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
+    save("crl", { crl: value }, ga);
+  });
 
-  const handleBPD = async () => {
+  const handleBPD = () => wrapCalc(async () => {
     const value = parseFloat(bpdSingle);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
-    if (blocked || needsLogin || loading) return;
-    setError("");
-    setCalculating(true);
-    try {
-      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-        "/calculate/biometry",
-        { method: "POST", body: JSON.stringify({ mode: "bpd", bpd: value }) },
-      );
-      setResults({ ...result, dueDate: new Date(result.dueDate) });
-      void refetch();
-      save("bpd", { bpd: value }, result);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
-      else setError("Erro ao calcular. Tente novamente.");
-    } finally {
-      setCalculating(false);
-    }
-  };
+    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+      "/calculate/biometry/bpd", { method: "POST", body: JSON.stringify({ bpd: value }) }
+    );
+    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
+    save("bpd", { bpd: value }, ga);
+  });
 
-  const handleComposite = async () => {
+  const handleComposite = () => wrapCalc(async () => {
     const params = {
       bpd: bpd ? parseFloat(bpd) : undefined,
       hc: hc ? parseFloat(hc) : undefined,
@@ -123,26 +117,12 @@ const BiometryCalculator = () => {
     if (!params.bpd && !params.hc && !params.ac && !params.fl) {
       setError("Insira ao menos uma medida biométrica."); return;
     }
-    if (blocked || needsLogin || loading) return;
-    setError("");
-    setCalculating(true);
-    try {
-      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string; estimates: { label: string; weeks: number; days: number }[] }>(
-        "/calculate/biometry",
-        { method: "POST", body: JSON.stringify({ mode: "composite", ...params }) },
-      );
-      setResults({ ...result, dueDate: new Date(result.dueDate) });
-      void refetch();
-      save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, result);
-    } catch (err) {
-      if (err instanceof ApiError && err.status === 400) setError(err.body?.error ?? "Valores fora do intervalo aceitável.");
-      else if (err instanceof ApiError && err.status === 402) setError("Tokens esgotados. Assine um plano para continuar.");
-      else if (err instanceof ApiError && err.status === 401) setError("Faça login para usar as calculadoras premium.");
-      else setError("Erro ao calcular. Tente novamente.");
-    } finally {
-      setCalculating(false);
-    }
-  };
+    const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string; estimates: { label: string; weeks: number; days: number }[] }>(
+      "/calculate/biometry/composite", { method: "POST", body: JSON.stringify(params) }
+    );
+    setResults({ ...ga, dueDate: new Date(ga.dueDate) });
+    save("biometry", { bpd: params.bpd, hc: params.hc, ac: params.ac, fl: params.fl }, ga);
+  });
 
   const compositeFields = [
     { label: "DBP", desc: "Diâmetro Biparietal", value: bpd, set: setBpd, range: "14–100 mm" },

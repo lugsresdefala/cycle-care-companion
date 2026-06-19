@@ -19,7 +19,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 import { CRL_REFERENCE } from "@/lib/biometry-references";
 
 const CRLCalculator = () => {
-  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [crl, setCrl] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -33,35 +33,35 @@ const CRLCalculator = () => {
     const value = parseFloat(crl);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidCRL(value)) { setError("O CCN deve estar entre 2 e 84 mm (≈6–14 semanas)."); return; }
-    if (blocked || needsLogin || loading) return;
     setError("");
     setCalculating(true);
     try {
-      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-        "/calculate/biometry",
-        { method: "POST", body: JSON.stringify({ mode: "crl", crl: value }) },
+      const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry/crl",
+        { method: "POST", body: JSON.stringify({ crl: value }) }
       );
-      const dueDate = new Date(result.dueDate);
-      setResults({ weeks: result.weeks, days: result.days, totalDays: result.totalDays, dueDate });
-      void refetch();
+      const res = { ...ga, dueDate: new Date(ga.dueDate) };
+      setResults(res);
+      refetch();
       if (canSave) {
-        void saveExam({
+        saveExam({
           calcType: "crl",
           inputData: { crl: value },
-          resultData: { weeks: result.weeks, days: result.days, totalDays: result.totalDays },
-          gestationalAgeWeeks: result.weeks,
-          gestationalAgeDays: result.days,
+          resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+          gestationalAgeWeeks: ga.weeks,
+          gestationalAgeDays: ga.days,
           patientId: selectedPatientId,
         });
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+        setError("Tokens esgotados. Assine um plano para continuar.");
       } else if (err instanceof ApiError && err.status === 401) {
-        setError("Faça login para usar as calculadoras premium.");
+        setError("Faça login para usar esta calculadora.");
       } else {
-        setError("Erro ao calcular. Tente novamente.");
+        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
       }
+      refetch();
     } finally {
       setCalculating(false);
     }

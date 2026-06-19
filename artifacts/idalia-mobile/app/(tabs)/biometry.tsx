@@ -17,16 +17,7 @@ import { GlassCard } from "@/components/GlassCard";
 import { Field } from "@/components/Field";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useColors } from "@/hooks/useColors";
-import {
-  dueDateFromGA,
-  estimatedFetalWeight,
-  gestationalAgeFromCRL,
-  gestationalAgeFromMultipleBiometry,
-  isValidCRL,
-  type BiometryAverage,
-  type EFWResult,
-  type GAEstimate,
-} from "@/lib/biometry";
+import { customFetch } from "@workspace/api-client-react";
 
 type Mode = "crl" | "multi" | "efw";
 
@@ -35,6 +26,22 @@ const MODES: { id: Mode; label: string; sub: string }[] = [
   { id: "multi", label: "Biometria", sub: "DBP · CC · CA · CF" },
   { id: "efw", label: "Peso fetal", sub: "Hadlock 3-param" },
 ];
+
+interface GAResult {
+  weeks: number;
+  days: number;
+  totalDays: number;
+  dueDate: string;
+  estimates?: { label: string; weeks: number; days: number }[];
+}
+
+interface EFWResult {
+  weightG: number;
+  weightKg: string;
+  percentileRange: string;
+  formula: string;
+  percentiles: { p10: number; p50: number; p90: number } | null;
+}
 
 export default function BiometryTab() {
   const colors = useColors();
@@ -47,40 +54,49 @@ export default function BiometryTab() {
   const [ac, setAc] = useState("");
   const [fl, setFl] = useState("");
 
-  const [crlResult, setCrlResult] = useState<GAEstimate | null>(null);
-  const [multiResult, setMultiResult] = useState<BiometryAverage | null>(null);
+  const [crlResult, setCrlResult] = useState<GAResult | null>(null);
+  const [multiResult, setMultiResult] = useState<GAResult | null>(null);
   const [efwResult, setEfwResult] = useState<EFWResult | null>(null);
-  const [efwGa, setEfwGa] = useState<GAEstimate | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const headerTop = Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top;
 
-  const compute = () => {
+  const compute = async () => {
     setError(null);
     setCrlResult(null);
     setMultiResult(null);
     setEfwResult(null);
-    setEfwGa(null);
+    setLoading(true);
+
     try {
       if (mode === "crl") {
         const v = parseFloat(crl.replace(",", "."));
-        if (!isValidCRL(v)) {
+        if (isNaN(v) || v < 2 || v > 84) {
           setError("CCN deve estar entre 2 e 84 mm");
           return;
         }
-        setCrlResult(gestationalAgeFromCRL(v));
+        const res = await customFetch<GAResult>("/calculate/biometry/crl", {
+          method: "POST",
+          body: JSON.stringify({ crl: v }),
+        });
+        setCrlResult(res);
       } else if (mode === "multi") {
-        const r = gestationalAgeFromMultipleBiometry({
+        const params = {
           bpd: bpd ? parseFloat(bpd.replace(",", ".")) : undefined,
           hc: hc ? parseFloat(hc.replace(",", ".")) : undefined,
           ac: ac ? parseFloat(ac.replace(",", ".")) : undefined,
           fl: fl ? parseFloat(fl.replace(",", ".")) : undefined,
-        });
-        if (r.estimates.length === 0) {
+        };
+        if (!params.bpd && !params.hc && !params.ac && !params.fl) {
           setError("Informe ao menos um valor (DBP, CC, CA ou CF)");
           return;
         }
-        setMultiResult(r);
+        const res = await customFetch<GAResult>("/calculate/biometry/composite", {
+          method: "POST",
+          body: JSON.stringify(params),
+        });
+        setMultiResult(res);
       } else {
         const hcN = parseFloat(hc.replace(",", "."));
         const acN = parseFloat(ac.replace(",", "."));
@@ -89,17 +105,22 @@ export default function BiometryTab() {
           setError("CC, CA e CF são obrigatórios para estimar o peso");
           return;
         }
-        setEfwResult(estimatedFetalWeight({ hc: hcN, ac: acN, fl: flN }));
-        const ga = gestationalAgeFromMultipleBiometry({
-          bpd: bpd ? parseFloat(bpd.replace(",", ".")) : undefined,
-          hc: hcN,
-          ac: acN,
-          fl: flN,
+        const res = await customFetch<EFWResult>("/calculate/biometry/efw", {
+          method: "POST",
+          body: JSON.stringify({ hc: hcN, ac: acN, fl: flN }),
         });
-        if (ga.estimates.length > 0) setEfwGa(ga);
+        setEfwResult(res);
       }
     } catch (e: any) {
-      setError(e?.message || "Erro no cálculo");
+      if (e?.status === 402) {
+        setError("Assinatura necessária para usar esta calculadora");
+      } else if (e?.status === 401) {
+        setError("Faça login para usar esta calculadora");
+      } else {
+        setError(e?.message || "Erro no cálculo");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,7 +211,7 @@ export default function BiometryTab() {
             {error ? (
               <Text style={{ color: colors.destructive, fontFamily: "Inter_500Medium" }}>{error}</Text>
             ) : null}
-            <PrimaryButton label="Calcular" onPress={compute} variant="secondary" />
+            <PrimaryButton label={loading ? "Calculando…" : "Calcular"} onPress={compute} variant="secondary" />
           </View>
         </GlassCard>
 
@@ -201,7 +222,7 @@ export default function BiometryTab() {
               {crlResult.weeks}s {crlResult.days}d
             </Text>
             <Text style={styles.subLight}>
-              DPP estimada: {format(dueDateFromGA(crlResult.totalDays), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+              DPP estimada: {format(new Date(crlResult.dueDate), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
             </Text>
           </GlassCard>
         ) : null}
@@ -214,24 +235,26 @@ export default function BiometryTab() {
                 {multiResult.weeks}s {multiResult.days}d
               </Text>
               <Text style={styles.subLight}>
-                DPP estimada: {format(dueDateFromGA(multiResult.totalDays), "dd/MM/yyyy")}
+                DPP estimada: {format(new Date(multiResult.dueDate), "dd/MM/yyyy")}
               </Text>
             </GlassCard>
-            <GlassCard>
-              <Text style={{ fontFamily: "Inter_700Bold", color: colors.foreground, marginBottom: 8 }}>
-                Estimativas individuais
-              </Text>
-              {multiResult.estimates.map((e) => (
-                <View key={e.label} style={styles.estRow}>
-                  <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium" }}>
-                    {e.label}
-                  </Text>
-                  <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold" }}>
-                    {e.weeks}s {e.days}d
-                  </Text>
-                </View>
-              ))}
-            </GlassCard>
+            {multiResult.estimates && multiResult.estimates.length > 0 ? (
+              <GlassCard>
+                <Text style={{ fontFamily: "Inter_700Bold", color: colors.foreground, marginBottom: 8 }}>
+                  Estimativas individuais
+                </Text>
+                {multiResult.estimates.map((e) => (
+                  <View key={e.label} style={styles.estRow}>
+                    <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium" }}>
+                      {e.label}
+                    </Text>
+                    <Text style={{ color: colors.foreground, fontFamily: "Inter_600SemiBold" }}>
+                      {e.weeks}s {e.days}d
+                    </Text>
+                  </View>
+                ))}
+              </GlassCard>
+            ) : null}
           </>
         ) : null}
 
@@ -252,13 +275,8 @@ export default function BiometryTab() {
                 </Text>
               </View>
               <Text style={{ color: colors.foreground, marginTop: 8 }}>
-                {efwResult.classification}
+                {efwResult.percentileRange}
               </Text>
-              {efwGa ? (
-                <Text style={{ color: colors.mutedForeground, marginTop: 8, fontSize: 13 }}>
-                  Idade gestacional pela biometria: {efwGa.weeks}s {efwGa.days}d
-                </Text>
-              ) : null}
             </GlassCard>
           </>
         ) : null}

@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 
 const EFWCalculator = () => {
-  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [hc, setHc] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -37,41 +37,54 @@ const EFWCalculator = () => {
     const acVal = parseFloat(ac);
     const flVal = parseFloat(fl);
 
-    if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) { setError("Preencha CC, CA e CF para o cálculo do peso fetal."); return; }
-    if (hcVal < 50 || hcVal > 380) { setError("CC deve estar entre 50 e 380 mm."); return; }
-    if (acVal < 40 || acVal > 400) { setError("CA deve estar entre 40 e 400 mm."); return; }
-    if (flVal < 10 || flVal > 85) { setError("CF deve estar entre 10 e 85 mm."); return; }
-    if (blocked || needsLogin || loading) return;
+    if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) {
+      setError("Preencha CC, CA e CF para o cálculo do peso fetal.");
+      return;
+    }
+    if (hcVal < 50 || hcVal > 380) {
+      setError("CC deve estar entre 50 e 380 mm.");
+      return;
+    }
+    if (acVal < 40 || acVal > 400) {
+      setError("CA deve estar entre 40 e 400 mm.");
+      return;
+    }
+    if (flVal < 10 || flVal > 85) {
+      setError("CF deve estar entre 10 e 85 mm.");
+      return;
+    }
+
     setError("");
     setCalculating(true);
     try {
-      const gaW = gaWeeks ? parseFloat(gaWeeks) : undefined;
+      const gaW = gaWeeks ? parseFloat(gaWeeks) : null;
       const result = await apiFetch<{
         weightG: number; weightKg: string; percentileRange: string; formula: string;
         percentiles: { p10: number; p50: number; p90: number } | null;
-      }>("/calculate/efw", {
+      }>("/calculate/biometry/efw", {
         method: "POST",
         body: JSON.stringify({ hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW }),
       });
       setResults(result);
-      void refetch();
+      refetch();
       if (canSave) {
-        void saveExam({
+        saveExam({
           calcType: "efw",
-          inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW },
+          inputData: { hc: hcVal, ac: acVal, fl: flVal, gaWeeks: gaW ?? undefined },
           resultData: { weightG: result.weightG, weightKg: result.weightKg, percentileRange: result.percentileRange },
-          gestationalAgeWeeks: gaW,
+          gestationalAgeWeeks: gaW ?? undefined,
           patientId: selectedPatientId,
         });
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+        setError("Tokens esgotados. Assine um plano para continuar.");
       } else if (err instanceof ApiError && err.status === 401) {
-        setError("Faça login para usar as calculadoras premium.");
+        setError("Faça login para usar esta calculadora.");
       } else {
-        setError("Erro ao calcular. Tente novamente.");
+        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
       }
+      refetch();
     } finally {
       setCalculating(false);
     }
@@ -119,7 +132,11 @@ const EFWCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
+        <Button
+          onClick={handleCalculate}
+          disabled={blocked || needsLogin || calculating}
+          className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50"
+        >
           <Scale className="w-4 h-4 mr-1" /> Calcular PFE
         </Button>
       </div>

@@ -19,7 +19,7 @@ import ScientificFooter from "@/components/ScientificFooter";
 import { BPD_REFERENCE } from "@/lib/biometry-references";
 
 const BPDCalculator = () => {
-  const { blocked, needsLogin, loading, subscription, refetch } = useTokenGate();
+  const { blocked, needsLogin, subscription, refetch } = useTokenGate();
   const { saveExam, canSave } = useExamSave();
   const [bpd, setBpd] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -33,35 +33,35 @@ const BPDCalculator = () => {
     const value = parseFloat(bpd);
     if (isNaN(value)) { setError("Insira um valor numérico válido."); return; }
     if (!isValidBPD(value)) { setError("O DBP deve estar entre 14 e 100 mm."); return; }
-    if (blocked || needsLogin || loading) return;
     setError("");
     setCalculating(true);
     try {
-      const result = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
-        "/calculate/biometry",
-        { method: "POST", body: JSON.stringify({ mode: "bpd", bpd: value }) },
+      const ga = await apiFetch<{ weeks: number; days: number; totalDays: number; dueDate: string }>(
+        "/calculate/biometry/bpd",
+        { method: "POST", body: JSON.stringify({ bpd: value }) }
       );
-      const dueDate = new Date(result.dueDate);
-      setResults({ weeks: result.weeks, days: result.days, totalDays: result.totalDays, dueDate });
-      void refetch();
+      const res = { ...ga, dueDate: new Date(ga.dueDate) };
+      setResults(res);
+      refetch();
       if (canSave) {
-        void saveExam({
+        saveExam({
           calcType: "bpd",
           inputData: { bpd: value },
-          resultData: { weeks: result.weeks, days: result.days, totalDays: result.totalDays },
-          gestationalAgeWeeks: result.weeks,
-          gestationalAgeDays: result.days,
+          resultData: { weeks: ga.weeks, days: ga.days, totalDays: ga.totalDays },
+          gestationalAgeWeeks: ga.weeks,
+          gestationalAgeDays: ga.days,
           patientId: selectedPatientId,
         });
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
-        setError("Tokens esgotados. Assine um plano para continuar usando as calculadoras.");
+        setError("Tokens esgotados. Assine um plano para continuar.");
       } else if (err instanceof ApiError && err.status === 401) {
-        setError("Faça login para usar as calculadoras premium.");
+        setError("Faça login para usar esta calculadora.");
       } else {
-        setError("Erro ao calcular. Tente novamente.");
+        setError((err as any)?.message || "Erro no cálculo. Tente novamente.");
       }
+      refetch();
     } finally {
       setCalculating(false);
     }

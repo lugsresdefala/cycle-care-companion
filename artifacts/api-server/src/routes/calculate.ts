@@ -13,24 +13,18 @@ import {
   gestationalAgeFromBPD,
   gestationalAgeFromMultipleBiometry,
   estimatedFetalWeight,
-  getEFWPercentiles,
   dueDateFromGA,
-  assessGrowth,
-  getGrowthData,
   isValidCRL,
   isValidBPD,
-  type GrowthParameter,
-} from "../lib/biometry-calculators";
+} from "../lib/biometry";
 import {
-  evaluateUmbilicalArteryPI,
-  evaluateUmbilicalArteryRI,
-  evaluateUmbilicalArterySDRatio,
-  evaluateMCAPI,
-  evaluateUterineArteryPI,
-  calculateCPR,
-  evaluateDuctusVenosusPIV,
-  evaluateDuctusVenosusWaveA,
-} from "../lib/doppler-calculators";
+  evaluateUmbilicalArtery,
+  evaluateMCA,
+  evaluateUterineArtery,
+  evaluateCPR,
+  evaluateDuctusVenosus,
+} from "../lib/doppler";
+import { assessGrowth, isValidGrowthParam } from "../lib/intergrowth";
 
 const router: IRouter = Router();
 
@@ -58,7 +52,7 @@ async function deductToken(userId: string): Promise<boolean> {
   return !!row;
 }
 
-// ── Existing server-computed risk calculators ──────────────────────────────
+// ── Trisomy Risk (existing) ──────────────────────────────────────────────────
 
 router.post("/calculate/trisomy-risk", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
@@ -69,9 +63,7 @@ router.post("/calculate/trisomy-risk", requireAuth, async (req, res): Promise<an
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
   return res.json(result);
 });
 
@@ -84,195 +76,207 @@ router.post("/calculate/preeclampsia-risk", requireAuth, async (req, res): Promi
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
   return res.json(result);
 });
 
-// ── Biometry (CRL / BPD / Composite) ──────────────────────────────────────
-
-router.post("/calculate/biometry", requireAuth, async (req, res): Promise<any> => {
+router.post("/calculate/biometry/crl", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
-  const { mode, crl, bpd, hc, ac, fl } = req.body ?? {};
+  const { crl } = req.body ?? {};
+  const crlVal = parseFloat(crl);
+  if (isNaN(crlVal)) return res.status(400).json({ error: "crl must be a number" });
+  if (!isValidCRL(crlVal)) return res.status(400).json({ error: "CCN deve estar entre 2 e 84 mm" });
 
-  let result: any;
-  try {
-    if (mode === "crl") {
-      const value = parseFloat(crl);
-      if (isNaN(value)) return res.status(400).json({ error: "CCN inválido." });
-      if (!isValidCRL(value)) return res.status(400).json({ error: "CCN deve estar entre 2 e 84 mm." });
-      const ga = gestationalAgeFromCRL(value);
-      result = { ...ga, dueDate: dueDateFromGA(ga.totalDays).toISOString() };
-    } else if (mode === "bpd") {
-      const value = parseFloat(bpd);
-      if (isNaN(value)) return res.status(400).json({ error: "DBP inválido." });
-      if (!isValidBPD(value)) return res.status(400).json({ error: "DBP deve estar entre 14 e 100 mm." });
-      const ga = gestationalAgeFromBPD(value);
-      result = { ...ga, dueDate: dueDateFromGA(ga.totalDays).toISOString() };
-    } else if (mode === "composite") {
-      const params = {
-        bpd: bpd != null ? parseFloat(bpd) : undefined,
-        hc: hc != null ? parseFloat(hc) : undefined,
-        ac: ac != null ? parseFloat(ac) : undefined,
-        fl: fl != null ? parseFloat(fl) : undefined,
-      };
-      const ga = gestationalAgeFromMultipleBiometry(params);
-      if (ga.estimates.length === 0) return res.status(400).json({ error: "Valores fora do intervalo aceitável ou nenhuma medida fornecida." });
-      result = { ...ga, dueDate: dueDateFromGA(ga.totalDays).toISOString() };
-    } else {
-      return res.status(400).json({ error: "Modo inválido. Use crl, bpd ou composite." });
-    }
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  const ga = gestationalAgeFromCRL(crlVal);
+  return res.json({ ...ga, dueDate: dueDateFromGA(ga.totalDays).toISOString() });
+});
+
+// ── Biometry: BPD ────────────────────────────────────────────────────────────
+
+router.post("/calculate/biometry/bpd", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { bpd } = req.body ?? {};
+  const bpdVal = parseFloat(bpd);
+  if (isNaN(bpdVal)) return res.status(400).json({ error: "bpd must be a number" });
+  if (!isValidBPD(bpdVal)) return res.status(400).json({ error: "DBP deve estar entre 14 e 100 mm" });
+
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  const ga = gestationalAgeFromBPD(bpdVal);
+  return res.json({ ...ga, dueDate: dueDateFromGA(ga.totalDays).toISOString() });
+});
+
+// ── Biometry: Composite ──────────────────────────────────────────────────────
+
+router.post("/calculate/biometry/composite", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { bpd, hc, ac, fl } = req.body ?? {};
+  const params = {
+    bpd: bpd !== undefined ? parseFloat(bpd) : undefined,
+    hc: hc !== undefined ? parseFloat(hc) : undefined,
+    ac: ac !== undefined ? parseFloat(ac) : undefined,
+    fl: fl !== undefined ? parseFloat(fl) : undefined,
+  };
+  if (!params.bpd && !params.hc && !params.ac && !params.fl) {
+    return res.status(400).json({ error: "Informe ao menos uma medida biométrica" });
+  }
+
+  const result = gestationalAgeFromMultipleBiometry(params);
+  if (result.estimates.length === 0) {
+    return res.status(400).json({ error: "Valores fora do intervalo aceitável" });
   }
 
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
-  return res.json(result);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json({ ...result, dueDate: dueDateFromGA(result.totalDays).toISOString() });
 });
 
-// ── Estimated Fetal Weight ─────────────────────────────────────────────────
+// ── Biometry: EFW ────────────────────────────────────────────────────────────
 
-router.post("/calculate/efw", requireAuth, async (req, res): Promise<any> => {
+router.post("/calculate/biometry/efw", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
   const { hc, ac, fl, gaWeeks } = req.body ?? {};
-
-  let result: any;
-  try {
-    const hcVal = parseFloat(hc);
-    const acVal = parseFloat(ac);
-    const flVal = parseFloat(fl);
-
-    if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) return res.status(400).json({ error: "CC, CA e CF são obrigatórios." });
-    if (hcVal < 50 || hcVal > 380) return res.status(400).json({ error: "CC deve estar entre 50 e 380 mm." });
-    if (acVal < 40 || acVal > 400) return res.status(400).json({ error: "CA deve estar entre 40 e 400 mm." });
-    if (flVal < 10 || flVal > 85) return res.status(400).json({ error: "CF deve estar entre 10 e 85 mm." });
-
-    const efw = estimatedFetalWeight({ hc: hcVal, ac: acVal, fl: flVal });
-    const gaW = gaWeeks != null ? parseFloat(gaWeeks) : null;
-    const percentiles = gaW !== null && !isNaN(gaW) ? getEFWPercentiles(gaW) : null;
-
-    let percentileRange: string;
-    if (percentiles) {
-      if (efw.weightG < percentiles.p10) percentileRange = "Abaixo do percentil 10 — avaliar CIUR";
-      else if (efw.weightG > percentiles.p90) percentileRange = "Acima do percentil 90 — avaliar macrossomia";
-      else percentileRange = "Entre percentis 10 e 90 — Adequado para IG (AIG)";
-    } else if (gaW !== null && !isNaN(gaW)) {
-      percentileRange = "Percentil indisponível — padrão INTERGROWTH-21st definido para IG 22–40 semanas";
-    } else {
-      percentileRange = "Informe a IG (22–40 semanas) para classificação por percentil";
-    }
-
-    result = { ...efw, percentileRange, percentiles };
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  const hcVal = parseFloat(hc);
+  const acVal = parseFloat(ac);
+  const flVal = parseFloat(fl);
+  if (isNaN(hcVal) || isNaN(acVal) || isNaN(flVal)) {
+    return res.status(400).json({ error: "CC, CA e CF são obrigatórios" });
   }
+  if (hcVal < 50 || hcVal > 380) return res.status(400).json({ error: "CC deve estar entre 50 e 380 mm" });
+  if (acVal < 40 || acVal > 400) return res.status(400).json({ error: "CA deve estar entre 40 e 400 mm" });
+  if (flVal < 10 || flVal > 85) return res.status(400).json({ error: "CF deve estar entre 10 e 85 mm" });
 
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
-  return res.json(result);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  const gaW = gaWeeks !== undefined ? parseFloat(gaWeeks) : null;
+  return res.json(estimatedFetalWeight({ hc: hcVal, ac: acVal, fl: flVal }, gaW));
 });
 
-// ── Doppler Velocimetry ────────────────────────────────────────────────────
+// ── Doppler: Umbilical Artery ────────────────────────────────────────────────
 
-router.post("/calculate/doppler", requireAuth, async (req, res): Promise<any> => {
+router.post("/calculate/doppler/umbilical", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
-  const { mode, ga, pi, ri, sd, mcaPi, uaPi, notch, piv, waveAReversed } = req.body ?? {};
-
-  let result: any;
-  try {
-    const gaVal = parseInt(ga);
-
-    if (mode === "umbilical") {
-      if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) return res.status(400).json({ error: "IG deve estar entre 20 e 42 semanas." });
-      const piVal = pi != null ? parseFloat(pi) : NaN;
-      const riVal = ri != null ? parseFloat(ri) : NaN;
-      const sdVal = sd != null ? parseFloat(sd) : NaN;
-      if (isNaN(piVal) && isNaN(riVal) && isNaN(sdVal)) return res.status(400).json({ error: "Informe ao menos um índice: IP, IR ou S/D." });
-      const piResult = !isNaN(piVal) ? evaluateUmbilicalArteryPI(piVal, gaVal) : undefined;
-      result = {
-        piResult: piResult ? { value: piResult.value, percentile: piResult.percentile, interpretation: piResult.interpretation, severity: piResult.severity } : undefined,
-        riResult: !isNaN(riVal) ? evaluateUmbilicalArteryRI(riVal) : undefined,
-        sdResult: !isNaN(sdVal) ? evaluateUmbilicalArterySDRatio(sdVal, gaVal) : undefined,
-        refs: piResult?.refs ?? evaluateUmbilicalArteryPI(isNaN(piVal) ? 1 : piVal, gaVal).refs,
-      };
-    } else if (mode === "mca") {
-      const piVal = parseFloat(pi);
-      if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) return res.status(400).json({ error: "IG entre 20 e 42 semanas." });
-      if (isNaN(piVal) || piVal <= 0) return res.status(400).json({ error: "Informe o IP da ACM." });
-      const r = evaluateMCAPI(piVal, gaVal);
-      result = { res: { value: r.value, percentile: r.percentile, interpretation: r.interpretation, severity: r.severity }, refs: r.refs };
-    } else if (mode === "uterine") {
-      const piVal = parseFloat(pi);
-      if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) return res.status(400).json({ error: "IG entre 11 e 42 semanas." });
-      if (isNaN(piVal) || piVal <= 0) return res.status(400).json({ error: "Informe o IP da artéria uterina." });
-      const r = evaluateUterineArteryPI(piVal, gaVal, !!notch);
-      result = { res: { value: r.value, percentile: r.percentile, interpretation: r.interpretation, severity: r.severity }, refs: r.refs };
-    } else if (mode === "cpr") {
-      const mcaVal = parseFloat(mcaPi);
-      const uaVal = parseFloat(uaPi);
-      if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) return res.status(400).json({ error: "IG entre 20 e 42 semanas." });
-      if (isNaN(mcaVal) || mcaVal <= 0) return res.status(400).json({ error: "Informe o IP da ACM." });
-      if (isNaN(uaVal) || uaVal <= 0) return res.status(400).json({ error: "Informe o IP da AU." });
-      const r = calculateCPR(mcaVal, uaVal, gaVal);
-      result = { res: { cpr: r.cpr, mcaPI: r.mcaPI, uaPI: r.uaPI, percentile: r.percentile, interpretation: r.interpretation, severity: r.severity }, refs: r.refs };
-    } else if (mode === "ductus") {
-      if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) return res.status(400).json({ error: "Informe a IG entre 11 e 42 semanas." });
-      const pivVal = piv != null ? parseFloat(piv) : NaN;
-      const waveAResult = evaluateDuctusVenosusWaveA(!!waveAReversed, gaVal);
-      let pivResult: any = undefined;
-      let refs: any = undefined;
-      if (!isNaN(pivVal) && pivVal > 0) {
-        const r = evaluateDuctusVenosusPIV(pivVal, gaVal);
-        pivResult = { value: r.value, percentile: r.percentile, interpretation: r.interpretation, severity: r.severity };
-        if (gaVal >= 20) refs = r.refs;
-      }
-      result = { pivResult, waveAResult, refs };
-    } else {
-      return res.status(400).json({ error: "Modo inválido." });
-    }
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  const { ga, pi, ri, sd } = req.body ?? {};
+  const gaVal = parseInt(ga);
+  if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) {
+    return res.status(400).json({ error: "IG deve estar entre 20 e 42 semanas" });
+  }
+  const piVal = pi !== undefined ? parseFloat(pi) : undefined;
+  const riVal = ri !== undefined ? parseFloat(ri) : undefined;
+  const sdVal = sd !== undefined ? parseFloat(sd) : undefined;
+  if ((piVal === undefined || isNaN(piVal)) && (riVal === undefined || isNaN(riVal)) && (sdVal === undefined || isNaN(sdVal))) {
+    return res.status(400).json({ error: "Informe ao menos um índice: IP, IR ou S/D" });
   }
 
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
-  return res.json(result);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json(evaluateUmbilicalArtery({ ga: gaVal, pi: piVal, ri: riVal, sd: sdVal }));
 });
 
-// ── Growth Curve Assessment ────────────────────────────────────────────────
+// ── Doppler: MCA ─────────────────────────────────────────────────────────────
+
+router.post("/calculate/doppler/mca", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { ga, pi } = req.body ?? {};
+  const gaVal = parseInt(ga);
+  const piVal = parseFloat(pi);
+  if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) return res.status(400).json({ error: "IG deve estar entre 20 e 42 semanas" });
+  if (isNaN(piVal) || piVal <= 0) return res.status(400).json({ error: "Informe o IP da ACM" });
+
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json(evaluateMCA({ ga: gaVal, pi: piVal }));
+});
+
+// ── Doppler: Uterine Artery ──────────────────────────────────────────────────
+
+router.post("/calculate/doppler/uterine", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { ga, pi, bilateralNotch } = req.body ?? {};
+  const gaVal = parseInt(ga);
+  const piVal = parseFloat(pi);
+  if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) return res.status(400).json({ error: "IG deve estar entre 11 e 42 semanas" });
+  if (isNaN(piVal) || piVal <= 0) return res.status(400).json({ error: "Informe o IP da artéria uterina" });
+
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json(evaluateUterineArtery({ ga: gaVal, pi: piVal, bilateralNotch: !!bilateralNotch }));
+});
+
+// ── Doppler: CPR ─────────────────────────────────────────────────────────────
+
+router.post("/calculate/doppler/cpr", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { ga, mcaPI, uaPI } = req.body ?? {};
+  const gaVal = parseInt(ga);
+  const mcaVal = parseFloat(mcaPI);
+  const uaVal = parseFloat(uaPI);
+  if (isNaN(gaVal) || gaVal < 20 || gaVal > 42) return res.status(400).json({ error: "IG deve estar entre 20 e 42 semanas" });
+  if (isNaN(mcaVal) || mcaVal <= 0) return res.status(400).json({ error: "Informe o IP da ACM" });
+  if (isNaN(uaVal) || uaVal <= 0) return res.status(400).json({ error: "Informe o IP da AU" });
+
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json(evaluateCPR({ ga: gaVal, mcaPI: mcaVal, uaPI: uaVal }));
+});
+
+// ── Doppler: Ductus Venosus ──────────────────────────────────────────────────
+
+router.post("/calculate/doppler/ductus", requireAuth, async (req, res): Promise<any> => {
+  const userId = (req as AuthedRequest).userId;
+  const { ga, piv, waveAReversed } = req.body ?? {};
+  const gaVal = parseInt(ga);
+  if (isNaN(gaVal) || gaVal < 11 || gaVal > 42) {
+    return res.status(400).json({ error: "IG deve estar entre 11 e 42 semanas" });
+  }
+  const pivVal = piv !== undefined ? parseFloat(piv) : undefined;
+
+  const ok = await deductToken(userId);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  return res.json(evaluateDuctusVenosus({
+    ga: gaVal,
+    piv: pivVal,
+    waveAReversed: !!waveAReversed,
+  }));
+});
+
+// ── Growth Curve ─────────────────────────────────────────────────────────────
 
 router.post("/calculate/growth-curve", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
   const { param, measurements } = req.body ?? {};
-
-  let result: any;
-  try {
-    const validParams: GrowthParameter[] = ["efw", "hc", "ac", "fl", "bpd"];
-    if (!validParams.includes(param)) return res.status(400).json({ error: "Parâmetro inválido." });
-    if (!Array.isArray(measurements) || measurements.length === 0) return res.status(400).json({ error: "Insira pelo menos uma medida válida." });
-
-    const assessments = (measurements as { ga: number; value: number }[]).map((m) =>
-      assessGrowth(param as GrowthParameter, m.ga, m.value),
-    );
-    const curveData = getGrowthData(param as GrowthParameter);
-    result = { assessments, curveData };
-  } catch (err: any) {
-    return res.status(400).json({ error: err?.message ?? "Calculation error" });
+  if (!isValidGrowthParam(param)) {
+    return res.status(400).json({ error: "Parâmetro inválido. Use: efw, hc, ac, fl ou bpd" });
+  }
+  if (!Array.isArray(measurements) || measurements.length === 0) {
+    return res.status(400).json({ error: "Informe pelo menos uma medida" });
+  }
+  for (const m of measurements) {
+    const ga = parseFloat(m.ga);
+    const value = parseFloat(m.value);
+    if (isNaN(ga) || isNaN(value)) {
+      return res.status(400).json({ error: "Cada medida deve ter ga e value numéricos" });
+    }
   }
 
   const ok = await deductToken(userId);
-  if (!ok) {
-    return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
-  }
-  return res.json(result);
+  if (!ok) return res.status(402).json({ error: "Active subscription with available tokens required for premium calculators" });
+
+  const results = (measurements as { ga: number; value: number }[]).map((m) =>
+    assessGrowth(param, parseFloat(String(m.ga)), parseFloat(String(m.value)))
+  );
+  return res.json({ assessments: results });
 });
 
 export default router;
