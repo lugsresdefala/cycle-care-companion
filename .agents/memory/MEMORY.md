@@ -7,3 +7,4 @@
 - [Stripe missing key fallback](stripe-missing-key-fallback.md) — checkout 500 `Invalid API Key …lder` means STRIPE_SECRET_KEY unset (silent sk_test_placeholder default); fix is config, re-publish prod.
 - [Parallel merge conflict markers](parallel-merge-conflict-markers.md) — concurrent task merges on the same fn can strand `<<<<<<<` markers; esbuild dies, API won't boot. grep for markers after merge bursts.
 - [Vite build vs typecheck gap](vite-build-typecheck-gap.md) — idalia dev (Vite) skips typecheck, so deploy build can fail green-in-dev; run `pnpm run typecheck` to reproduce failed publishes.
+- [Deploy build debugging](deploy-build-debugging.md) — publish fails: pull real logs via listDeploymentBuilds/getDeploymentBuild (not fetchDeploymentLogs); deploy builds per-artifact via .replit-artifact/artifact.toml, not root build.
