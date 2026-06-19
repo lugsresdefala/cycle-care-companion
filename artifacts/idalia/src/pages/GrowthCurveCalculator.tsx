@@ -17,7 +17,7 @@ import {
   ResponsiveContainer, Area, Legend,
 } from "recharts";
 import {
-  GrowthParameter, GROWTH_PARAMS, getGrowthData,
+  GrowthParameter, GROWTH_PARAMS,
   type GrowthAssessment, type PercentileRow,
 } from "@/lib/intergrowth";
 import { apiFetch, ApiError } from "@/lib/api";

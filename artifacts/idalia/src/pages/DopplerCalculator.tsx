@@ -424,14 +424,14 @@ export default function DopplerCalculator() {
 
   return (
     <div className="min-h-screen pb-20 mesh-gradient">
-      <PageMeta title="Calculadora de Doppler Fetal | Idália" description="Avaliação de Doppler da Artéria Umbilical, Cerebral Média, Uterinas, Ducto Venoso e RCP com percentis." />
+      <PageMeta title="Calculadora de Doppler Fetal | Idália" description="Avaliação de Doppler da Artéria Umbilical, Cerebral Média, Uterinas, Ducto Venoso e RCP com percentis." path="/doppler" />
       <div className="container max-w-2xl mx-auto px-4 pt-8 md:pt-12">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2.5 rounded-2xl bg-primary/10 text-primary glow-primary"><Activity className="w-6 h-6" /></div>
           <div><h1 className="text-2xl font-display text-foreground leading-none">Doppler Fetal</h1><p className="text-sm text-muted-foreground mt-1">Avaliação hemodinâmica fetal e placentária</p></div>
         </div>
 
-        <TokenGateAlert />
+        <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
 
         <Tabs defaultValue="ua" className="space-y-6">
           <div className="overflow-x-auto pb-1 -mx-4 px-4 scrollbar-none">
@@ -451,7 +451,20 @@ export default function DopplerCalculator() {
           <TabsContent value="dv" className="focus-visible:outline-none"><DVTab disabled={disabled} onSuccess={() => void refetch()} /></TabsContent>
         </Tabs>
       </div>
-      <ScientificFooter />
+      <ScientificFooter
+        references={[
+          { authors: "Acharya G, Wilsgaard T, Berntsen GK, Maltau JM, Kiserud T", title: "Reference ranges for serial measurements of umbilical artery Doppler indices in the second half of pregnancy", journal: "Am J Obstet Gynecol", year: 2005, doi: "10.1016/j.ajog.2004.10.598", pubmedId: "15846216" },
+          { authors: "Ciobanu A, Wright A, Syngelaki A, Wright D, Akolekar R, Nicolaides KH", title: "Fetal Medicine Foundation reference ranges for umbilical artery and middle cerebral artery pulsatility index and cerebroplacental ratio", journal: "Ultrasound Obstet Gynecol", year: 2019, doi: "10.1002/uog.20157", pubmedId: "30207011" },
+          { authors: "Gómez O, Figueras F, Fernández S, et al.", title: "Reference ranges for uterine artery mean pulsatility index at 11–41 weeks of gestation", journal: "Ultrasound Obstet Gynecol", year: 2008, doi: "10.1002/uog.5315", pubmedId: "18816490" },
+          { authors: "Kessler J, Rasmussen S, Hanson M, Kiserud T", title: "Longitudinal reference ranges for ductus venosus flow velocities and waveform indices", journal: "Ultrasound Obstet Gynecol", year: 2006, doi: "10.1002/uog.3819", pubmedId: "17029301" },
+        ]}
+        units={[
+          { param: "IP / IR", unit: "adimensional", description: "Índice de pulsatilidade e índice de resistência (Doppler)" },
+          { param: "RCP", unit: "adimensional", description: "Relação cerebroplacentária (IP ACM ÷ IP umbilical)" },
+          { param: "Idade gestacional", unit: "semanas", description: "Semanas completas para seleção do percentil" },
+        ]}
+        extraDisclaimer="Os percentis de Doppler dependem de técnica de insonação adequada (ângulo, ciclos cardíacos e ausência de movimento fetal/respiração). Interprete sempre no contexto clínico."
+      />
     </div>
   );
 }

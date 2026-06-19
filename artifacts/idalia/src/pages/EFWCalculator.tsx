@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Info, Scale, Baby, AlertCircle, TrendingUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import ScientificFooter from "@/components/ScientificFooter";
 import { apiFetch, ApiError } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
