@@ -8,7 +8,7 @@ import {
   stripeWebhookEvents,
   stripeCheckoutAttempts,
 } from "@workspace/db";
-import { eq, desc, and, ne } from "drizzle-orm";
+import { eq, desc, and, ne, sql } from "drizzle-orm";
 import { requireAuth, requireBootstrap, type AuthedRequest } from "../lib/auth";
 import { stripe, resolveOrigin, PRODUCT_TIER_MAP } from "../lib/stripe";
 
@@ -359,6 +359,7 @@ async function syncSubscription(
       .where(eq(userSubscriptions.id, existing[0].id));
     upsertedId = existing[0].id;
   } else {
+<<<<<<< HEAD
     const inserted = await db
       .insert(userSubscriptions)
       .values({
@@ -390,6 +391,31 @@ async function syncSubscription(
           ne(userSubscriptions.id, upsertedId),
         ),
       );
+=======
+    // Retire any free-trial row before inserting the paid subscription.
+    // Without this, the token deduction query falls back to the trial row once
+    // the paid balance is exhausted, granting extra premium executions the user
+    // did not purchase.
+    await db.execute(sql`
+      UPDATE user_subscriptions
+      SET status = 'inactive',
+          tokens_remaining = 0,
+          updated_at = now()
+      WHERE doctor_id = ${userId}
+        AND status = 'trial'
+    `);
+
+    await db.insert(userSubscriptions).values({
+      doctorId: userId,
+      planId: plan[0].id,
+      status,
+      startDate: new Date(),
+      endDate,
+      tokensRemaining: plan[0].tokensPerPeriod,
+      stripeCustomerId: incomingCustomerId,
+      stripeSubscriptionId: stripeSubId,
+    });
+>>>>>>> deda25f (Fix: Retire free-trial tokens when a paid subscription is activated)
   }
 }
 
