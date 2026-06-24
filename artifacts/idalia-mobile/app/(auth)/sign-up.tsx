@@ -14,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useColors } from "@/hooks/useColors";
 import { Field } from "@/components/Field";
 import { PrimaryButton } from "@/components/PrimaryButton";
+import { HEADER_ACCENT, HEADER_GRADIENT } from "@/components/BrandHeader";
 
 export default function SignUpScreen() {
   const colors = useColors();
@@ -79,11 +80,12 @@ export default function SignUpScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={[colors.primary, colors.secondary, colors.accent]}
+        colors={HEADER_GRADIENT}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={styles.hero}
       >
+        <View style={styles.accentBar} />
         <Text style={styles.brand}>IDALIA</Text>
         <Text style={styles.tagline}>Crie sua conta</Text>
       </LinearGradient>
@@ -192,14 +194,22 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  hero: { paddingTop: 80, paddingBottom: 36, paddingHorizontal: 24 },
-  brand: { fontFamily: "Inter_700Bold", fontSize: 36, color: "#fff", letterSpacing: 4 },
+  hero: { paddingTop: 84, paddingBottom: 40, paddingHorizontal: 24 },
+  accentBar: {
+    width: 32,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: HEADER_ACCENT,
+    marginBottom: 16,
+  },
+  brand: { fontFamily: "Inter_700Bold", fontSize: 34, color: "#fff", letterSpacing: 1 },
   tagline: {
-    fontFamily: "Inter_500Medium",
+    fontFamily: "Inter_400Regular",
     color: "#fff",
-    opacity: 0.9,
-    marginTop: 6,
+    opacity: 0.78,
+    marginTop: 8,
     fontSize: 14,
+    lineHeight: 20,
   },
   form: { padding: 24, paddingBottom: 60 },
   title: { fontFamily: "Inter_700Bold", fontSize: 26, letterSpacing: -0.5 },
