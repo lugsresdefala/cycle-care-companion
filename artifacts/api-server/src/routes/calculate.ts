@@ -27,6 +27,7 @@ import {
   getCPRRefsForGA,
   getDVPivRefsForGA,
   assessGrowthBatch,
+  getGrowthCurveData,
   type GrowthParameter,
 } from "../lib/premium-calculators";
 
@@ -298,7 +299,8 @@ router.post("/calculate/growth-curve", requireAuth, async (req, res): Promise<an
   let result;
   try {
     const assessments = assessGrowthBatch(parameter as GrowthParameter, measurements);
-    result = { assessments };
+    const curveData = getGrowthCurveData(parameter as GrowthParameter);
+    result = { assessments, curveData };
   } catch (err: any) {
     return res.status(400).json({ error: err?.message ?? "Calculation error" });
   }

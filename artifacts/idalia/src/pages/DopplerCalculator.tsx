@@ -336,8 +336,8 @@ function CPRTab({ disabled, onSuccess }: TabProps) {
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <ResultCard label="Relação Cérebro-Placentária (RCP)" result={result.res as any} note="RCP abaixo do percentil 5 indica redistribuição hemodinâmica, mesmo com índices isolados normais." />
-            <div className="glass-card-static p-4"><PercentileRefBar value={(result.res as any).value} refs={result.refs} label="RCP" format={formatIndex} /></div>
+            <ResultCard label="Relação Cérebro-Placentária (RCP)" result={{ value: result.res.cpr, percentile: result.res.percentile, interpretation: result.res.interpretation, severity: result.res.severity }} note="RCP abaixo do percentil 5 indica redistribuição hemodinâmica, mesmo com índices isolados normais." />
+            <div className="glass-card-static p-4"><PercentileRefBar value={result.res.cpr} refs={result.refs} label="RCP" format={formatIndex} /></div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -351,7 +351,7 @@ function DVTab({ disabled, onSuccess }: TabProps) {
   const [waveA, setWaveA] = useState<"positive" | "zero" | "reversed">("positive");
   const [error, setError] = useState("");
   const [calculating, setCalculating] = useState(false);
-  const [result, setResult] = useState<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } } | null>(null);
+  const [result, setResult] = useState<{ pivResult?: DopplerResult; waveAResult: DopplerResult; refs?: { p5: number; p50: number; p95: number } } | null>(null);
 
   const handleCalc = async () => {
     const gaVal = parseInt(ga);
@@ -361,9 +361,9 @@ function DVTab({ disabled, onSuccess }: TabProps) {
     setCalculating(true);
     setError("");
     try {
-      const r = await apiFetch<{ res: DopplerResult; refs: { p5: number; p50: number; p95: number } }>(
+      const r = await apiFetch<{ pivResult?: DopplerResult; waveAResult: DopplerResult; refs?: { p5: number; p50: number; p95: number } }>(
         "/calculate/doppler/dv",
-        { method: "POST", body: JSON.stringify({ ga: gaVal, pi: piVal, waveA }) },
+        { method: "POST", body: JSON.stringify({ ga: gaVal, piv: piVal, waveAReversed: waveA === "reversed" }) },
       );
       setResult(r);
       onSuccess();
@@ -406,8 +406,13 @@ function DVTab({ disabled, onSuccess }: TabProps) {
       <AnimatePresence>
         {result && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-            <ResultCard label="IP — Ducto Venoso" result={result.res} note="Onda A ausente ou reversa indica deterioração hemodinâmica avançada; avaliar conduta e momento do parto." />
-            <div className="glass-card-static p-4"><PercentileRefBar value={result.res.value} refs={result.refs} label="IP — Ducto Venoso" format={formatIndex} /></div>
+            {result.pivResult && (
+              <ResultCard label="IP — Ducto Venoso" result={result.pivResult} note="Onda A ausente ou reversa indica deterioração hemodinâmica avançada; avaliar conduta e momento do parto." />
+            )}
+            {result.pivResult && result.refs && (
+              <div className="glass-card-static p-4"><PercentileRefBar value={result.pivResult.value} refs={result.refs} label="IP — Ducto Venoso" format={formatIndex} /></div>
+            )}
+            <ResultCard label="Onda A" result={result.waveAResult} note="A onda 'a' anterógrada é o padrão normal; onda 'a' reversa indica aumento da pressão atrial direita." />
           </motion.div>
         )}
       </AnimatePresence>

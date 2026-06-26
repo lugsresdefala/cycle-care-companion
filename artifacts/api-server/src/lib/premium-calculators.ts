@@ -527,6 +527,12 @@ const GROWTH_DATA_MAP: Record<GrowthParameter, PercentileRow[]> = {
   bpd: BPD_GROWTH_DATA,
 };
 
+export function getGrowthCurveData(param: GrowthParameter): PercentileRow[] {
+  const data = GROWTH_DATA_MAP[param];
+  if (!data) throw new Error(`Unknown growth parameter: ${param}`);
+  return data;
+}
+
 export function assessGrowthBatch(
   param: GrowthParameter,
   measurements: { ga: number; value: number }[],
