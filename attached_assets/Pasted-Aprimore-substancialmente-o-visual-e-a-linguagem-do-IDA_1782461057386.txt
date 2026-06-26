@@ -1,0 +1,60 @@
+Aprimore substancialmente o visual e a linguagem do IDALIACalc para que a aplicação tenha aparência técnica, científica e institucional, com maior credibilidade.
+
+Objetivos principais:
+1. Melhorar a interface geral, abandonando aparência genérica ou amadora.
+2. Tornar os gráficos visualmente mais sofisticados, analíticos e profissionais.
+3. Reescrever os textos informativos em registro técnico, clínico-científico e institucional.
+4. Preservar a lógica funcional existente, alterando apenas apresentação, linguagem, hierarquia visual e experiência de uso.
+
+Direção visual:
+- A aplicação deve parecer uma calculadora científica biomédica contemporânea.
+- Evitar aparência casual, promocional, escolar ou excessivamente colorida.
+- Usar paleta sóbria: azul profundo, petróleo, teal, cinza grafite, branco e variações discretas.
+- Melhorar tipografia, espaçamento, cards, contraste, organização dos blocos e hierarquia da informação.
+- Usar sombras discretas, bordas refinadas e microinterações sutis.
+- Evitar ícones infantis, excesso de gradientes, cores gritantes ou elementos decorativos sem função.
+
+Gráficos:
+- Os gráficos não devem parecer 2D básicos ou escolares.
+- Manter legibilidade estatística como prioridade.
+- Não usar pseudo-3D decorativo que prejudique interpretação.
+- Refinar linhas, áreas, eixos, grades, legendas e tooltips.
+- Usar grids discretos, labels técnicos, tooltips informativos e destaque seletivo para valores críticos.
+- Incluir, quando fizer sentido, faixas de referência, zonas de interpretação ou anotações clínicas/metodológicas.
+- O resultado deve parecer um painel analítico profissional, não um gráfico padrão sem acabamento.
+
+Linguagem:
+- Reescrever todos os textos da interface em tom técnico, clínico-científico e institucional.
+- Eliminar linguagem coloquial, promocional, simplificada ou conversada.
+- Padronizar terminologia, unidades, variáveis e referências.
+- Distinguir claramente dado inserido, estimativa calculada, inferência interpretativa e limitação metodológica.
+- Evitar frases como “está tudo bem”, “resultado bom”, “não precisa se preocupar” ou equivalentes informais.
+- Usar linguagem objetiva e cautelosa.
+
+Modelo de redação para resultados:
+Cada bloco de resultado deve conter, sempre que aplicável:
+- Título técnico.
+- Valor principal.
+- Interpretação objetiva.
+- Nota metodológica ou limitação.
+
+Exemplo de tom desejado:
+Em vez de:
+“Seu resultado está bom.”
+
+Usar:
+“O valor observado encontra-se dentro da faixa de referência adotada pelo sistema para o perfil analisado.”
+
+Em vez de:
+“Provavelmente não há problema.”
+
+Usar:
+“Este resultado, isoladamente, não indica alteração relevante; a interpretação final deve considerar o conjunto dos parâmetros clínicos e laboratoriais disponíveis.”
+
+Critérios finais:
+- Preservar as funcionalidades existentes.
+- Não remover cálculos já implementados.
+- Melhorar a experiência visual sem comprometer clareza.
+- Garantir responsividade.
+- Garantir coerência terminológica em toda a aplicação.
+- O produto final deve transmitir rigor, confiabilidade e sobriedade técnica.
