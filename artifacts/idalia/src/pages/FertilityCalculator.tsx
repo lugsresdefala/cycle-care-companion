@@ -24,6 +24,8 @@ import { ptBR } from "date-fns/locale";
 import CycleVisualization from "@/components/CycleVisualization";
 import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "@/components/DatePicker";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 
 const PHASE_CONFIG: Record<string, {color: string;label: string;description: string;bgColor: string;}> = {
   menstrual: { color: "text-menstrual", bgColor: "bg-menstrual/15 border-menstrual/25", label: "Menstrual", description: "Descamação endometrial" },
@@ -180,29 +182,30 @@ const FertilityCalculator = () => {
         description="Identifique os dias férteis, a ovulação e a janela de concepção com base no ciclo menstrual. Calculadora de período fértil baseada em evidências — IDALIA Calc."
         path="/fertility"
       />
+      <CalculatorHeader
+        icon={Heart}
+        title="Período Fértil e Ovulação"
+        subtitle="Estimativa do ciclo menstrual, janela fértil e ovulação"
+      />
+
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
 
       {/* ─── Input Section ─────────────────────────────── */}
-      <div className="glass-card-static p-5 sm:p-6 space-y-5 mesh-cyan">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <div className="w-8 h-8 rounded-xl bg-accent/15 flex items-center justify-center">
-              <Heart className="w-4 h-4 text-accent" />
-            </div>
-            <div>
-              <h1 className="font-display text-lg text-foreground leading-tight">Calculadora de Ciclo Menstrual e Fertilidade</h1>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Período Fértil & Ovulação</p>
-            </div>
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-lg font-semibold text-primary">Ciclo Menstrual e Fertilidade</h2>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+              Estimativa de período fértil, data de ovulação e fase do ciclo a partir dos parâmetros do ciclo menstrual.
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Estimativa de período fértil, data de ovulação e fase do ciclo com base em parâmetros do ciclo menstrual.
-          </p>
+          <CitationChip>Método calendário</CitationChip>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Início da Última Menstruação</Label>
+              <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Início da Última Menstruação</Label>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button className="flex items-center">
@@ -221,7 +224,7 @@ const FertilityCalculator = () => {
           </div>
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Fim da Última Menstruação</Label>
+              <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Fim da Última Menstruação</Label>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button className="flex items-center">
@@ -243,7 +246,7 @@ const FertilityCalculator = () => {
         <div className="flex items-end gap-3">
           <div className="space-y-1.5">
             <div className="flex items-center gap-1.5">
-              <Label className="text-xs font-semibold text-foreground">Duração do Ciclo</Label>
+              <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Duração do Ciclo</Label>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button className="flex items-center">
@@ -260,7 +263,7 @@ const FertilityCalculator = () => {
                 max={45}
                 value={cycleLength}
                 onChange={(e) => setCycleLength(parseInt(e.target.value) || 28)}
-                className="input-glass w-20 tabular-nums" />
+                className="input-glass w-20 num" />
               
               <span className="text-xs text-muted-foreground whitespace-nowrap">dias</span>
             </div>
@@ -271,7 +274,7 @@ const FertilityCalculator = () => {
             disabled={!canCalculate || blocked || needsLogin || consuming}
             className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
             canCalculate ?
-            "bg-accent text-accent-foreground hover:bg-accent/90 glow-accent" :
+            "bg-primary text-primary-foreground hover:bg-primary/90 glow-primary" :
             "opacity-40 cursor-not-allowed"}`
             }>
             
@@ -294,7 +297,7 @@ const FertilityCalculator = () => {
             {/* Hero Phase Banner */}
             <div className={`glass-card-static p-5 sm:p-6 border ${phaseConfig?.bgColor} relative overflow-hidden`}>
               {/* Subtle background gradient */}
-              <div className="absolute inset-0 pointer-events-none mesh-cyan opacity-60" />
+              <div className="absolute inset-0 pointer-events-none mesh-navy opacity-60" />
 
               <div className="relative flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="flex-1 min-w-0">
@@ -311,13 +314,13 @@ const FertilityCalculator = () => {
                 <div className="flex gap-4 sm:gap-5">
                   {results.daysUntilNextPhase > 0 &&
                 <div className="stat-card text-center min-w-[64px]">
-                      <p className="number-display text-2xl font-display text-foreground">{results.daysUntilNextPhase}</p>
+                      <p className="num text-2xl font-semibold text-primary">{results.daysUntilNextPhase}</p>
                       <p className="text-[10px] text-muted-foreground">dias para</p>
                       <p className="text-xs text-primary capitalize font-semibold">{results.nextPhase}</p>
                     </div>
                 }
                   <div className="stat-card text-center min-w-[56px]">
-                    <p className="number-display text-2xl font-display text-foreground">{cycleLength}</p>
+                    <p className="num text-2xl font-semibold text-primary">{cycleLength}</p>
                     <p className="text-[10px] text-muted-foreground">dias</p>
                     <p className="text-[10px] text-muted-foreground/70">ciclo</p>
                   </div>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..600;1,8..60,400..600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,74 +6,75 @@
 
 @layer base {
   :root {
-    /* ── Core palette derived from IDALIA Calc logo ── */
-    /* Logo left-half: deep navy / right-half: warm amber-orange */
-    --background: 220 18% 97%;
-    --foreground: 218 50% 10%;
+    /* ── Premium Biomédico palette ── */
+    /* Deep navy + petrol/teal + graphite on paper/white */
+    --background: 210 33% 98%;
+    --foreground: 213 60% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 218 50% 10%;
+    --card-foreground: 213 60% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 218 50% 10%;
+    --popover-foreground: 213 60% 13%;
 
-    /* Deep navy — logo left arc */
-    --primary: 218 72% 27%;
+    /* Deep navy — primary surfaces, headings, CTAs */
+    --primary: 213 66% 18%;
     --primary-foreground: 0 0% 100%;
 
-    /* Rich purple — logo connecting accent */
-    --secondary: 262 52% 44%;
+    /* Graphite slate — secondary */
+    --secondary: 215 25% 27%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Warm amber-orange — logo right arc */
-    --accent: 25 88% 56%;
+    /* Petrol / teal — analytical accent (replaces amber) */
+    --accent: 193 84% 31%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62% 50%;
+    /* Sober clinical red */
+    --destructive: 0 72% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --muted: 218 18% 92%;
-    --muted-foreground: 218 16% 48%;
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --border: 218 22% 89%;
-    --input: 218 16% 94%;
-    --ring: 218 72% 27%;
+    --border: 214 22% 88%;
+    --input: 214 26% 95%;
+    --ring: 193 84% 31%;
 
     --radius: 0.875rem;
 
     /* ── Extended brand tokens ── */
-    --primary-light: 218 72% 94%;
-    --accent-light: 25 88% 94%;
-    --secondary-light: 262 52% 94%;
+    --primary-light: 213 60% 94%;
+    --accent-light: 193 70% 93%;
+    --secondary-light: 215 25% 92%;
 
-    /* Glow effects */
-    --glow-primary: 218 80% 40%;
-    --glow-accent: 25 90% 57%;
-    --glow-secondary: 262 60% 50%;
-    --glow-warm: 35 80% 55%;
+    /* Glow effects — sober */
+    --glow-primary: 213 70% 30%;
+    --glow-accent: 193 84% 35%;
+    --glow-secondary: 215 25% 38%;
+    --glow-warm: 32 90% 42%;
 
-    /* Phase colors — keep semantic naming */
-    --fertility: 25 88% 56%;
-    --gestational: 262 52% 44%;
-    --menstrual: 0 68% 58%;
-    --folicular: 218 72% 38%;
-    --ovulatory: 35 82% 52%;
-    --luteal: 262 52% 44%;
+    /* Phase / semantic colors — keep names, sober values */
+    --fertility: 193 84% 31%;
+    --gestational: 213 66% 30%;
+    --menstrual: 0 70% 50%;
+    --folicular: 213 66% 38%;
+    --ovulatory: 32 90% 38%;   /* amber — warning severity */
+    --luteal: 215 25% 38%;
 
     /* Glass surface */
     --glass: 0 0% 100%;
-    --glass-border: 218 50% 10% / 0.07;
-    --glass-border-hover: 218 50% 10% / 0.14;
+    --glass-border: 213 40% 14% / 0.08;
+    --glass-border-hover: 213 40% 14% / 0.16;
 
     /* Sidebar */
-    --sidebar-background: 218 22% 96%;
-    --sidebar-foreground: 218 35% 22%;
-    --sidebar-primary: 218 72% 27%;
+    --sidebar-background: 210 30% 97%;
+    --sidebar-foreground: 213 35% 22%;
+    --sidebar-primary: 213 66% 18%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 218 20% 91%;
-    --sidebar-accent-foreground: 218 35% 22%;
-    --sidebar-border: 218 22% 89%;
-    --sidebar-ring: 218 72% 27%;
+    --sidebar-accent: 214 28% 92%;
+    --sidebar-accent-foreground: 213 35% 22%;
+    --sidebar-border: 214 22% 88%;
+    --sidebar-ring: 193 84% 31%;
   }
 
   .dark {
@@ -86,16 +87,16 @@
     --popover: 218 35% 11%;
     --popover-foreground: 218 15% 93%;
 
-    --primary: 218 72% 60%;
-    --primary-foreground: 218 72% 8%;
+    --primary: 205 70% 64%;
+    --primary-foreground: 213 66% 10%;
 
-    --secondary: 262 52% 65%;
-    --secondary-foreground: 218 50% 8%;
+    --secondary: 215 20% 70%;
+    --secondary-foreground: 213 40% 8%;
 
-    --accent: 25 88% 62%;
-    --accent-foreground: 218 50% 8%;
+    --accent: 193 75% 50%;
+    --accent-foreground: 213 40% 8%;
 
-    --destructive: 0 62% 60%;
+    --destructive: 0 70% 58%;
     --destructive-foreground: 0 0% 100%;
 
     --muted: 218 22% 18%;
@@ -140,8 +141,8 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Instrument Sans', system-ui, sans-serif;
-    letter-spacing: -0.028em;
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.02em;
     font-weight: 600;
     line-height: 1.15;
   }
@@ -244,95 +245,95 @@
       0 0 0 1px hsla(218, 72%, 40%, 0.12);
   }
 
-  /* ── Glass card — warm tint (accent/orange theme) ── */
+  /* ── Glass card — teal tint (analytical accent) ── */
   .glass-card-warm {
     @apply border rounded-2xl;
     background: linear-gradient(145deg,
-      hsla(25, 88%, 56%, 0.06) 0%,
-      hsla(35, 80%, 55%, 0.04) 50%,
+      hsla(193, 84%, 31%, 0.06) 0%,
+      hsla(193, 70%, 40%, 0.04) 50%,
       rgba(255,255,255,0.88) 100%
     );
     backdrop-filter: blur(20px) saturate(1.5);
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    border-color: hsla(25, 88%, 56%, 0.14);
+    border-color: hsla(193, 84%, 31%, 0.14);
     box-shadow:
       0 1px 0 0 rgba(255,255,255,0.8) inset,
-      0 8px 28px -6px rgba(100, 50, 15, 0.10),
-      0 0 0 1px hsla(25, 88%, 56%, 0.06);
+      0 8px 28px -6px rgba(11, 40, 60, 0.10),
+      0 0 0 1px hsla(193, 84%, 31%, 0.06);
     transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
                 box-shadow 0.38s cubic-bezier(0.16,1,0.3,1);
   }
 
   .glass-card-warm:hover {
     transform: translateY(-4px);
-    border-color: hsla(25, 88%, 56%, 0.22);
+    border-color: hsla(193, 84%, 31%, 0.22);
     box-shadow:
       0 1px 0 0 rgba(255,255,255,0.9) inset,
-      0 20px 48px -12px rgba(100, 50, 15, 0.15),
-      0 0 20px hsla(25, 88%, 56%, 0.10),
-      0 0 0 1px hsla(25, 88%, 56%, 0.12);
+      0 20px 48px -12px rgba(11, 40, 60, 0.15),
+      0 0 20px hsla(193, 84%, 31%, 0.10),
+      0 0 0 1px hsla(193, 84%, 31%, 0.12);
   }
 
-  /* ── Glass card — purple tint (secondary theme) ── */
+  /* ── Glass card — deep navy tint (secondary theme) ── */
   .glass-card-purple {
     @apply border rounded-2xl;
     background: linear-gradient(145deg,
-      hsla(262, 52%, 44%, 0.06) 0%,
-      hsla(262, 52%, 55%, 0.04) 50%,
+      hsla(213, 66%, 24%, 0.06) 0%,
+      hsla(213, 60%, 32%, 0.04) 50%,
       rgba(255,255,255,0.88) 100%
     );
     backdrop-filter: blur(20px) saturate(1.5);
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
-    border-color: hsla(262, 52%, 50%, 0.14);
+    border-color: hsla(213, 66%, 30%, 0.14);
     box-shadow:
       0 1px 0 0 rgba(255,255,255,0.8) inset,
-      0 8px 28px -6px rgba(40, 15, 80, 0.10),
-      0 0 0 1px hsla(262, 52%, 50%, 0.06);
+      0 8px 28px -6px rgba(11, 30, 60, 0.10),
+      0 0 0 1px hsla(213, 66%, 30%, 0.06);
     transition: transform 0.38s cubic-bezier(0.16,1,0.3,1),
                 box-shadow 0.38s cubic-bezier(0.16,1,0.3,1);
   }
 
   .glass-card-purple:hover {
     transform: translateY(-4px);
-    border-color: hsla(262, 52%, 50%, 0.22);
+    border-color: hsla(213, 66%, 30%, 0.22);
     box-shadow:
       0 1px 0 0 rgba(255,255,255,0.9) inset,
-      0 20px 48px -12px rgba(40, 15, 80, 0.15),
-      0 0 20px hsla(262, 52%, 50%, 0.10),
-      0 0 0 1px hsla(262, 52%, 50%, 0.12);
+      0 20px 48px -12px rgba(11, 30, 60, 0.15),
+      0 0 20px hsla(213, 66%, 30%, 0.10),
+      0 0 0 1px hsla(213, 66%, 30%, 0.12);
   }
 
   /* ── Mesh gradient overlays ── */
   .mesh-navy {
     background-image:
-      radial-gradient(at 5% 5%, hsla(218, 72%, 30%, 0.09) 0, transparent 55%),
-      radial-gradient(at 95% 90%, hsla(262, 52%, 44%, 0.06) 0, transparent 50%);
+      radial-gradient(at 5% 5%, hsla(213, 66%, 24%, 0.07) 0, transparent 55%),
+      radial-gradient(at 95% 90%, hsla(193, 84%, 31%, 0.05) 0, transparent 50%);
   }
 
   .mesh-purple {
     background-image:
-      radial-gradient(at 5% 5%, hsla(262, 52%, 44%, 0.09) 0, transparent 55%),
-      radial-gradient(at 95% 90%, hsla(218, 72%, 30%, 0.06) 0, transparent 50%);
+      radial-gradient(at 5% 5%, hsla(213, 66%, 26%, 0.08) 0, transparent 55%),
+      radial-gradient(at 95% 90%, hsla(193, 84%, 31%, 0.05) 0, transparent 50%);
   }
 
   .mesh-coral {
     background-image:
-      radial-gradient(at 5% 5%, hsla(25, 88%, 56%, 0.10) 0, transparent 55%),
-      radial-gradient(at 95% 90%, hsla(35, 80%, 55%, 0.06) 0, transparent 50%);
+      radial-gradient(at 5% 5%, hsla(193, 84%, 31%, 0.08) 0, transparent 55%),
+      radial-gradient(at 95% 90%, hsla(213, 66%, 30%, 0.05) 0, transparent 50%);
   }
 
   .mesh-warm {
     background-image:
-      radial-gradient(at 5% 5%, hsla(35, 80%, 55%, 0.09) 0, transparent 55%),
-      radial-gradient(at 95% 90%, hsla(25, 88%, 56%, 0.06) 0, transparent 50%);
+      radial-gradient(at 5% 5%, hsla(193, 70%, 38%, 0.08) 0, transparent 55%),
+      radial-gradient(at 95% 90%, hsla(193, 84%, 31%, 0.05) 0, transparent 50%);
   }
 
   /* ── Brand gradient text ── */
   .gradient-text-brand {
     background: linear-gradient(135deg,
-      hsl(218, 72%, 27%) 0%,
-      hsl(262, 52%, 44%) 45%,
-      hsl(25, 88%, 56%) 100%
+      hsl(213, 66%, 20%) 0%,
+      hsl(193, 84%, 31%) 55%,
+      hsl(215, 25%, 30%) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -341,8 +342,8 @@
 
   .gradient-text-blue-orange {
     background: linear-gradient(135deg,
-      hsl(218, 72%, 32%) 0%,
-      hsl(25, 88%, 56%) 100%
+      hsl(213, 66%, 22%) 0%,
+      hsl(193, 84%, 33%) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -352,20 +353,20 @@
   /* ── Glow effects ── */
   .glow-primary {
     box-shadow:
-      0 0 12px hsla(218, 80%, 40%, 0.22),
-      0 0 32px hsla(218, 80%, 40%, 0.10);
+      0 0 12px hsla(213, 70%, 30%, 0.18),
+      0 0 32px hsla(213, 70%, 30%, 0.08);
   }
 
   .glow-accent {
     box-shadow:
-      0 0 12px hsla(25, 90%, 57%, 0.24),
-      0 0 32px hsla(25, 90%, 57%, 0.10);
+      0 0 12px hsla(193, 84%, 35%, 0.20),
+      0 0 32px hsla(193, 84%, 35%, 0.08);
   }
 
   .glow-secondary {
     box-shadow:
-      0 0 12px hsla(262, 60%, 50%, 0.22),
-      0 0 32px hsla(262, 60%, 50%, 0.10);
+      0 0 12px hsla(215, 25%, 38%, 0.18),
+      0 0 32px hsla(215, 25%, 38%, 0.08);
   }
 
   /* ── Input ── */
@@ -412,10 +413,10 @@
     border-radius: 50%;
     background: conic-gradient(
       from 0deg,
-      hsla(218, 72%, 27%, 0.5) 0deg,
-      hsla(262, 52%, 44%, 0.4) 120deg,
-      hsla(25, 88%, 56%, 0.5) 240deg,
-      hsla(218, 72%, 27%, 0.5) 360deg
+      hsla(213, 66%, 22%, 0.5) 0deg,
+      hsla(193, 84%, 31%, 0.4) 120deg,
+      hsla(215, 25%, 30%, 0.5) 240deg,
+      hsla(213, 66%, 22%, 0.5) 360deg
     );
     animation: spin-ring 12s linear infinite;
     opacity: 0.7;
@@ -430,10 +431,10 @@
     border-radius: 50%;
     background: conic-gradient(
       from 180deg,
-      hsla(25, 88%, 56%, 0.3) 0deg,
-      hsla(262, 52%, 44%, 0.2) 120deg,
-      hsla(218, 72%, 27%, 0.3) 240deg,
-      hsla(25, 88%, 56%, 0.3) 360deg
+      hsla(193, 84%, 31%, 0.3) 0deg,
+      hsla(213, 66%, 22%, 0.2) 120deg,
+      hsla(215, 25%, 30%, 0.3) 240deg,
+      hsla(193, 84%, 31%, 0.3) 360deg
     );
     animation: spin-ring 18s linear infinite reverse;
     opacity: 0.5;
@@ -484,8 +485,30 @@
 
   /* ── Brand background pattern ── */
   .bg-dot-pattern {
-    background-image: radial-gradient(circle, hsla(218, 40%, 50%, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(circle, hsla(213, 30%, 45%, 0.07) 1px, transparent 1px);
     background-size: 24px 24px;
+  }
+
+  /* ── Graph-paper grid (analytical surfaces) ── */
+  .graph-paper {
+    background-image:
+      linear-gradient(to right, hsla(215, 28%, 30%, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(215, 28%, 30%, 0.045) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+
+  /* ── Methodological note (scientific, serif italic) ── */
+  .methodological-note {
+    @apply border-l-2 pl-3 italic leading-relaxed;
+    font-family: 'Source Serif 4', Georgia, serif;
+    border-color: hsl(var(--border));
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* ── Monospace tabular numerals (clinical values) ── */
+  .num {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ── Result card ── */
@@ -504,7 +527,7 @@
   .badge-accent {
     @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium;
     background: hsl(var(--accent) / 0.12);
-    color: hsl(25 88% 40%);
+    color: hsl(var(--accent));
     border: 1px solid hsl(var(--accent) / 0.2);
   }
 

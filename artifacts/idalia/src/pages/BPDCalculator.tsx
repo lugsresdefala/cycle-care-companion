@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
 import { Info, Ruler, Baby, Calendar, AlertCircle } from "lucide-react";
 import { apiFetch, ApiError } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -17,6 +16,8 @@ import { ptBR } from "date-fns/locale";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 import { BPD_REFERENCE } from "@/lib/biometry-references";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 
 const BPDCalculator = () => {
   const { blocked, needsLogin, subscription, refetch } = useTokenGate();
@@ -75,21 +76,29 @@ const BPDCalculator = () => {
         description="Estime a idade gestacional e a data do parto pelo Diâmetro Biparietal (DBP) fetal. Cálculo baseado em curvas de referência validadas — IDALIA Calc."
         path="/bpd"
       />
+      <CalculatorHeader
+        icon={Ruler}
+        title="DBP — Diâmetro Biparietal"
+        subtitle="Estimativa da idade gestacional pelo diâmetro biparietal fetal"
+      />
+
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
-        <div>
-          <h1 className="font-display text-xl text-foreground">DBP — Diâmetro Biparietal</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Estimativa da idade gestacional pelo diâmetro biparietal fetal.
-          </p>
-          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">Hadlock, 1982</Badge>
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h3 className="font-display text-lg font-semibold text-primary">Medida do DBP</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+              Estimativa da idade gestacional pelo diâmetro biparietal — mais acurado entre 12 e 28 semanas.
+            </p>
+          </div>
+          <CitationChip>Hadlock, 1982</CitationChip>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <div className="flex items-center gap-1.5">
-            <Label className="text-sm text-foreground">DBP (mm)</Label>
+            <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">DBP (mm)</Label>
             <Tooltip>
               <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
               <TooltipContent>Diâmetro biparietal medido de borda externa a borda interna (14–100 mm)</TooltipContent>
@@ -99,10 +108,11 @@ const BPDCalculator = () => {
             <Input
               type="number" min={14} max={100} step={0.1}
               value={bpd} onChange={(e) => setBpd(e.target.value)}
-              placeholder="Ex: 55" className="input-glass w-32 tabular-nums"
+              placeholder="Ex: 55" className="input-glass num w-32"
             />
-            <span className="text-sm text-muted-foreground">mm</span>
+            <span className="num text-sm text-muted-foreground">mm</span>
           </div>
+          <p className="num text-[10px] text-muted-foreground">14–100 mm</p>
         </div>
 
         {error && (
@@ -125,13 +135,13 @@ const BPDCalculator = () => {
           >
             <div className="glass-card-static p-6 md:p-8 mesh-navy">
               <div className="flex items-center gap-2 mb-2">
-                <Baby className="w-4 h-4 text-primary" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground">Idade Gestacional Estimada</span>
+                <Baby className="w-4 h-4 text-accent" />
+                <span className="section-label text-[11px]">Idade Gestacional Estimada</span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
+                <span className="num text-4xl font-semibold text-primary">{results.weeks}</span>
                 <span className="text-sm text-muted-foreground">sem</span>
-                <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
+                <span className="num text-2xl font-semibold text-primary ml-2">{results.days}</span>
                 <span className="text-sm text-muted-foreground">dias</span>
               </div>
             </div>
@@ -141,24 +151,24 @@ const BPDCalculator = () => {
                 <Calendar className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
               </div>
-              <p className="tabular-nums text-lg font-display text-foreground">
+              <p className="num text-lg font-semibold text-primary">
                 {format(results.dueDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
               </p>
-              <p className="text-xs text-muted-foreground">DPP estimada (±7–14 dias no 2º/3º trimestre)</p>
+              <p className="methodological-note text-[11px]">DPP estimada (±7–14 dias no 2º/3º trimestre).</p>
             </div>
 
             <div className="glass-card-static p-5 space-y-3">
-              <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Ruler className="w-4 h-4 text-primary" /> Tabela de Referência — DBP × IG
+              <h4 className="font-display text-sm font-semibold text-primary flex items-center gap-2">
+                <Ruler className="w-4 h-4 text-accent" /> Tabela de Referência — DBP × IG
               </h4>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead><tr className="border-b border-border"><th className="text-left py-2 text-muted-foreground font-medium">DBP (mm)</th><th className="text-left py-2 text-muted-foreground font-medium">IG (sem+dias)</th></tr></thead>
+                  <thead><tr className="border-b border-border"><th className="text-left py-2 section-label text-[10px]">DBP (mm)</th><th className="text-left py-2 section-label text-[10px]">IG (sem+dias)</th></tr></thead>
                   <tbody>
                     {BPD_REFERENCE.map((ref) => (
-                      <tr key={ref.bpd} className={`border-b border-border/50 ${Math.abs(parseFloat(bpd) - ref.bpd) < 5 ? "bg-primary/10" : ""}`}>
-                        <td className="py-1.5 tabular-nums text-foreground">{ref.bpd}</td>
-                        <td className="py-1.5 tabular-nums text-foreground">{ref.ga}</td>
+                      <tr key={ref.bpd} className={`border-b border-border/50 ${Math.abs(parseFloat(bpd) - ref.bpd) < 5 ? "bg-accent/10" : ""}`}>
+                        <td className="py-1.5 num text-foreground">{ref.bpd}</td>
+                        <td className="py-1.5 num text-foreground">{ref.ga}</td>
                       </tr>
                     ))}
                   </tbody>

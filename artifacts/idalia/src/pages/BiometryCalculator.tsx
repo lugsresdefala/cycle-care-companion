@@ -8,7 +8,6 @@ import { PageMeta } from "@/components/PageMeta";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Info, Ruler, Baby, Calendar, Activity, AlertCircle } from "lucide-react";
 import { dueDateFromGA } from "@/lib/biometry";
@@ -16,6 +15,8 @@ import { formatDateLongBR, formatGAShort } from "@/lib/units";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
 import { CRL_REFERENCE, BPD_REFERENCE } from "@/lib/biometry-references";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 import { apiFetch, ApiError } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
@@ -167,85 +168,109 @@ const BiometryCalculator = () => {
         description="Avalie DBP, CA, CC e CF para estimar a idade gestacional e o peso fetal. Biometria fetal baseada nas referências INTERGROWTH-21st — IDALIA Calc."
         path="/biometry"
       />
+      <CalculatorHeader
+        icon={Activity}
+        title="Biometria Fetal"
+        subtitle="Estimativa da idade gestacional por medida individual ou biometria composta"
+      />
+
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
-        <div>
-          <h1 className="font-display text-xl text-foreground">Biometria Fetal</h1>
-          <p className="text-sm text-muted-foreground mt-1">Estimativa da idade gestacional por medida individual ou biometria composta.</p>
-        </div>
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <Tabs value={mode} onValueChange={handleTabChange} className="w-full space-y-5">
+          <div className="overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
+            <TabsList className="bg-muted/50 p-1 h-11 grid w-full grid-cols-3">
+              <TabsTrigger value="crl" className="text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
+                <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />CCN (1º Tri)
+              </TabsTrigger>
+              <TabsTrigger value="bpd" className="text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
+                <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />DBP
+              </TabsTrigger>
+              <TabsTrigger value="composite" className="text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm">
+                <Activity className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />Composta
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-        <Tabs value={mode} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="crl" className="text-xs sm:text-sm">
-              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />CCN (1º Tri)
-            </TabsTrigger>
-            <TabsTrigger value="bpd" className="text-xs sm:text-sm">
-              <Ruler className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />DBP
-            </TabsTrigger>
-            <TabsTrigger value="composite" className="text-xs sm:text-sm">
-              <Activity className="w-3.5 h-3.5 mr-1.5 hidden sm:inline-block" />Composta
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="crl" className="space-y-4 mt-4">
-            <Badge variant="outline" className="text-xs border-accent/30 text-accent">Robinson & Fleming, 1975</Badge>
-            <div className="space-y-2">
+          <TabsContent value="crl" className="space-y-4 focus-visible:outline-none">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h3 className="font-display text-lg font-semibold text-primary">CCN — 1º Trimestre</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">Datação pelo comprimento crânio-caudal (6–14 semanas).</p>
+              </div>
+              <CitationChip>Robinson &amp; Fleming, 1975</CitationChip>
+            </div>
+            <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">CCN (mm)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">CCN (mm)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Comprimento crânio-caudal medido no US de 1º trimestre (2–84 mm)</TooltipContent>
                 </Tooltip>
               </div>
               <div className="flex items-center gap-3">
-                <Input type="number" min={2} max={84} step={0.1} value={crl} onChange={(e) => setCrl(e.target.value)} placeholder="Ex: 45" className="input-glass w-32 tabular-nums" />
-                <span className="text-sm text-muted-foreground">mm</span>
+                <Input type="number" min={2} max={84} step={0.1} value={crl} onChange={(e) => setCrl(e.target.value)} placeholder="Ex: 45" className="input-glass num w-32" />
+                <span className="num text-sm text-muted-foreground">mm</span>
               </div>
+              <p className="num text-[10px] text-muted-foreground">2–84 mm</p>
             </div>
-            <Button onClick={handleCRL} disabled={isDisabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+            <Button onClick={handleCRL} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
             </Button>
           </TabsContent>
 
-          <TabsContent value="bpd" className="space-y-4 mt-4">
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">Hadlock, 1982</Badge>
-            <div className="space-y-2">
+          <TabsContent value="bpd" className="space-y-4 focus-visible:outline-none">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h3 className="font-display text-lg font-semibold text-primary">DBP — Diâmetro Biparietal</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">Datação pelo diâmetro biparietal (mais acurado entre 12 e 28 semanas).</p>
+              </div>
+              <CitationChip>Hadlock, 1982</CitationChip>
+            </div>
+            <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">DBP (mm)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">DBP (mm)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Diâmetro biparietal medido de borda externa a borda interna (14–100 mm)</TooltipContent>
                 </Tooltip>
               </div>
               <div className="flex items-center gap-3">
-                <Input type="number" min={14} max={100} step={0.1} value={bpdSingle} onChange={(e) => setBpdSingle(e.target.value)} placeholder="Ex: 55" className="input-glass w-32 tabular-nums" />
-                <span className="text-sm text-muted-foreground">mm</span>
+                <Input type="number" min={14} max={100} step={0.1} value={bpdSingle} onChange={(e) => setBpdSingle(e.target.value)} placeholder="Ex: 55" className="input-glass num w-32" />
+                <span className="num text-sm text-muted-foreground">mm</span>
               </div>
+              <p className="num text-[10px] text-muted-foreground">14–100 mm</p>
             </div>
             <Button onClick={handleBPD} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
             </Button>
           </TabsContent>
 
-          <TabsContent value="composite" className="space-y-4 mt-4">
-            <Badge variant="outline" className="text-xs border-accent/30 text-accent">Hadlock, 1984</Badge>
+          <TabsContent value="composite" className="space-y-4 focus-visible:outline-none">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h3 className="font-display text-lg font-semibold text-primary">Biometria Composta</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">Estimativa pela média ponderada de múltiplos parâmetros biométricos.</p>
+              </div>
+              <CitationChip>Hadlock, 1984</CitationChip>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               {compositeFields.map((f) => (
                 <div key={f.label} className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
-                    <Label className="text-sm text-foreground">{f.label} (mm)</Label>
+                    <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">{f.label} (mm)</Label>
                     <Tooltip>
                       <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                       <TooltipContent>{f.desc} — {f.range}</TooltipContent>
                     </Tooltip>
                   </div>
-                  <Input type="number" step={0.1} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label} className="input-glass tabular-nums" />
+                  <Input type="number" step={0.1} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label} className="input-glass num" />
+                  <p className="num text-[10px] text-muted-foreground">{f.range}</p>
                 </div>
               ))}
             </div>
-            <Button onClick={handleComposite} disabled={isDisabled} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
+            <Button onClick={handleComposite} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
               <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG Composta"}
             </Button>
           </TabsContent>
@@ -271,18 +296,18 @@ const BiometryCalculator = () => {
             <div className="glass-card-static p-6 md:p-8 mesh-navy">
               <div className="flex items-center gap-2 mb-2">
                 <Baby className="w-4 h-4 text-accent" />
-                <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                <span className="section-label text-[11px]">
                   {results.estimates ? "IG Média Composta" : "Idade Gestacional Estimada"}
                 </span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
+                <span className="num text-4xl font-semibold text-primary">{results.weeks}</span>
                 <span className="text-sm text-muted-foreground">sem</span>
-                <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
+                <span className="num text-2xl font-semibold text-primary ml-2">{results.days}</span>
                 <span className="text-sm text-muted-foreground">dias</span>
               </div>
               {results.estimates && (
-                <p className="text-xs text-muted-foreground mt-2">Média de {results.estimates.length} medida{results.estimates.length > 1 ? "s" : ""}</p>
+                <p className="text-xs text-muted-foreground mt-2">Média de <span className="num">{results.estimates.length}</span> medida{results.estimates.length > 1 ? "s" : ""}</p>
               )}
             </div>
 
@@ -291,10 +316,10 @@ const BiometryCalculator = () => {
                 {results.estimates.map((est) => (
                   <div key={est.label} className="glass-card-static p-4 space-y-1">
                     <div className="flex items-center gap-2">
-                      <Activity className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-xs font-medium text-muted-foreground">{est.label}</span>
+                      <Activity className="w-3.5 h-3.5 text-accent" />
+                      <span className="section-label text-[10px]">{est.label}</span>
                     </div>
-                    <p className="tabular-nums text-lg font-display text-foreground">{formatGAShort(est.weeks, est.days)}</p>
+                    <p className="num text-lg font-semibold text-primary">{formatGAShort(est.weeks, est.days)}</p>
                   </div>
                 ))}
               </div>
@@ -305,25 +330,25 @@ const BiometryCalculator = () => {
                 <Calendar className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium text-foreground">Data Provável do Parto</span>
               </div>
-              <p className="tabular-nums text-lg font-display text-foreground">{formatDateLongBR(results.dueDate)}</p>
-              <p className="text-xs text-muted-foreground">
-                {mode === "crl" ? "DPP estimada (±5 dias no 1º trimestre)" : "DPP estimada (±7–14 dias no 2º/3º trimestre)"}
+              <p className="num text-lg font-semibold text-primary">{formatDateLongBR(results.dueDate)}</p>
+              <p className="methodological-note text-[11px]">
+                {mode === "crl" ? "DPP estimada (±5 dias no 1º trimestre)." : "DPP estimada (±7–14 dias no 2º/3º trimestre)."}
               </p>
             </div>
 
             {mode === "crl" && (
               <div className="glass-card-static p-5 space-y-3">
-                <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-primary" /> Tabela de Referência — CCN × IG
+                <h4 className="font-display text-sm font-semibold text-primary flex items-center gap-2">
+                  <Ruler className="w-4 h-4 text-accent" /> Tabela de Referência — CCN × IG
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
-                    <thead><tr className="border-b border-border"><th className="text-left py-2 text-muted-foreground font-medium">CCN (mm)</th><th className="text-left py-2 text-muted-foreground font-medium">IG (sem+dias)</th></tr></thead>
+                    <thead><tr className="border-b border-border"><th className="text-left py-2 section-label text-[10px]">CCN (mm)</th><th className="text-left py-2 section-label text-[10px]">IG (sem+dias)</th></tr></thead>
                     <tbody>
                       {CRL_REFERENCE.map((ref) => (
                         <tr key={ref.crl} className={`border-b border-border/50 ${Math.abs(parseFloat(crl) - ref.crl) < 5 ? "bg-accent/10" : ""}`}>
-                          <td className="py-1.5 tabular-nums text-foreground">{ref.crl}</td>
-                          <td className="py-1.5 tabular-nums text-foreground">{ref.ga}</td>
+                          <td className="py-1.5 num text-foreground">{ref.crl}</td>
+                          <td className="py-1.5 num text-foreground">{ref.ga}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -334,17 +359,17 @@ const BiometryCalculator = () => {
 
             {mode === "bpd" && (
               <div className="glass-card-static p-5 space-y-3">
-                <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Ruler className="w-4 h-4 text-primary" /> Tabela de Referência — DBP × IG
+                <h4 className="font-display text-sm font-semibold text-primary flex items-center gap-2">
+                  <Ruler className="w-4 h-4 text-accent" /> Tabela de Referência — DBP × IG
                 </h4>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
-                    <thead><tr className="border-b border-border"><th className="text-left py-2 text-muted-foreground font-medium">DBP (mm)</th><th className="text-left py-2 text-muted-foreground font-medium">IG (sem+dias)</th></tr></thead>
+                    <thead><tr className="border-b border-border"><th className="text-left py-2 section-label text-[10px]">DBP (mm)</th><th className="text-left py-2 section-label text-[10px]">IG (sem+dias)</th></tr></thead>
                     <tbody>
                       {BPD_REFERENCE.map((ref) => (
-                        <tr key={ref.bpd} className={`border-b border-border/50 ${Math.abs(parseFloat(bpdSingle) - ref.bpd) < 5 ? "bg-primary/10" : ""}`}>
-                          <td className="py-1.5 tabular-nums text-foreground">{ref.bpd}</td>
-                          <td className="py-1.5 tabular-nums text-foreground">{ref.ga}</td>
+                        <tr key={ref.bpd} className={`border-b border-border/50 ${Math.abs(parseFloat(bpdSingle) - ref.bpd) < 5 ? "bg-accent/10" : ""}`}>
+                          <td className="py-1.5 num text-foreground">{ref.bpd}</td>
+                          <td className="py-1.5 num text-foreground">{ref.ga}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -375,4 +400,3 @@ const BiometryCalculator = () => {
 };
 
 export default BiometryCalculator;
-

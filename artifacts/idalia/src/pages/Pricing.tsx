@@ -249,14 +249,14 @@ const Pricing = () => {
                           </div>
 
                           <div>
-                            <span className="font-display text-2xl font-bold text-foreground">
+                            <span className="num text-2xl font-bold text-foreground">
                               R$ {(plan.priceCents / 100).toFixed(2).replace(".", ",")}
                             </span>
                             <span className="text-xs text-muted-foreground">/mês</span>
                           </div>
 
                           <p className="text-xs text-muted-foreground">
-                            <span className="font-medium text-foreground">{plan.tokensPerPeriod}</span> cálculos/mês
+                            <span className="num font-medium text-foreground">{plan.tokensPerPeriod}</span> cálculos/mês
                           </p>
 
                           <div className="flex-1 space-y-1.5">

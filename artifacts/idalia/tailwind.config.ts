@@ -14,8 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', '"Inter"', 'system-ui', 'sans-serif'],
         body: ['"Inter"', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
         script: ['"Dancing Script"', 'cursive'],
       },
       colors: {

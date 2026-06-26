@@ -14,6 +14,8 @@ import { type PreeclampsiaInput, type PreeclampsiaResult } from "@/lib/risk-calc
 import { apiFetch, ApiError } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 
 const PreeclampsiaRiskCalculator = () => {
   const { blocked, needsLogin, consuming, loading, subscription, refetch } = useTokenGate("preeclampsia_risk");
@@ -125,25 +127,30 @@ const PreeclampsiaRiskCalculator = () => {
 
   return (
     <div className="space-y-6">
+      <CalculatorHeader
+        icon={HeartPulse}
+        title="Risco de Pré-Eclâmpsia"
+        subtitle="Rastreamento de 1º trimestre — modelo de riscos competitivos"
+      />
+
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 
       {/* ── Input Form ── */}
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
-        <div>
-          <h1 className="font-display text-xl text-foreground">Risco de Pré-Eclâmpsia — 1º Trimestre</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Rastreamento baseado no modelo de riscos competitivos da FMF, com fatores maternos, medidas biofísicas e marcadores bioquímicos opcionais.
-          </p>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">FMF / ASPRE Trial</Badge>
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">11–13⁺⁶ semanas</Badge>
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-lg font-semibold text-primary">Pré-Eclâmpsia — 1º Trimestre</h2>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+              Modelo de riscos competitivos da FMF (11–13⁺⁶ semanas) combinando fatores maternos, medidas biofísicas e marcadores bioquímicos opcionais.
+            </p>
           </div>
+          <CitationChip>FMF · ASPRE</CitationChip>
         </div>
 
         {/* Maternal characteristics */}
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Dados Maternos</p>
+          <p className="section-label text-[11px] mb-3">Dados Maternos</p>
           <div className="grid grid-cols-3 gap-4">
             {[
               { label: "Idade (anos)", desc: "Idade materna", value: maternalAge, set: setMaternalAge, step: "1" },
@@ -152,13 +159,13 @@ const PreeclampsiaRiskCalculator = () => {
             ].map((f) => (
               <div key={f.label} className="space-y-1.5">
                 <div className="flex items-center gap-1.5">
-                  <Label className="text-sm text-foreground">{f.label}</Label>
+                  <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">{f.label}</Label>
                   <Tooltip>
                     <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                     <TooltipContent>{f.desc}</TooltipContent>
                   </Tooltip>
                 </div>
-                <Input type="number" step={f.step} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label.split(" ")[0]} className="input-glass tabular-nums" />
+                <Input type="number" step={f.step} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder={f.label.split(" ")[0]} className="input-glass num" />
               </div>
             ))}
           </div>
@@ -183,7 +190,7 @@ const PreeclampsiaRiskCalculator = () => {
 
         {/* Medical history */}
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Histórico Médico</p>
+          <p className="section-label text-[11px] mb-3">Histórico Médico</p>
           <div className="space-y-3">
             {[
               { label: "Hipertensão crônica", checked: chronicHypertension, set: setChronicHypertension },
@@ -213,23 +220,23 @@ const PreeclampsiaRiskCalculator = () => {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">PAM (mmHg)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">PAM (mmHg)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Pressão arterial média = (PAS + 2×PAD) / 3</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.1} value={map} onChange={(e) => setMap(e.target.value)} placeholder="Ex: 85" className="input-glass tabular-nums" />
+              <Input type="number" step={0.1} value={map} onChange={(e) => setMap(e.target.value)} placeholder="Ex: 85" className="input-glass num" />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">IP Art. Uterinas (média)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">IP Art. Uterinas (média)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Média do índice de pulsatilidade das artérias uterinas direita e esquerda</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.01} value={uterinePI} onChange={(e) => setUterinePI(e.target.value)} placeholder="Ex: 1.5" className="input-glass tabular-nums" />
+              <Input type="number" step={0.01} value={uterinePI} onChange={(e) => setUterinePI(e.target.value)} placeholder="Ex: 1.5" className="input-glass num" />
             </div>
           </motion.div>
         )}
@@ -247,23 +254,23 @@ const PreeclampsiaRiskCalculator = () => {
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">PAPP-A (MoM)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">PAPP-A (MoM)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Proteína plasmática A associada à gravidez — MoM corrigido</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.01} value={pappaMoM} onChange={(e) => setPappaMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass tabular-nums" />
+              <Input type="number" step={0.01} value={pappaMoM} onChange={(e) => setPappaMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass num" />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">PlGF (MoM)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">PlGF (MoM)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Fator de crescimento placentário — MoM corrigido</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.01} value={plgfMoM} onChange={(e) => setPlgfMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass tabular-nums" />
+              <Input type="number" step={0.01} value={plgfMoM} onChange={(e) => setPlgfMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass num" />
             </div>
           </motion.div>
         )}
@@ -291,17 +298,17 @@ const PreeclampsiaRiskCalculator = () => {
             {/* Category Banner */}
             <div className={`glass-card-static p-5 ${
               results.riskCategory === "alto" ? "border-destructive/40 bg-destructive/5" :
-              results.riskCategory === "intermediário" ? "border-yellow-500/40 bg-yellow-500/5" :
-              "border-emerald-500/40 bg-emerald-500/5"
+              results.riskCategory === "intermediário" ? "border-ovulatory/40 bg-ovulatory/5" :
+              "border-accent/40 bg-accent/5"
             }`}>
               <div className="flex items-center gap-3">
                 <HeartPulse className={`w-6 h-6 ${
                   results.riskCategory === "alto" ? "text-destructive" :
-                  results.riskCategory === "intermediário" ? "text-yellow-600 dark:text-yellow-400" :
-                  "text-emerald-600 dark:text-emerald-400"
+                  results.riskCategory === "intermediário" ? "text-ovulatory" :
+                  "text-accent"
                 }`} />
                 <div>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-semibold text-foreground">
                     Risco {results.riskCategory.toUpperCase()} para pré-eclâmpsia
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Método: {results.method}</p>
@@ -319,30 +326,30 @@ const PreeclampsiaRiskCalculator = () => {
                 <div key={r.label} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-foreground">{r.label}</span>
+                      <span className="section-label text-[11px]">{r.label}</span>
                       {r.cutoff && (
                         <Badge variant="destructive" className="text-[10px]">
                           Positivo (≥ 1%)
                         </Badge>
                       )}
                     </div>
-                    <span className={`tabular-nums text-lg font-display ${
-                      r.value >= 1 ? "text-destructive" : r.value >= 0.5 ? "text-yellow-600 dark:text-yellow-400" : "text-emerald-600 dark:text-emerald-400"
+                    <span className={`num text-lg font-semibold ${
+                      r.value >= 1 ? "text-destructive" : r.value >= 0.5 ? "text-ovulatory" : "text-accent"
                     }`}>
                       {r.value.toFixed(2)}%
                     </span>
                   </div>
-                  <div className="h-3 bg-muted rounded-full overflow-hidden relative">
+                  <div className="h-3 bg-muted rounded-full overflow-hidden relative ring-1 ring-inset ring-foreground/10">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        r.value >= 1 ? "bg-destructive/70" : r.value >= 0.5 ? "bg-yellow-500/70" : "bg-emerald-500/70"
+                        r.value >= 1 ? "bg-destructive/70" : r.value >= 0.5 ? "bg-ovulatory/70" : "bg-accent/70"
                       }`}
                       style={{ width: riskBarWidth(r.value) }}
                     />
                     {/* 1% cutoff marker */}
                     <div className="absolute top-0 h-full w-0.5 bg-destructive/50" style={{ left: "10%" }} />
                   </div>
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <div className="flex justify-between num text-[10px] text-muted-foreground">
                     <span>0%</span>
                     <span className="text-destructive/70">corte 1%</span>
                     <span>≥10%</span>
@@ -350,8 +357,8 @@ const PreeclampsiaRiskCalculator = () => {
                 </div>
               ))}
 
-              <p className="text-xs text-muted-foreground">
-                Equivalente: PE pré-termo ≈ 1 : {results.riskPreterm > 0 ? Math.round(100 / results.riskPreterm).toLocaleString("pt-BR") : "N/A"}
+              <p className="methodological-note text-[11px]">
+                Equivalente: PE pré-termo ≈ 1 : <span className="num">{results.riskPreterm > 0 ? Math.round(100 / results.riskPreterm).toLocaleString("pt-BR") : "N/A"}</span>
               </p>
             </div>
 
@@ -365,7 +372,7 @@ const PreeclampsiaRiskCalculator = () => {
                 ) : (
                   <Stethoscope className="w-5 h-5 text-primary" />
                 )}
-                <p className="text-sm font-medium text-foreground">Recomendação</p>
+                <p className="text-sm font-semibold text-foreground">Recomendação</p>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{results.recommendation}</p>
             </div>

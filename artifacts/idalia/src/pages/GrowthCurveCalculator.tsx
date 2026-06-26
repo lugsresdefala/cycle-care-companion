@@ -12,6 +12,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Info, TrendingUp, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, Area, Legend,
@@ -145,68 +147,75 @@ const GrowthCurveCalculator = () => {
 
   const severityClass = (s: string) =>
     s === "critical" ? "border-destructive/40 bg-destructive/5"
-    : s === "warning" ? "border-accent/40 bg-accent/5"
-    : "border-primary/40 bg-primary/5";
+    : s === "warning" ? "border-ovulatory/40 bg-ovulatory/5"
+    : "border-accent/40 bg-accent/5";
 
   const severityDot = (s: string) =>
-    s === "critical" ? "bg-destructive" : s === "warning" ? "bg-accent" : "bg-primary";
+    s === "critical" ? "bg-destructive" : s === "warning" ? "bg-ovulatory" : "bg-accent";
 
   const isDisabled = blocked || needsLogin || calculating;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen pb-20">
       <PageMeta
         title="Curvas de Crescimento Fetal"
         description="Acompanhe o crescimento fetal ao longo da gestação com curvas baseadas nas referências INTERGROWTH-21st e Hadlock. Avalie percentis e tendências — IDALIA Calc."
         path="/growth-curve"
       />
-      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
-      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
+      <div className="container max-w-2xl mx-auto px-4 pt-8 md:pt-12 space-y-6">
+        <CalculatorHeader icon={TrendingUp} title="Curva de Crescimento Fetal" subtitle="Trajetória de crescimento fetal por percentis INTERGROWTH-21st" />
 
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-blue">
-        <div>
-          <h1 className="font-display text-xl text-foreground">Curva de Crescimento Fetal</h1>
-          <p className="text-sm text-muted-foreground mt-1">Percentis INTERGROWTH-21st — padrão internacional de crescimento fetal.</p>
-          <Badge variant="outline" className="mt-2 text-xs border-primary/30 text-primary">INTERGROWTH-21st, 2014</Badge>
-        </div>
+        <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+        <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 
-        <div className="flex flex-wrap gap-2">
-          {GROWTH_PARAMS.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => { setSelectedParam(p.key); setAssessments([]); setCurveData([]); setError(""); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedParam === p.key ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
-            >
-              {p.label}
-              <span className="hidden sm:inline ml-1 opacity-70">({p.unit})</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium text-foreground">Medidas — {paramMeta.fullName} ({paramMeta.unit})</Label>
-            <Tooltip>
-              <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
-              <TooltipContent>Adicione múltiplas medidas para plotar a trajetória de crescimento</TooltipContent>
-            </Tooltip>
+        <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="font-display text-lg font-semibold text-primary">Curva de Crescimento Fetal</h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+                Percentis INTERGROWTH-21st — padrão internacional de crescimento fetal. Adicione medidas seriadas para plotar a trajetória.
+              </p>
+            </div>
+            <CitationChip>INTERGROWTH-21st, 2014</CitationChip>
           </div>
 
-          {measurements.map((m, i) => (
-            <div key={m.id} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground w-5 shrink-0 tabular-nums">{i + 1}.</span>
-              <Input
-                type="number" step="0.1" placeholder="IG (sem)"
-                value={m.ga} onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)}
-                className="input-glass tabular-nums w-24"
-              />
-              <Input
-                type="number" step="0.1"
-                placeholder={`${paramMeta.label} (${paramMeta.unit})`}
-                value={m.value} onChange={(e) => updateMeasurement(m.id, "value", e.target.value)}
-                className="input-glass tabular-nums flex-1"
-              />
-              {measurements.length > 1 && (
+          <div className="flex flex-wrap gap-2">
+            {GROWTH_PARAMS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => { setSelectedParam(p.key); setAssessments([]); setCurveData([]); setError(""); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${selectedParam === p.key ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
+              >
+                {p.label}
+                <span className="hidden sm:inline ml-1 opacity-70">({p.unit})</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Medidas — {paramMeta.fullName} ({paramMeta.unit})</Label>
+              <Tooltip>
+                <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
+                <TooltipContent>Adicione múltiplas medidas para plotar a trajetória de crescimento</TooltipContent>
+              </Tooltip>
+            </div>
+
+            {measurements.map((m, i) => (
+              <div key={m.id} className="flex items-center gap-2">
+                <span className="num text-xs text-muted-foreground w-5 shrink-0">{i + 1}.</span>
+                <Input
+                  type="number" step="0.1" placeholder="IG (sem)"
+                  value={m.ga} onChange={(e) => updateMeasurement(m.id, "ga", e.target.value)}
+                  className="input-glass num w-24"
+                />
+                <Input
+                  type="number" step="0.1"
+                  placeholder={`${paramMeta.label} (${paramMeta.unit})`}
+                  value={m.value} onChange={(e) => updateMeasurement(m.id, "value", e.target.value)}
+                  className="input-glass num flex-1"
+                />
+                {measurements.length > 1 && (
                 <button onClick={() => removeMeasurement(m.id)} className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -289,14 +298,14 @@ const GrowthCurveCalculator = () => {
                         </span>
                         <Badge variant="outline" className={`text-xs ${
                           a.severity === "critical" ? "border-destructive/40 text-destructive"
-                          : a.severity === "warning" ? "border-accent/40 text-accent"
-                          : "border-primary/40 text-primary"
+                          : a.severity === "warning" ? "border-ovulatory/40 text-ovulatory"
+                          : "border-accent/40 text-accent"
                         }`}>
                           {a.percentileLabel}
                         </Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">{a.interpretation}</p>
-                      <div className="flex gap-4 text-xs text-muted-foreground mt-1 tabular-nums">
+                      <div className="flex gap-4 num text-xs text-muted-foreground mt-1">
                         <span>P10: {a.closestRow.p10}</span>
                         <span>P50: {a.closestRow.p50}</span>
                         <span>P90: {a.closestRow.p90}</span>
@@ -325,7 +334,8 @@ const GrowthCurveCalculator = () => {
           { param: "IG", unit: "semanas", description: "Idade gestacional em semanas completas" },
         ]}
         extraDisclaimer="Curvas baseadas no estudo INTERGROWTH-21st com populações saudáveis multiétnicas. Os percentis apresentados são aproximações dos valores publicados. A avaliação clínica deve considerar a trajetória de crescimento e o contexto individual."
-      />
+        />
+      </div>
     </div>
   );
 };

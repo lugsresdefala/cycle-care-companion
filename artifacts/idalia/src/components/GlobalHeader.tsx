@@ -105,7 +105,7 @@ const GlobalHeader = () => {
                   className="flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
                 >
                   <Coins className="w-3.5 h-3.5" />
-                  <span className="tabular-nums">{subscription.tokens_remaining}</span>
+                  <span className="num tabular-nums">{subscription.tokens_remaining}</span>
                 </button>
               )}
               <Button

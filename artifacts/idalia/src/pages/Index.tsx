@@ -187,11 +187,11 @@ const Index = () => {
       />
       <div
         className="hero-gradient-orb w-[500px] h-[500px] top-[40%] -right-[180px] fixed"
-        style={{ background: "radial-gradient(circle, hsla(262,52%,44%,0.10) 0%, transparent 65%)" }}
+        style={{ background: "radial-gradient(circle, hsla(193,84%,31%,0.10) 0%, transparent 65%)" }}
       />
       <div
         className="hero-gradient-orb w-[420px] h-[420px] bottom-[8%] left-[22%] fixed"
-        style={{ background: "radial-gradient(circle, hsla(25,88%,56%,0.08) 0%, transparent 65%)" }}
+        style={{ background: "radial-gradient(circle, hsla(215,25%,38%,0.07) 0%, transparent 65%)" }}
       />
 
       {/* ── Main ── */}

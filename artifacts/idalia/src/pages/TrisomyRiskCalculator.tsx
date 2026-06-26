@@ -21,6 +21,8 @@ import { type TrisomyInput, type TrisomyResult } from "@/lib/risk-calculators";
 import { apiFetch, ApiError } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import ScientificFooter from "@/components/ScientificFooter";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
+import { CitationChip } from "@/components/CitationChip";
 
 const TrisomyRiskCalculator = () => {
   const { blocked, needsLogin, consuming, loading, subscription, refetch } = useTokenGate("trisomy_risk");
@@ -118,27 +120,32 @@ const TrisomyRiskCalculator = () => {
   const formatRisk = (risk: number) => `1 : ${risk.toLocaleString("pt-BR")}`;
 
   const riskColor = (risk: number, cutoff: number) =>
-    risk <= cutoff ? "text-destructive" : risk <= 1000 ? "text-yellow-600 dark:text-yellow-400" : "text-emerald-600 dark:text-emerald-400";
+    risk <= cutoff ? "text-destructive" : risk <= 1000 ? "text-ovulatory" : "text-accent";
 
   const riskBg = (risk: number, cutoff: number) =>
-    risk <= cutoff ? "border-destructive/30 bg-destructive/5" : risk <= 1000 ? "border-yellow-500/30 bg-yellow-500/5" : "border-emerald-500/30 bg-emerald-500/5";
+    risk <= cutoff ? "border-destructive/30 bg-destructive/5" : risk <= 1000 ? "border-ovulatory/30 bg-ovulatory/5" : "border-accent/30 bg-accent/5";
 
   return (
     <div className="space-y-6">
+      <CalculatorHeader
+        icon={ShieldAlert}
+        title="Risco de Trissomias"
+        subtitle="Rastreamento combinado de 1º trimestre — T21, T18 e T13"
+      />
+
       <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
       <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
 
       {/* ── Input Form ── */}
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-coral">
-        <div>
-          <h1 className="font-display text-xl text-foreground">Risco de Trissomias — 1º Trimestre</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cálculo de risco para T21, T18 e T13 baseado no rastreamento combinado do primeiro trimestre.
-          </p>
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">FMF, 2004–2023</Badge>
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">11–13⁺⁶ semanas</Badge>
+      <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-lg font-semibold text-primary">Trissomias — 1º Trimestre</h2>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+              Risco para T21, T18 e T13 pelo rastreamento combinado da FMF (11–13⁺⁶ semanas), com bioquímica e marcadores ecográficos opcionais.
+            </p>
           </div>
+          <CitationChip>FMF, 2004–2023</CitationChip>
         </div>
 
         {/* Required fields */}
@@ -150,7 +157,7 @@ const TrisomyRiskCalculator = () => {
           ].map((f) => (
             <div key={f.label} className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">{f.label}</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">{f.label}</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>{f.desc} ({f.range})</TooltipContent>
@@ -162,7 +169,7 @@ const TrisomyRiskCalculator = () => {
                 value={f.value}
                 onChange={(e) => f.set(e.target.value)}
                 placeholder={f.label.split(" ")[0]}
-                className="input-glass tabular-nums"
+                className="input-glass num"
               />
             </div>
           ))}
@@ -185,23 +192,23 @@ const TrisomyRiskCalculator = () => {
           >
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">PAPP-A (MoM)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">PAPP-A (MoM)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Proteína plasmática A associada à gravidez — valor em MoM corrigido</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.01} value={pappaMoM} onChange={(e) => setPappaMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass tabular-nums" />
+              <Input type="number" step={0.01} value={pappaMoM} onChange={(e) => setPappaMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass num" />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">β-hCG livre (MoM)</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">β-hCG livre (MoM)</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Fração livre do β-hCG — valor em MoM corrigido</TooltipContent>
                 </Tooltip>
               </div>
-              <Input type="number" step={0.01} value={bhcgMoM} onChange={(e) => setBhcgMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass tabular-nums" />
+              <Input type="number" step={0.01} value={bhcgMoM} onChange={(e) => setBhcgMoM(e.target.value)} placeholder="Ex: 1.0" className="input-glass num" />
             </div>
           </motion.div>
         )}
@@ -224,7 +231,7 @@ const TrisomyRiskCalculator = () => {
             {/* Nasal Bone */}
             <div className="space-y-1.5">
               <div className="flex items-center gap-1.5">
-                <Label className="text-sm text-foreground">Osso Nasal</Label>
+                <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Osso Nasal</Label>
                 <Tooltip>
                   <TooltipTrigger><Info className="w-3.5 h-3.5 text-muted-foreground" /></TooltipTrigger>
                   <TooltipContent>Presença ou ausência do osso nasal fetal</TooltipContent>
@@ -311,17 +318,17 @@ const TrisomyRiskCalculator = () => {
             {/* Risk Category Banner */}
             <div className={`glass-card-static p-5 ${
               results.riskCategory === "alto" ? "border-destructive/40 bg-destructive/5" :
-              results.riskCategory === "intermediário" ? "border-yellow-500/40 bg-yellow-500/5" :
-              "border-emerald-500/40 bg-emerald-500/5"
+              results.riskCategory === "intermediário" ? "border-ovulatory/40 bg-ovulatory/5" :
+              "border-accent/40 bg-accent/5"
             }`}>
               <div className="flex items-center gap-3">
                 <ShieldAlert className={`w-6 h-6 ${
                   results.riskCategory === "alto" ? "text-destructive" :
-                  results.riskCategory === "intermediário" ? "text-yellow-600 dark:text-yellow-400" :
-                  "text-emerald-600 dark:text-emerald-400"
+                  results.riskCategory === "intermediário" ? "text-ovulatory" :
+                  "text-accent"
                 }`} />
                 <div>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-semibold text-foreground">
                     Risco {results.riskCategory.toUpperCase()}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">{results.method}</p>
@@ -342,12 +349,12 @@ const TrisomyRiskCalculator = () => {
                     <p className="text-xs text-muted-foreground">{t.subtitle}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Risco basal (idade)</p>
-                    <p className="tabular-nums text-sm text-foreground">{formatRisk(t.bg)}</p>
+                    <p className="section-label text-[10px]">Risco basal (idade)</p>
+                    <p className="num text-sm text-foreground">{formatRisk(t.bg)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Risco ajustado</p>
-                    <p className={`tabular-nums text-2xl font-display ${riskColor(t.adj, t.cutoff)}`}>
+                    <p className="section-label text-[10px]">Risco ajustado</p>
+                    <p className={`num text-2xl font-semibold ${riskColor(t.adj, t.cutoff)}`}>
                       {formatRisk(t.adj)}
                     </p>
                   </div>
@@ -364,11 +371,11 @@ const TrisomyRiskCalculator = () => {
             <div className="glass-card-static p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-foreground">TN MoM</p>
+                  <p className="text-sm font-semibold text-foreground">TN MoM</p>
                   <p className="text-xs text-muted-foreground">Múltiplo da mediana para o CCN informado</p>
                 </div>
-                <span className={`tabular-nums text-xl font-display ${
-                  results.ntMoM > 2.0 ? "text-destructive" : results.ntMoM > 1.5 ? "text-yellow-600 dark:text-yellow-400" : "text-foreground"
+                <span className={`num text-xl font-semibold ${
+                  results.ntMoM > 2.0 ? "text-destructive" : results.ntMoM > 1.5 ? "text-ovulatory" : "text-foreground"
                 }`}>
                   {results.ntMoM.toFixed(2)}
                 </span>
@@ -378,7 +385,7 @@ const TrisomyRiskCalculator = () => {
             {/* Recommendations */}
             {results.riskCategory !== "baixo" && (
               <div className="glass-card-static p-5 border-primary/20 space-y-2">
-                <p className="text-sm font-medium text-foreground">Conduta sugerida</p>
+                <p className="text-sm font-semibold text-foreground">Conduta sugerida</p>
                 {results.screenPositiveT21 && (
                   <p className="text-xs text-muted-foreground">
                     T21 ≥ 1:100 — Oferecer teste diagnóstico invasivo (BVC ou amniocentese) ou DNA fetal livre (cfDNA/NIPT).

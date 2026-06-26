@@ -99,7 +99,7 @@ const Dashboard = () => {
                 <stat.icon className={`w-4 h-4 ${stat.color}`} />
                 <span className="text-xs text-muted-foreground">{stat.label}</span>
               </div>
-              <p className="font-display text-lg font-semibold text-foreground">{stat.value}</p>
+              <p className={`text-lg font-semibold text-foreground ${typeof stat.value === "number" ? "num" : "font-display"}`}>{stat.value}</p>
             </motion.div>
           ))}
         </div>

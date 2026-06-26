@@ -25,7 +25,7 @@ const Auth = () => {
       />
       <div
         className="hero-gradient-orb w-[400px] h-[400px] bottom-[10%] right-[5%] fixed"
-        style={{ background: "radial-gradient(circle, hsla(25,88%,56%,0.08) 0%, transparent 65%)" }}
+        style={{ background: "radial-gradient(circle, hsla(193,84%,31%,0.08) 0%, transparent 65%)" }}
       />
 
       <motion.div

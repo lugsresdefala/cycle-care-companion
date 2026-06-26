@@ -17,10 +17,10 @@ interface CycleVisualizationProps {
 }
 
 const PHASE_COLORS: Record<string, { fill: string; stroke: string; label: string }> = {
-  menstrual:  { fill: "hsl(0, 68%, 58%)",    stroke: "hsl(0, 68%, 75%)",   label: "Menstrual" },
-  follicular: { fill: "hsl(218, 72%, 38%)",  stroke: "hsl(218, 72%, 62%)", label: "Folicular" },
-  ovulatory:  { fill: "hsl(25, 88%, 56%)",   stroke: "hsl(25, 88%, 72%)",  label: "Ovulatória" },
-  luteal:     { fill: "hsl(262, 52%, 44%)",  stroke: "hsl(262, 52%, 68%)", label: "Lútea" },
+  menstrual:  { fill: "hsl(var(--menstrual))",  stroke: "hsl(var(--menstrual) / 0.6)",  label: "Menstrual" },
+  follicular: { fill: "hsl(var(--folicular))",  stroke: "hsl(var(--folicular) / 0.6)",  label: "Folicular" },
+  ovulatory:  { fill: "hsl(var(--ovulatory))",  stroke: "hsl(var(--ovulatory) / 0.6)",  label: "Ovulatória" },
+  luteal:     { fill: "hsl(var(--luteal))",     stroke: "hsl(var(--luteal) / 0.6)",     label: "Lútea" },
 };
 
 const CycleVisualization = ({
@@ -50,11 +50,11 @@ const CycleVisualization = ({
 
   const getFertilityLevel = (day: number) => {
     const dist = Math.abs(day - ovulationDay);
-    if (dist === 0) return { level: 100, label: "Pico de Fertilidade", color: "hsl(25, 88%, 56%)" };
-    if (dist <= 1)  return { level: 90,  label: "Muito Alta",          color: "hsl(25, 88%, 62%)" };
-    if (dist <= 3)  return { level: 70,  label: "Alta",                color: "hsl(35, 82%, 52%)" };
-    if (dist <= 5)  return { level: 40,  label: "Moderada",            color: "hsl(262, 52%, 44%)" };
-    return { level: 10, label: "Baixa", color: "hsl(218, 16%, 55%)" };
+    if (dist === 0) return { level: 100, label: "Pico de Fertilidade", color: "hsl(var(--ovulatory))" };
+    if (dist <= 1)  return { level: 90,  label: "Muito Alta",          color: "hsl(var(--ovulatory) / 0.85)" };
+    if (dist <= 3)  return { level: 70,  label: "Alta",                color: "hsl(var(--accent) / 0.75)" };
+    if (dist <= 5)  return { level: 40,  label: "Moderada",            color: "hsl(var(--secondary) / 0.7)" };
+    return { level: 10, label: "Baixa", color: "hsl(var(--muted-foreground) / 0.6)" };
   };
 
   const getDayCharacteristics = (day: number) => {
@@ -129,12 +129,12 @@ const CycleVisualization = ({
                     <circle
                       cx={x} cy={y}
                       r={isSelected ? 9 : isOvulation ? 7 : 5}
-                      fill={isOvulation ? "hsl(25, 88%, 56%)" : isCurrent ? "hsl(218, 72%, 38%)" : isSelected ? "hsl(0, 68%, 58%)" : "rgba(15,30,70,0.10)"}
-                      stroke={isSelected ? "hsl(0, 68%, 62%)" : isOvulation ? "hsl(25, 88%, 56%)" : "none"}
+                      fill={isOvulation ? "hsl(var(--ovulatory))" : isCurrent ? "hsl(var(--primary))" : isSelected ? "hsl(var(--accent))" : "rgba(15,30,70,0.10)"}
+                      stroke={isSelected ? "hsl(var(--accent))" : isOvulation ? "hsl(var(--ovulatory))" : "none"}
                       strokeWidth={isSelected ? 2 : 0}
                     />
                     {(day === 1 || day % 7 === 0 || day === ovulationDay) && (
-                      <text x={x} y={y - 13} textAnchor="middle" fontSize="9" fill="hsl(220, 20%, 70%)" fontWeight="600">
+                      <text x={x} y={y - 13} textAnchor="middle" fontSize="9" fill="hsl(var(--muted-foreground))" fontWeight="600">
                         {day}
                       </text>
                     )}
@@ -144,13 +144,13 @@ const CycleVisualization = ({
 
               {/* Center Info */}
               <circle cx={CX} cy={CY} r={56} fill="rgba(255,255,255,0.92)" />
-              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(218, 50%, 10%)">
+              <text x={CX} y={CY - 14} textAnchor="middle" fontSize="26" fontWeight="700" fill="hsl(var(--foreground))">
                 {selectedDay}
               </text>
               <text x={CX} y={CY + 8} textAnchor="middle" fontSize="10" fill={currentPhaseConfig.fill} fontWeight="600">
                 {currentPhaseConfig.label}
               </text>
-              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(218, 16%, 48%)">
+              <text x={CX} y={CY + 22} textAnchor="middle" fontSize="9" fill="hsl(var(--muted-foreground))">
                 de {cycleLength} dias
               </text>
             </svg>

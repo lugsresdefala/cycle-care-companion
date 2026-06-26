@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import {
   Info, Calendar, Baby, Stethoscope, Syringe, HeartPulse,
-  Salad, Ruler, ChevronDown, ChevronUp, AlertCircle
+  Salad, ChevronDown, ChevronUp, AlertCircle
 } from "lucide-react";
 import {
   calculateGestationalAgeFromLMP,
@@ -24,6 +24,7 @@ import { formatDateBR, formatGALong } from "@/lib/units";
 import GestationalVisualization from "@/components/GestationalVisualization";
 import { motion, AnimatePresence } from "framer-motion";
 import { DatePicker } from "@/components/DatePicker";
+import { CalculatorHeader } from "@/components/CalculatorHeader";
 
 type CalculationType = "lmp" | "ultrasound" | "transfer";
 
@@ -109,26 +110,29 @@ const GestationalCalculator = () => {
   const trimCfg = results ? TRIMESTER_CONFIG[results.currentTrimester - 1] : null;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen pb-20">
       <PageMeta
         title="Calculadora de Idade Gestacional"
         description="Calcule a idade gestacional pela DUM, ultrassom ou FIV. Estime a data provável do parto com precisão baseada em evidências — IDALIA Calc."
         path="/gestational"
       />
-      <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
-      <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
-      {/* Input */}
-      <div className="glass-card-static p-6 md:p-8 space-y-6 mesh-navy">
-        <div>
-          <h1 className="font-display text-xl text-foreground">Calculadora de Idade Gestacional</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cálculo de idade gestacional, data provável do parto e referências de desenvolvimento fetal por semana gestacional.
-          </p>
-        </div>
+      <div className="container max-w-2xl mx-auto px-4 pt-8 md:pt-12 space-y-6">
+        <CalculatorHeader icon={Calendar} title="Idade Gestacional" subtitle="Idade gestacional, data provável do parto e desenvolvimento fetal" />
 
-        {/* Method Selection */}
-        <div className="space-y-3">
-          <Label className="text-sm text-foreground">Método de Cálculo</Label>
+        <TokenGateAlert needsLogin={needsLogin} blocked={blocked} tokensRemaining={subscription?.tokens_remaining} />
+        <PatientSelector value={selectedPatientId} onChange={setSelectedPatientId} />
+        {/* Input */}
+        <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
+          <div>
+            <h3 className="font-display text-lg font-semibold text-primary">Cálculo da Idade Gestacional</h3>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+              Estimativa da idade gestacional, da data provável do parto e das referências de desenvolvimento fetal por semana gestacional.
+            </p>
+          </div>
+
+          {/* Method Selection */}
+          <div className="space-y-3">
+            <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-secondary">Método de Cálculo</Label>
           <RadioGroup
             value={calculationType}
             onValueChange={(v) => setCalculationType(v as CalculationType)}
@@ -270,23 +274,23 @@ const GestationalCalculator = () => {
                     <span className="text-xs uppercase tracking-wider text-muted-foreground">{trimCfg?.label}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="tabular-nums text-4xl font-display text-foreground">{results.weeks}</span>
+                    <span className="num text-4xl font-semibold text-primary">{results.weeks}</span>
                     <span className="text-sm text-muted-foreground">sem</span>
-                    <span className="tabular-nums text-2xl font-display text-foreground ml-2">{results.days}</span>
+                    <span className="num text-2xl font-semibold text-primary ml-2">{results.days}</span>
                     <span className="text-sm text-muted-foreground">dias</span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">{trimCfg?.description} · {trimCfg?.range}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">Progresso</p>
-                  <p className="tabular-nums text-3xl font-display text-accent">{results.progressPercent}%</p>
+                  <p className="num text-3xl font-semibold text-accent">{results.progressPercent}%</p>
                 </div>
               </div>
 
               {/* Progress + DPP inline */}
               <div className="mt-6 flex items-center justify-between text-xs text-muted-foreground">
-                <span>DPP: <span className="text-foreground font-medium">{results.dueDate}</span></span>
-                <span>{40 - results.weeks} semanas restantes</span>
+                <span>DPP: <span className="num text-foreground font-medium">{results.dueDate}</span></span>
+                <span><span className="num">{40 - results.weeks}</span> semanas restantes</span>
               </div>
             </div>
 
@@ -348,6 +352,7 @@ const GestationalCalculator = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
