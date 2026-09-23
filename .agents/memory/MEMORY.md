@@ -5,7 +5,8 @@
 - [useAuth stable user ref](useauth-stable-ref.md) — idalia useAuth must memoize authUser; a fresh object literal per render caused a fetch→setState→refetch storm across all user-keyed effects.
 - [Stripe webhook idempotency order](stripe-webhook-idempotency.md) — record the event row only AFTER successful processing + return non-2xx on failure, else a transient sync error permanently strands a paying user.
 - [Stripe missing key fallback](stripe-missing-key-fallback.md) — checkout 500 `Invalid API Key …lder` means STRIPE_SECRET_KEY unset (silent sk_test_placeholder default); fix is config, re-publish prod.
-- [Parallel merge conflict markers](parallel-merge-conflict-markers.md) — concurrent task merges on the same fn can strand `<<<<<<<` markers; esbuild dies, API won't boot. grep for markers after merge bursts.
+- [Parallel merge conflict markers](parallel-merge-conflict-markers.md) — concurrent merges can strand conflict markers; esbuild dies, API won't boot. Check for markers after merge bursts.
 - [Vite build vs typecheck gap](vite-build-typecheck-gap.md) — idalia dev (Vite) skips typecheck, so deploy build can fail green-in-dev; run `pnpm run typecheck` to reproduce failed publishes.
 - [Deploy build debugging](deploy-build-debugging.md) — publish fails: pull real logs via listDeploymentBuilds/getDeploymentBuild (not fetchDeploymentLogs); deploy builds per-artifact via .replit-artifact/artifact.toml, not root build.
 - [Ductus wave contract](ductus-wave-contract.md) — reject legacy boolean observations: false ambiguously encoded absent or positive flow.
+- [Calculator visual baselines](calculator-visual-baselines.md) — use Nix Chromium for workspace screenshots; downloaded Playwright Chromium may lack host libraries.
