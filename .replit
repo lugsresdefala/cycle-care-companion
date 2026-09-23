@@ -24,6 +24,10 @@ args = "calculator-regressions"
 task = "workflow.run"
 args = "idalia-typecheck"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "calculate-auth-integration"
+
 [[workflows.workflow]]
 name = "calculator-regressions"
 author = "agent"
@@ -42,6 +46,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "pnpm --filter @workspace/idalia typecheck"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[[workflows.workflow]]
+name = "calculate-auth-integration"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm test:calculate-auth"
 
 [workflows.workflow.metadata]
 isValidation = true

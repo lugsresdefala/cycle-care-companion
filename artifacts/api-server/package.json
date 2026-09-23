@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:calculate-auth": "bash scripts/test-calculate-auth.sh",
     "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
@@ -24,6 +25,7 @@
     "stripe": "^22.1.1"
   },
   "devDependencies": {
+    "vitest": "^4.1.7",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

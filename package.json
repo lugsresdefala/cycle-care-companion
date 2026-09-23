@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "test:calculate-auth": "pnpm --filter @workspace/api-server test:calculate-auth",
     "test:calculators": "pnpm --filter @workspace/idalia test:calculators && pnpm run test:calculators:visual",
     "test:calculators:visual": "cd artifacts/idalia && PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=\"${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH:-$(command -v chromium || true)}\" playwright test --config playwright.visual.config.ts",
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
