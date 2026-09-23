@@ -363,7 +363,7 @@ function DVTab({ disabled, onSuccess }: TabProps) {
     try {
       const r = await apiFetch<{ pivResult?: DopplerResult; waveAResult: DopplerResult; refs?: { p5: number; p50: number; p95: number } }>(
         "/calculate/doppler/dv",
-        { method: "POST", body: JSON.stringify({ ga: gaVal, piv: piVal, waveAReversed: waveA === "reversed" }) },
+        { method: "POST", body: JSON.stringify({ ga: gaVal, piv: piVal, waveA }) },
       );
       setResult(r);
       onSuccess();
@@ -412,7 +412,7 @@ function DVTab({ disabled, onSuccess }: TabProps) {
             {result.pivResult && result.refs && (
               <div className="glass-card-static p-4"><PercentileRefBar value={result.pivResult.value} refs={result.refs} label="IP — Ducto Venoso" format={formatIndex} /></div>
             )}
-            <ResultCard label="Onda A" result={result.waveAResult} note="A onda 'a' anterógrada é o padrão normal; onda 'a' reversa indica aumento da pressão atrial direita." />
+            <ResultCard label="Onda A" result={result.waveAResult} note="A onda 'a' anterógrada é o padrão normal. Ausência e reversão são achados anormais; interpretar com o contexto clínico e os demais parâmetros de vitalidade fetal (ISUOG, 2020; doi:10.1002/uog.22134)." />
           </motion.div>
         )}
       </AnimatePresence>

@@ -270,13 +270,18 @@ router.post("/calculate/doppler/cpr", requireAuth, async (req, res): Promise<any
 
 router.post("/calculate/doppler/dv", requireAuth, async (req, res): Promise<any> => {
   const userId = (req as AuthedRequest).userId;
-  const { ga, piv, waveAReversed } = req.body ?? {};
+  const { ga, piv, waveA } = req.body ?? {};
+  // The legacy boolean collapses absent and forward flow. Reject it rather than
+  // silently labeling an ambiguous observation as normal.
+  if ("waveAReversed" in (req.body ?? {}) || !["positive", "zero", "reversed"].includes(waveA)) {
+    return res.status(400).json({ error: "Send waveA as positive, zero or reversed; waveAReversed is no longer accepted" });
+  }
   if (typeof ga !== "number" || isNaN(ga) || ga < 11 || ga > 42) {
     return res.status(400).json({ error: "ga must be a number between 11 and 42" });
   }
   let result;
   try {
-    const waveAResult = evaluateDuctusVenosusWaveA(!!waveAReversed, ga);
+    const waveAResult = evaluateDuctusVenosusWaveA(waveA, ga);
     const pivResult = piv != null && !isNaN(piv) && piv > 0 ? evaluateDuctusVenosusPIV(piv, ga) : undefined;
     const refs = ga >= 20 ? getDVPivRefsForGA(ga) : undefined;
     result = { pivResult, waveAResult, refs };

@@ -329,13 +329,24 @@ export function evaluateDuctusVenosusPIV(piv: number, gaWeeks: number): DopplerR
   return { value: piv, percentile, interpretation, severity };
 }
 
-export function evaluateDuctusVenosusWaveA(waveAReversed: boolean, gaWeeks: number): DopplerResult {
-  if (waveAReversed) {
+export type DuctusVenosusWaveA = "positive" | "zero" | "reversed";
+
+export function evaluateDuctusVenosusWaveA(waveA: DuctusVenosusWaveA, gaWeeks: number): DopplerResult {
+  // ISUOG FGR guideline (Lees et al., 2020), doi:10.1002/uog.22134:
+  // absent AND reversed a-waves are abnormal; neither is equivalent to forward flow.
+  if (waveA === "zero") {
+    const interpretation = gaWeeks < 14
+      ? "Onda 'a' ausente — ausência de fluxo durante a contração atrial; achado anormal. Confirmar a aquisição e solicitar avaliação especializada no contexto do rastreamento do 1º trimestre."
+      : "Onda 'a' ausente — ausência de fluxo durante a contração atrial; achado anormal que, no contexto de restrição de crescimento fetal, pode indicar deterioração cardiovascular avançada. Requer avaliação especializada urgente e correlação com os demais parâmetros de vitalidade fetal.";
+    return { value: 0, percentile: "Onda A ausente", interpretation, severity: "critical" };
+  }
+  if (waveA === "reversed") {
     const interpretation = gaWeeks < 14
       ? "Onda 'a' reversa no 1º trimestre — associada a aneuploidias e cardiopatias congênitas. Correlacionar com translucência nucal e cariótipo."
       : "Onda 'a' reversa — indica aumento significativo da pressão atrial direita e possível insuficiência cardíaca fetal. Risco de óbito perinatal aumentado.";
-    return { value: 0, percentile: "Onda A reversa", interpretation, severity: "critical" };
+    return { value: -1, percentile: "Onda A reversa", interpretation, severity: "critical" };
   }
+  if (waveA !== "positive") throw new Error("waveA must be positive, zero or reversed");
   return { value: 1, percentile: "Onda A positiva", interpretation: "Onda 'a' anterógrada — padrão normal de fluxo no ducto venoso.", severity: "normal" };
 }
 
