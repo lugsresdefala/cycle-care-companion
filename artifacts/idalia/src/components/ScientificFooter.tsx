@@ -66,8 +66,8 @@ const ScientificFooter = ({ references, units, extraDisclaimer }: ScientificFoot
               </p>
             )}
             <p className="text-xs text-muted-foreground/70 leading-relaxed">
-              Em conformidade com as diretrizes do <strong>Ministério da Saúde</strong>, <strong>FEBRASGO</strong>, <strong>ACOG</strong> e <strong>ISUOG</strong>.
-              Nenhum dado pessoal ou clínico é coletado, armazenado ou transmitido — todo o processamento ocorre localmente no dispositivo.
+              As referências abaixo informam os métodos apresentados, sem implicar endosso ou certificação por sociedades médicas.
+              O tratamento de dados depende do recurso utilizado, como conta e histórico; consulte a Política de Privacidade.
             </p>
           </div>
         </div>

@@ -29,7 +29,7 @@ const GlobalHeader = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-2xl shadow-nav">
+    <header className="sticky top-0 z-50 border-b border-border bg-background shadow-sm">
       <div className="container max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2">
         <Link
           to="/"
@@ -42,7 +42,7 @@ const GlobalHeader = () => {
             className="w-8 h-8 rounded-full object-cover shadow-sm ring-2 ring-primary/10 group-hover:ring-primary/25 transition-all duration-300"
           />
           <span className="font-display text-base font-semibold text-foreground tracking-tight leading-none">
-            IDALIA<span className="font-script text-accent text-lg leading-none ml-0.5">Calc</span>
+            IDALIA<span className="text-accent ml-1">CALC</span>
           </span>
         </Link>
 

@@ -88,7 +88,7 @@ const CycleVisualization = ({
   return (
     <div className="space-y-5">
       {/* Circular Diagram + Info */}
-      <div className="glass-card p-5 border-primary/20 rounded-2xl">
+      <div className="glass-card-static p-5 border-primary/20 rounded-2xl">
         <h3 className="text-base font-semibold text-primary mb-4 flex items-center gap-2">
           <Calendar className="h-5 w-5" />
           Visualização do Ciclo Menstrual
@@ -180,9 +180,9 @@ const CycleVisualization = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Heart className="h-4 w-4 text-accent" />
-                  <span className="text-sm font-medium text-accent">Fertilidade — Dia {selectedDay}</span>
+                   <span className="text-sm font-medium text-accent">Escala ilustrativa — Dia {selectedDay}</span>
                 </div>
-                <span className="text-base font-bold text-foreground">{fertility.level}%</span>
+                <span className="text-base font-bold text-foreground">{fertility.level}/100</span>
               </div>
               <div className="relative h-3 bg-muted rounded-full overflow-hidden">
                 <div
@@ -191,6 +191,9 @@ const CycleVisualization = ({
                 />
               </div>
               <div className="mt-1.5 text-xs font-medium" style={{ color: fertility.color }}>{fertility.label}</div>
+               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                 Índice de proximidade da ovulação estimada. Não é probabilidade de gravidez e não deve ser usado como método contraceptivo.
+               </p>
             </div>
 
             {/* Biological Characteristics */}
@@ -228,7 +231,7 @@ const CycleVisualization = ({
       </div>
 
       {/* Linear Timeline */}
-      <div className="glass-card p-4 border-primary/20 rounded-2xl">
+      <div className="glass-card-static p-4 border-primary/20 rounded-2xl">
         <h4 className="text-sm font-medium text-primary mb-3 flex items-center gap-2">
           <TrendingUp className="h-4 w-4" />
           Timeline do Ciclo — clique para selecionar
@@ -247,13 +250,13 @@ const CycleVisualization = ({
                   key={day}
                   onClick={() => setSelectedDay(day)}
                   className={`flex-shrink-0 w-7 h-16 rounded-lg cursor-pointer transition-all duration-150 relative
-                    ${isSelected ? "scale-110 ring-2 ring-accent z-10" : "hover:scale-105"}
+                    ${isSelected ? "ring-2 ring-accent z-10" : "hover:opacity-75"}
                     ${isCurrent ? "ring-2 ring-primary" : ""}
                   `}
                   style={{ backgroundColor: cfg.fill, opacity: isSelected ? 1 : 0.45 }}
                 >
                   {isOvulation && (
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-accent rounded-full animate-pulse" />
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-accent rounded-full" />
                   )}
                   <div className="w-full h-full rounded-lg flex items-end justify-center pb-1">
                     <span className="text-xs font-semibold text-foreground/90">{day}</span>

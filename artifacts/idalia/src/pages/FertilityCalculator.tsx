@@ -305,7 +305,7 @@ const FertilityCalculator = () => {
                     <div className={`status-dot ${phaseConfig?.color}`} style={{ background: "currentColor" }} />
                     <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">Fase Atual do Ciclo</span>
                   </div>
-                  <h2 className={`font-display text-2xl sm:text-3xl capitalize ${phaseConfig?.color} animate-count-up`}>
+                  <h2 className={`font-display text-2xl sm:text-3xl capitalize ${phaseConfig?.color}`}>
                     {results.currentCyclePhase}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{phaseConfig?.description}</p>
@@ -545,7 +545,7 @@ const CollapsibleSection = ({
           {icon}
         </div>
         <span className="text-sm font-semibold text-foreground">{title}</span>
-        {isOpen && <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-ring" />}
+        {isOpen && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
       </div>
       <motion.div
       animate={{ rotate: isOpen ? 180 : 0 }}

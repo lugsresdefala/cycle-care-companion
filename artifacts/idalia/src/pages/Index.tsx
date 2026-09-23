@@ -205,24 +205,6 @@ const Index = () => {
           {/* ── Hero (compact — logo already in header) ── */}
           <motion.div variants={item} className="text-center space-y-4 pt-6 pb-2">
             <div className="relative mx-auto w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
-              <div
-                aria-hidden
-                className="absolute inset-0 rounded-full animate-spin-slow"
-                style={{
-                  background:
-                    "conic-gradient(from 0deg, transparent 0deg, hsl(var(--primary) / 0.55) 60deg, hsl(var(--accent) / 0.6) 140deg, transparent 220deg, hsl(var(--secondary) / 0.5) 300deg, transparent 360deg)",
-                  filter: "blur(14px)",
-                }}
-              />
-              <div
-                aria-hidden
-                className="absolute inset-1 rounded-full animate-spin-reverse opacity-70"
-                style={{
-                  background:
-                    "conic-gradient(from 180deg, transparent 0deg, hsl(var(--accent) / 0.45) 90deg, transparent 180deg, hsl(var(--primary) / 0.45) 270deg, transparent 360deg)",
-                  filter: "blur(10px)",
-                }}
-              />
               <img
                 src={logoMd}
                 alt="IDALIA Calc"
@@ -289,7 +271,7 @@ const Index = () => {
                           className={`${card.cardClass} p-5 text-left group cursor-pointer w-full block`}
                         >
                           <div className="flex items-start gap-4">
-                            <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0 ${card.iconColor} mt-0.5 transition-transform duration-300 group-hover:scale-110`}>
+                            <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center shrink-0 ${card.iconColor} mt-0.5`}>
                               {card.icon}
                             </div>
                             <div className="flex-1 min-w-0 space-y-1.5">
@@ -324,7 +306,7 @@ const Index = () => {
             <div className="flex items-center justify-center flex-wrap gap-3 sm:gap-5">
               <div className="badge-primary">
                 <Shield className="w-3 h-3" />
-                Processamento local
+                Privacidade documentada
               </div>
               <div className="badge-primary">
                 <Microscope className="w-3 h-3" />
@@ -367,7 +349,7 @@ const Index = () => {
             <div className="flex items-start gap-2.5">
               <Shield className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Aviso Legal</strong> — O IDALIA-CALC é uma ferramenta de apoio à decisão clínica destinada a profissionais habilitados. Os resultados são estimativas matemáticas e <strong className="text-foreground">não substituem</strong> avaliação, diagnóstico ou conduta médica. Processamento 100% local.
+                <strong className="text-foreground">Aviso Legal</strong> — O IDALIA-CALC é uma ferramenta de apoio à decisão clínica destinada a profissionais habilitados. Os resultados são estimativas matemáticas e <strong className="text-foreground">não substituem</strong> avaliação, diagnóstico ou conduta médica. O tratamento de dados varia conforme o recurso utilizado; consulte a Política de Privacidade.
               </p>
             </div>
           </motion.div>

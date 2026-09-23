@@ -16,18 +16,18 @@ interface GestationalVisualizationProps {
   dueDate?: Date;
 }
 
-const fetalDevelopment: Record<number, { size: string; weight: string; length: string; milestone: string }> = {
-  4:  { size: "Semente de papoula", weight: "< 1g",  length: "2mm",    milestone: "Formação do tubo neural" },
-  8:  { size: "Framboesa",          weight: "1g",    length: "1.6cm",  milestone: "Batimentos cardíacos detectáveis" },
-  12: { size: "Limão",              weight: "14g",   length: "5.4cm",  milestone: "Reflexos começam a se desenvolver" },
-  16: { size: "Abacate",            weight: "100g",  length: "11.6cm", milestone: "Pode ouvir sua voz" },
-  20: { size: "Banana",             weight: "300g",  length: "16.4cm", milestone: "Ultrassom morfológico" },
-  24: { size: "Espiga de milho",    weight: "600g",  length: "30cm",   milestone: "Viabilidade fetal" },
-  28: { size: "Berinjela",          weight: "1kg",   length: "37.6cm", milestone: "Abre e fecha os olhos" },
-  32: { size: "Abóbora",            weight: "1.7kg", length: "42.4cm", milestone: "Ossos endurecendo" },
-  36: { size: "Melão",              weight: "2.6kg", length: "47.4cm", milestone: "Pré-termo tardio" },
-  37: { size: "Alface romana",      weight: "2.9kg", length: "48.6cm", milestone: "Considerado a termo (≥ 37 semanas)" },
-  40: { size: "Melancia",           weight: "3.5kg", length: "51.2cm", milestone: "Nascimento esperado" },
+const fetalDevelopment: Record<number, { weight: string; length: string; milestone: string }> = {
+  4:  { weight: "< 1g",  length: "2mm",    milestone: "Formação inicial do tubo neural" },
+  8:  { weight: "1g",    length: "1.6cm",  milestone: "Atividade cardíaca pode ser identificada ao ultrassom" },
+  12: { weight: "14g",   length: "5.4cm",  milestone: "Período usual de avaliação do primeiro trimestre" },
+  16: { weight: "100g",  length: "11.6cm", milestone: "Crescimento fetal em progressão" },
+  20: { weight: "300g",  length: "16.4cm", milestone: "Período usual do ultrassom morfológico" },
+  24: { weight: "600g",  length: "30cm",   milestone: "Limiares de prognóstico dependem do contexto clínico" },
+  28: { weight: "1kg",   length: "37.6cm", milestone: "Início do terceiro trimestre" },
+  32: { weight: "1.7kg", length: "42.4cm", milestone: "Crescimento e maturação fetal em progressão" },
+  36: { weight: "2.6kg", length: "47.4cm", milestone: "Período pré-termo tardio" },
+  37: { weight: "2.9kg", length: "48.6cm", milestone: "Gestação a termo inicial (≥ 37 semanas)" },
+  40: { weight: "3.5kg", length: "51.2cm", milestone: "Datação obstétrica de referência" },
 };
 
 const growthData = [
@@ -115,7 +115,7 @@ const GestationalVisualization = ({
               </span>
             </div>
             <div className="text-lg font-bold text-foreground">{currentData.length}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">{currentData.size}</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Referência populacional aproximada</div>
           </div>
           <div className="p-4 rounded-xl bg-primary/10 border border-primary/25">
             <div className="flex items-center gap-2 mb-2">
@@ -139,6 +139,10 @@ const GestationalVisualization = ({
           </div>
           <p className="text-sm text-foreground font-medium">{currentData.milestone}</p>
         </div>
+        <p className="mb-5 text-xs leading-relaxed text-muted-foreground">
+          Valores ilustrativos por semana, não individualizados e não equivalentes a percentis. Peso e comprimento fetais
+          devem ser avaliados por ultrassonografia, curvas validadas e contexto clínico.
+        </p>
 
         {/* Progress bar */}
         <div className="mb-1.5 flex justify-between text-xs text-muted-foreground">
@@ -166,8 +170,8 @@ const GestationalVisualization = ({
                   key={week}
                   onClick={() => setSelectedWeek(week)}
                   title={`Semana ${week}`}
-                  className={`flex-shrink-0 w-6 rounded cursor-pointer transition-all duration-150 relative
-                    ${isSelected ? "scale-y-125 ring-2 ring-accent z-10" : "hover:scale-y-110"}
+                  className={`flex-shrink-0 w-6 rounded cursor-pointer transition-opacity duration-150 relative
+                    ${isSelected ? "ring-2 ring-accent z-10" : "hover:opacity-75"}
                     ${isCurrent ? "ring-1 ring-primary" : ""}
                   `}
                   style={{
@@ -209,7 +213,7 @@ const GestationalVisualization = ({
       <div className="glass-card-static rounded-2xl p-5 border border-accent/20">
         <h4 className="text-base font-semibold text-accent mb-4 flex items-center gap-2">
           <Activity className="h-5 w-5" />
-          Curva de Crescimento Fetal
+          Trajetória Fetal Ilustrativa
         </h4>
         <div className="h-56">
           <ResponsiveContainer width="100%" height="100%">
@@ -247,6 +251,9 @@ const GestationalVisualization = ({
             <span className="text-xs text-muted-foreground">Comprimento (cm)</span>
           </div>
         </div>
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          Série didática de valores pontuais; não representa curva de percentis nem substitui biometria fetal.
+        </p>
       </div>
 
       {/* Recommended Exams */}
@@ -254,7 +261,7 @@ const GestationalVisualization = ({
         <div className="glass-card-static rounded-2xl p-5 border border-accent/20">
           <h4 className="text-base font-semibold text-accent mb-4 flex items-center gap-2">
             <Stethoscope className="h-5 w-5" />
-            Exames — Semana {selectedWeek}
+            Janelas usuais de rastreamento — Semana {selectedWeek}
           </h4>
           <div className="space-y-3">
             {currentExams.map((exam, i) => (
@@ -267,10 +274,10 @@ const GestationalVisualization = ({
                   : <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />}
                 <div>
                   <div className="text-sm font-semibold text-foreground">{exam.name}</div>
-                  {exam.urgent && <div className="text-xs text-muted-foreground mt-0.5">Importante neste período</div>}
+                  {exam.urgent && <div className="text-xs text-muted-foreground mt-0.5">Janela de referência; confirme o protocolo assistencial</div>}
                 </div>
                 {exam.urgent && (
-                  <span className="ml-auto text-xs bg-accent/20 text-accent border border-accent/30 px-2 py-0.5 rounded-full">Urgente</span>
+                  <span className="ml-auto text-xs bg-accent/10 text-accent border border-accent/30 px-2 py-0.5 rounded-full">Janela usual</span>
                 )}
               </div>
             ))}

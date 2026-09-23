@@ -7,13 +7,13 @@ interface CalculatorHeaderProps {
 }
 
 /**
- * Premium Biomédico page header: navy→petrol icon chip,
+ * Biomedical page header: solid navy icon chip,
  * Space Grotesk title, muted subtitle.
  */
 export function CalculatorHeader({ icon: Icon, title, subtitle }: CalculatorHeaderProps) {
   return (
     <div className="flex items-start gap-3 mb-6">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white shadow-sm bg-gradient-to-br from-primary to-accent">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
         <Icon className="h-6 w-6" strokeWidth={2.2} />
       </div>
       <div className="flex-1 min-w-0">
