@@ -125,6 +125,24 @@ const TrisomyRiskCalculator = () => {
   const riskBg = (risk: number, cutoff: number) =>
     risk <= cutoff ? "border-destructive/30 bg-destructive/5" : risk <= 1000 ? "border-ovulatory/30 bg-ovulatory/5" : "border-accent/30 bg-accent/5";
 
+  const handleReset = () => {
+    setMaternalAge("");
+    setCrl("");
+    setNt("");
+    setShowBiochem(false);
+    setPappaMoM("");
+    setBhcgMoM("");
+    setShowAdditional(false);
+    setNasalBone("none");
+    setDuctusPIAbnormal(false);
+    setUseDuctus(false);
+    setTricuspidRegurg(false);
+    setUseTricuspid(false);
+    setSelectedPatientId(undefined);
+    setResults(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-6">
       <CalculatorHeader
@@ -296,14 +314,19 @@ const TrisomyRiskCalculator = () => {
         )}
 
         {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
+          <div className="flex items-center gap-2 text-destructive text-sm" role="alert">
             <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <ShieldAlert className="w-4 h-4 mr-1" /> {calculating ? "Calculando…" : "Calcular Risco"}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <ShieldAlert className="w-4 h-4 mr-2" /> {calculating ? "Calculando…" : "Calcular Risco"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating || consuming} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
 
       {/* ── Results ── */}

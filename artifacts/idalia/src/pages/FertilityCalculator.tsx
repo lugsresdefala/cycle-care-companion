@@ -105,6 +105,13 @@ const FertilityCalculator = () => {
     setResults({ ...result, currentCyclePhase, daysUntilNextPhase, nextPhase });
   };
 
+  const handleReset = () => {
+    setLastPeriodStart(undefined);
+    setLastPeriodEnd(undefined);
+    setCycleLength(28);
+    setResults(null);
+  };
+
   const renderCalendar = () => {
     if (!results) return null;
     const monthStart = startOfMonth(results.nextPeriodStart);
@@ -269,19 +276,24 @@ const FertilityCalculator = () => {
             </div>
           </div>
 
-          <Button
-            onClick={handleCalculate}
-            disabled={!canCalculate || blocked || needsLogin || consuming}
-            className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
-            canCalculate ?
-            "bg-primary text-primary-foreground hover:bg-primary/90 glow-primary" :
-            "opacity-40 cursor-not-allowed"}`
-            }>
-            
-            <Sparkles className="w-4 h-4" />
-            Calcular Ciclo
-            {canCalculate && <ArrowRight className="w-3.5 h-3.5 ml-0.5" />}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button
+              onClick={handleCalculate}
+              disabled={!canCalculate || blocked || needsLogin || consuming}
+              className={`flex-1 sm:flex-none flex items-center gap-2 font-semibold transition-all duration-300 ${
+              canCalculate ?
+              "bg-primary text-primary-foreground hover:bg-primary/90 glow-primary" :
+              "opacity-40 cursor-not-allowed"}`
+              }>
+              
+              <Sparkles className="w-4 h-4" />
+              Calcular Ciclo
+              {canCalculate && <ArrowRight className="w-3.5 h-3.5 ml-0.5" />}
+            </Button>
+            <Button onClick={handleReset} disabled={consuming} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+              Limpar cálculo
+            </Button>
+          </div>
         </div>
       </div>
 

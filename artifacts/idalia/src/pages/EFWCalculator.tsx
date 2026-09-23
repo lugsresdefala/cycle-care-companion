@@ -89,6 +89,16 @@ const EFWCalculator = () => {
 
   const isDisabled = blocked || needsLogin || calculating;
 
+  const handleReset = () => {
+    setHc("");
+    setAc("");
+    setFl("");
+    setGaWeeks("");
+    setSelectedPatientId(undefined);
+    setResults(null);
+    setError("");
+  };
+
   const severity: "normal" | "warning" | "critical" = results
     ? results.percentileRange.includes("CIUR")
       ? "critical"
@@ -147,14 +157,19 @@ const EFWCalculator = () => {
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-destructive text-sm">
+            <div className="flex items-center gap-2 text-destructive text-sm" role="alert">
               <AlertCircle className="w-4 h-4" /> {error}
             </div>
           )}
 
-          <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-            <Scale className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular PFE"}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+              <Scale className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Calcular PFE"}
+            </Button>
+            <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+              Limpar cálculo
+            </Button>
+          </div>
         </div>
 
         <AnimatePresence>

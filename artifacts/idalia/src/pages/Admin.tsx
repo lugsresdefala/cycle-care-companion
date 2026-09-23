@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ArrowLeft, Coins, Users, FileText, BarChart3, ShieldCheck, Search } from "lucide-react";
+import { PageMeta } from "@/components/PageMeta";
 
 interface AdminUserRow {
   id: string;
@@ -78,6 +79,7 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Administração" description="Painel de Administração." path="/admin" noindex={true} />
       <header className="border-b border-border/60 bg-card/20">
         <div className="container max-w-6xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">

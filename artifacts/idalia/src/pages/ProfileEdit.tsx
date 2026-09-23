@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
+import { PageMeta } from "@/components/PageMeta";
 
 const ProfileEdit = () => {
   const { user } = useAuth();
@@ -72,6 +73,7 @@ const ProfileEdit = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Editar Perfil" description="Edite suas informações da conta IDALIA Calc." path="/profile" noindex={true} />
       <header className="border-b border-border/60 bg-card/20">
         <div className="container max-w-4xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">

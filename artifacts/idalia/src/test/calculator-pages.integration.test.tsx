@@ -205,4 +205,22 @@ describe("calculator pages against calculate.ts responses", () => {
     expect(screen.getByRole("button", { name: "Avaliar" })).toBeDisabled();
     await waitFor(() => expect(globalThis.fetch).not.toHaveBeenCalled());
   });
+
+  it("resets inputs and results when clicking 'Limpar cálculo' in Growth Curve", async () => {
+    const user = userEvent.setup();
+    renderCalculator(<GrowthCurveCalculator />);
+
+    const gaInputs = screen.getAllByPlaceholderText("IG (sem)");
+    await user.type(gaInputs[0], "32");
+    await user.type(screen.getByPlaceholderText("PFE (g)"), "1755");
+    await user.click(screen.getByRole("button", { name: "Plotar na Curva" }));
+
+    expect(await screen.findByText("IG 32 sem — 1755 g")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Limpar cálculo" }));
+
+    expect(screen.queryByText("IG 32 sem — 1755 g")).not.toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText("IG (sem)")[0]).toHaveValue(null);
+    expect(screen.getByPlaceholderText("PFE (g)")).toHaveValue(null);
+  });
 });

@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Plus, Search, ArrowLeft, Users, FileText, Trash2, Pencil } from "lucide-react";
+import { PageMeta } from "@/components/PageMeta";
 
 interface Patient {
   id: string;
@@ -109,6 +110,7 @@ const Patients = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Pacientes" description="Gerencie seus pacientes." path="/patients" noindex={true} />
       <header className="border-b border-border/60 bg-card/20">
         <div className="container max-w-4xl mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">

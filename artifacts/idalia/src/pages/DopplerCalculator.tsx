@@ -106,6 +106,15 @@ function UmbilicalArteryTab({ disabled, onSuccess }: TabProps) {
     }
   };
 
+  const handleReset = () => {
+    setGa("");
+    setPi("");
+    setRi("");
+    setSd("");
+    setResults(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
@@ -123,10 +132,15 @@ function UmbilicalArteryTab({ disabled, onSuccess }: TabProps) {
             </div>
           ))}
         </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Activity className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar"}
-        </Button>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm" role="alert"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <Activity className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Avaliar"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
       <AnimatePresence>
         {results && (
@@ -173,6 +187,13 @@ function MCATab({ disabled, onSuccess }: TabProps) {
     }
   };
 
+  const handleReset = () => {
+    setGa("");
+    setPi("");
+    setResult(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
@@ -191,10 +212,15 @@ function MCATab({ disabled, onSuccess }: TabProps) {
             <Input type="number" step={0.01} value={pi} onChange={(e) => setPi(e.target.value)} placeholder="IP" className="input-glass num" />
           </div>
         </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Brain className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar ACM"}
-        </Button>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm" role="alert"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <Brain className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Avaliar ACM"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
       <AnimatePresence>
         {result && (
@@ -241,6 +267,14 @@ function UterineArteryTab({ disabled, onSuccess }: TabProps) {
     }
   };
 
+  const handleReset = () => {
+    setGa("");
+    setPi("");
+    setNotch(false);
+    setResult(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
@@ -263,10 +297,15 @@ function UterineArteryTab({ disabled, onSuccess }: TabProps) {
           <Switch checked={notch} onCheckedChange={setNotch} />
           <Label className="text-sm text-foreground">Incisura protodiastólica bilateral</Label>
         </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Heart className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar Uterina"}
-        </Button>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm" role="alert"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <Heart className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Avaliar Uterina"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
       <AnimatePresence>
         {result && (
@@ -315,6 +354,14 @@ function CPRTab({ disabled, onSuccess }: TabProps) {
     }
   };
 
+  const handleReset = () => {
+    setGa("");
+    setUaPi("");
+    setMcaPi("");
+    setResult(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
@@ -328,10 +375,15 @@ function CPRTab({ disabled, onSuccess }: TabProps) {
           <div className="space-y-1.5"><FieldLabel hint="Índice de Pulsatilidade da umbilical">IP Umbilical</FieldLabel><Input type="number" step={0.01} value={uaPi} onChange={(e) => setUaPi(e.target.value)} placeholder="IP UA" className="input-glass num" /></div>
           <div className="space-y-1.5"><FieldLabel hint="Índice de Pulsatilidade da cerebral média">IP Cerebral (ACM)</FieldLabel><Input type="number" step={0.01} value={mcaPi} onChange={(e) => setMcaPi(e.target.value)} placeholder="IP ACM" className="input-glass num" /></div>
         </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <ArrowRightLeft className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar RCP"}
-        </Button>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm" role="alert"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <ArrowRightLeft className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Avaliar RCP"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
       <AnimatePresence>
         {result && (
@@ -378,6 +430,14 @@ function DVTab({ disabled, onSuccess }: TabProps) {
     }
   };
 
+  const handleReset = () => {
+    setGa("");
+    setPi("");
+    setWaveA("positive");
+    setResult(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-5">
       <div className="glass-card-static p-5 md:p-6 space-y-5 mesh-navy">
@@ -398,10 +458,15 @@ function DVTab({ disabled, onSuccess }: TabProps) {
             </div>
           </div>
         </div>
-        {error && <div className="flex items-center gap-2 text-destructive text-sm"><AlertCircle className="w-4 h-4" /> {error}</div>}
-        <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <Waves className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Avaliar Ducto"}
-        </Button>
+        {error && <div className="flex items-center gap-2 text-destructive text-sm" role="alert"><AlertCircle className="w-4 h-4" /> {error}</div>}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalc} disabled={disabled || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <Waves className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Avaliar Ducto"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
       <AnimatePresence>
         {result && (

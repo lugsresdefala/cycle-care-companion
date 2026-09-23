@@ -106,6 +106,18 @@ const GestationalCalculator = () => {
     }
   };
 
+  const handleReset = () => {
+    setCalculationType("lmp");
+    setLmpDate(undefined);
+    setUltrasoundDate(undefined);
+    setUltrasoundWeeks(0);
+    setUltrasoundDays(0);
+    setTransferDate(undefined);
+    setEmbryoDays("5");
+    setSelectedPatientId(undefined);
+    setResults(null);
+  };
+
   const toggleSection = (s: string) => setExpandedSection(expandedSection === s ? null : s);
   const trimCfg = results ? TRIMESTER_CONFIG[results.currentTrimester - 1] : null;
 
@@ -251,9 +263,14 @@ const GestationalCalculator = () => {
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50">
-          Calcular
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || consuming} className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent disabled:opacity-50 flex-1 sm:flex-none">
+            Calcular
+          </Button>
+          <Button onClick={handleReset} disabled={consuming} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
 
       {/* Results */}

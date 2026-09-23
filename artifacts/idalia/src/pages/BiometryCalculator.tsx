@@ -159,6 +159,19 @@ const BiometryCalculator = () => {
     { label: "CF", desc: "Comprimento do Fêmur", value: fl, set: setFl, range: "10–85 mm" },
   ];
 
+  const handleReset = () => {
+    setCrl("");
+    setBpdSingle("");
+    setBpd("");
+    setHc("");
+    setAc("");
+    setFl("");
+    setMode("crl");
+    setSelectedPatientId(undefined);
+    setResults(null);
+    setError("");
+  };
+
   const isDisabled = blocked || needsLogin || calculating;
 
   return (
@@ -215,9 +228,14 @@ const BiometryCalculator = () => {
               </div>
               <p className="num text-[10px] text-muted-foreground">2–84 mm</p>
             </div>
-            <Button onClick={handleCRL} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button onClick={handleCRL} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+                <Ruler className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Calcular IG"}
+              </Button>
+              <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+                Limpar cálculo
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="bpd" className="space-y-4 focus-visible:outline-none">
@@ -242,9 +260,14 @@ const BiometryCalculator = () => {
               </div>
               <p className="num text-[10px] text-muted-foreground">14–100 mm</p>
             </div>
-            <Button onClick={handleBPD} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG"}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button onClick={handleBPD} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+                <Ruler className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Calcular IG"}
+              </Button>
+              <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+                Limpar cálculo
+              </Button>
+            </div>
           </TabsContent>
 
           <TabsContent value="composite" className="space-y-4 focus-visible:outline-none">
@@ -270,14 +293,19 @@ const BiometryCalculator = () => {
                 </div>
               ))}
             </div>
-            <Button onClick={handleComposite} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-              <Ruler className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Calcular IG Composta"}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Button onClick={handleComposite} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+                <Ruler className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Calcular IG Composta"}
+              </Button>
+              <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+                Limpar cálculo
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
 
         {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
+          <div className="flex items-center gap-2 text-destructive text-sm mt-4" role="alert">
             <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}

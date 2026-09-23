@@ -125,6 +125,29 @@ const PreeclampsiaRiskCalculator = () => {
 
   const riskBarWidth = (pct: number) => `${Math.min(100, Math.max(2, pct * 10))}%`;
 
+  const handleReset = () => {
+    setMaternalAge("");
+    setWeight("");
+    setHeight("");
+    setEthnicityAfro(false);
+    setNulliparous(false);
+    setConceptionIVF(false);
+    setChronicHypertension(false);
+    setDiabetesType(false);
+    setLupusSLE(false);
+    setPreviousPE(false);
+    setFamilyHistoryPE(false);
+    setShowMeasurements(false);
+    setMap("");
+    setUterinePI("");
+    setShowBiochem(false);
+    setPappaMoM("");
+    setPlgfMoM("");
+    setSelectedPatientId(undefined);
+    setResults(null);
+    setError("");
+  };
+
   return (
     <div className="space-y-6">
       <CalculatorHeader
@@ -276,14 +299,19 @@ const PreeclampsiaRiskCalculator = () => {
         )}
 
         {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
+          <div className="flex items-center gap-2 text-destructive text-sm" role="alert">
             <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <HeartPulse className="w-4 h-4 mr-1" /> {calculating ? "Calculando…" : "Calcular Risco de PE"}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalculate} disabled={blocked || needsLogin || loading || consuming || calculating} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <HeartPulse className="w-4 h-4 mr-2" /> {calculating ? "Calculando…" : "Calcular Risco de PE"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating || consuming} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
 
       {/* ── Results ── */}

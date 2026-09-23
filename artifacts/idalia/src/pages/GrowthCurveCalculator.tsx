@@ -150,6 +150,15 @@ const GrowthCurveCalculator = () => {
     : s === "warning" ? "border-ovulatory/40 bg-ovulatory/5"
     : "border-accent/40 bg-accent/5";
 
+  const handleReset = () => {
+    setSelectedParam("efw");
+    setSelectedPatientId(undefined);
+    setMeasurements([{ id: crypto.randomUUID(), ga: "", value: "" }]);
+    setAssessments([]);
+    setCurveData([]);
+    setError("");
+  };
+
   const severityDot = (s: string) =>
     s === "critical" ? "bg-destructive" : s === "warning" ? "bg-ovulatory" : "bg-accent";
 
@@ -229,14 +238,19 @@ const GrowthCurveCalculator = () => {
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
+          <div className="flex items-center gap-2 text-destructive text-sm" role="alert">
             <AlertCircle className="w-4 h-4" /> {error}
           </div>
         )}
 
-        <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50">
-          <TrendingUp className="w-4 h-4 mr-1" /> {calculating ? "Calculando..." : "Plotar na Curva"}
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button onClick={handleCalculate} disabled={isDisabled} className="bg-primary text-primary-foreground hover:bg-primary/90 glow-primary disabled:opacity-50 flex-1 sm:flex-none">
+            <TrendingUp className="w-4 h-4 mr-2" /> {calculating ? "Calculando..." : "Plotar na Curva"}
+          </Button>
+          <Button onClick={handleReset} disabled={calculating} variant="outline" className="flex-1 sm:flex-none" aria-label="Limpar cálculo">
+            Limpar cálculo
+          </Button>
+        </div>
       </div>
 
       <AnimatePresence>

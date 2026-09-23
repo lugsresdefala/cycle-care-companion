@@ -66,3 +66,9 @@ id = "lwZhSvnVfC_IFNT5Lvr1E"
 uri = "file://artifacts/idalia-promo/public/audio/vo/result.mp3"
 type = "audio"
 title = "idaliacalc-vo-result"
+
+[[outputs]]
+id = "BqguQe_3GCADZovrBeTQ0"
+uri = "file://.local/outputs/IDALIA---Pitch-Deck.pptx"
+type = "slides"
+title = "IDALIA — Pitch Deck.pptx"

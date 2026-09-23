@@ -10,3 +10,4 @@
 - [Deploy build debugging](deploy-build-debugging.md) — publish fails: pull real logs via listDeploymentBuilds/getDeploymentBuild (not fetchDeploymentLogs); deploy builds per-artifact via .replit-artifact/artifact.toml, not root build.
 - [Ductus wave contract](ductus-wave-contract.md) — reject legacy boolean observations: false ambiguously encoded absent or positive flow.
 - [Calculator visual baselines](calculator-visual-baselines.md) — use Nix Chromium for workspace screenshots; downloaded Playwright Chromium may lack host libraries.
+- [Synthetic Clerk lifecycle tests](clerk-lifecycle-testing.md) — verify server identity before mutations; injected test claims do not prove a real revocable Clerk session.

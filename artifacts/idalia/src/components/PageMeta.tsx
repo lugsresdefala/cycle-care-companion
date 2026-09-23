@@ -10,9 +10,10 @@ interface PageMetaProps {
   description: string;
   path: string;
   ogImage?: string;
+  noindex?: boolean;
 }
 
-export function PageMeta({ title, description, path, ogImage = OG_IMAGE }: PageMetaProps) {
+export function PageMeta({ title, description, path, ogImage = OG_IMAGE, noindex = false }: PageMetaProps) {
   const fullTitle = `${title} | ${SITE_NAME}`;
   const canonicalUrl = `${BASE_URL}${path}`;
 
@@ -21,6 +22,7 @@ export function PageMeta({ title, description, path, ogImage = OG_IMAGE }: PageM
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
 
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />

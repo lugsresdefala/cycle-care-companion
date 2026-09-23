@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { PageMeta } from "@/components/PageMeta";
 
 const CALC_LABELS: Record<string, string> = {
   biometry: "Biometria",
@@ -91,6 +92,7 @@ const PatientExams = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Exames do Paciente" description="Histórico de exames do paciente." path={`/patient/${id}/exams`} noindex={true} />
       <header className="border-b border-border/60 bg-card/20">
         <div className="container max-w-4xl mx-auto px-4 h-12 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/patients")}>
